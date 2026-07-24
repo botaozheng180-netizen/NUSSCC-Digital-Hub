@@ -1,0 +1,2820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NUS Semiconductor Club — Event Calendar AY2026/27</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#fff;--bg:#f7f8fa;--border:#e4e6ea;--border2:#d0d3da;
+  --text:#0f1117;--muted:#6b7280;--dim:#adb5bd;--font:'Inter',Arial,sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;padding:24px 20px 60px}
+
+/* ── PAGE HEADER ── */
+.page-header{display:flex;align-items:center;justify-content:space-between;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin-bottom:14px;gap:14px;flex-wrap:wrap}
+.logo-area{display:flex;align-items:center;gap:12px}
+.logo-box{background:#111;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-box svg{width:40px;height:40px}
+.club-name{font-size:16px;font-weight:700;color:var(--text)}
+.club-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.header-right{text-align:right}
+.ay-label{font-size:13px;font-weight:700;color:var(--text)}
+.ay-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.live-clock{margin-top:9px;display:inline-flex;align-items:center;gap:10px;background:#f3f6ff;border:1px solid #dbe4fe;border-radius:12px;padding:8px 14px}
+.live-clock .lc-icon{font-size:17px;line-height:1;filter:saturate(1.1)}
+.live-clock .lc-text{text-align:left;line-height:1.2}
+.live-clock .lc-date{font-size:11px;color:#5b6b9a;font-weight:600;letter-spacing:.01em}
+.live-clock .lc-time{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;color:#1e3a8a;margin-top:1px}
+.live-clock .lc-week{font-size:10px;font-weight:700;margin-top:3px;display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:5px;width:fit-content}
+.live-clock .lc-week.is-teaching{color:#15803d;background:#dcfce7}
+.live-clock .lc-week.is-break{color:#b45309;background:#fef3c7}
+
+/* ── "Today" highlighting on the calendar grid ── */
+.week-row.is-today-row{box-shadow:inset 3px 0 0 0 #2563eb}
+.day-col.is-today-col{background:#eff6ff}
+.day-col.is-today-col::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#2563eb}
+.wlabel.is-today-label .wk-num{color:#2563eb}
+.today-pill{display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;border-radius:3px;background:#2563eb;color:#fff;margin-top:2px;width:fit-content}
+
+/* ── SEMESTER TABS ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.sem-tabs{display:flex;gap:0;margin-bottom:0;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:4px;width:fit-content}
+.sem-tab{padding:7px 22px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:none;transition:all .15s;white-space:nowrap}
+.sem-tab.active{background:#0f1117;color:#fff}
+.btn-add-top{background:#0f1117;color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:background .15s}
+.btn-add-top:hover{background:#374151}
+.btn-add-top-secondary{background:var(--white);color:var(--text);border:1px solid var(--border2)}
+.btn-add-top-secondary:hover{background:#f3f4f6}
+
+/* ── STATS ── */
+.stats-strip{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.stat-box{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 18px;flex:1;min-width:100px;position:relative;overflow:hidden;transition:box-shadow .15s,opacity .15s;cursor:default}
+.stat-box:hover{box-shadow:0 2px 12px rgba(0,0,0,.07)}
+.stat-bar{position:absolute;bottom:0;left:0;height:3px;right:0;border-radius:0 0 12px 12px}
+.stat-icon{font-size:18px;margin-bottom:5px;line-height:1;display:block}
+.stat-val{font-size:26px;font-weight:700;line-height:1;margin-bottom:3px;display:block}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;display:block}
+
+/* ── LEGEND / FILTER ── */
+.filter-bar{display:flex;flex-direction:column;gap:0;margin-bottom:14px;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
+.filter-label{font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap}
+.fp{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;cursor:pointer;border:1px solid transparent;user-select:none;transition:opacity .15s}
+.fp.off{opacity:.3}
+.fp-dot{width:7px;height:7px;border-radius:50%}
+.fp-industry{background:#dbeafe;color:#1d4ed8;border-color:#93c5fd}
+.fp-workshop{background:#f5f3ff;color:#7c3aed;border-color:#ddd6fe}
+.fp-visit{background:#d1fae5;color:#065f46;border-color:#6ee7b7}
+.fp-bonding{background:#fdf2f8;color:#be185d;border-color:#fbcfe8}
+.fp-external{background:#fff7ed;color:#c2410c;border-color:#fed7aa}
+.fp-extpartner{background:#fef9c3;color:#a16207;border-color:#fde047}
+
+/* ── CAL WRAP ── */
+.cal-wrap{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+
+/* Month header strip */
+.month-strip{display:grid;border-bottom:1px solid var(--border)}
+.mhdr{background:#f8f9fb;padding:8px 10px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);border-right:1px solid var(--border);text-align:center}
+.mhdr:last-child{border-right:none}
+
+/* Week row */
+.week-row{display:grid;border-bottom:1px solid var(--border);min-height:44px}
+.week-row:last-child{border-bottom:none}
+.week-row.rr-recess{background:#fafbfc}
+.week-row.rr-exam{background:#fffdf5}
+.week-row.rr-vac{background:#f9fafb}
+
+/* Left label */
+.wlabel{border-right:1px solid var(--border);padding:6px 8px;display:flex;flex-direction:column;justify-content:center}
+.wk-num{font-size:11px;font-weight:700;color:var(--text)}
+.wk-dates{font-size:9px;color:var(--dim);margin-top:1px}
+.wk-tag{display:inline-block;font-size:8px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 5px;border-radius:3px;margin-top:3px}
+.t-recess{background:#e2e8f0;color:#475569}
+.t-exam{background:#fde68a;color:#92400e}
+.t-vac{background:#e0f2fe;color:#0369a1}
+.t-reading{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+
+/* Day columns */
+.day-col{border-right:1px solid var(--border);padding:3px 4px;min-width:0;position:relative}
+.day-col:last-child{border-right:none}
+.day-name{font-size:9px;font-weight:600;color:var(--dim);text-align:center;margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em}
+.day-inactive{background:#fafbfc}
+
+/* Event pill */
+.ev{display:block;border-radius:5px;padding:4px 6px;margin-bottom:3px;cursor:pointer;border:1px solid transparent;transition:filter .12s,transform .1s}
+.ev:last-child{margin-bottom:0}
+.ev:hover{filter:brightness(.93);transform:translateY(-1px)}
+.ev-type{font-size:8px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;opacity:.75;margin-bottom:1px}
+.ev-name{font-size:11px;font-weight:600;line-height:1.3;color:#111827}
+.ev-date{font-size:9px;font-weight:500;margin-top:1px;color:#374151}
+.ev-time{font-size:9px;font-weight:600;margin-top:1px;color:#374151}
+.ev-venue{font-size:9px;font-weight:600;margin-top:1px;color:#64748b;word-break:break-word}
+.ev-continue{padding:3px 6px;opacity:.8}
+.ev-continue-label{font-size:9px;font-weight:600;line-height:1.3;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-cat{display:inline-block;font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px;margin-top:2px;margin-right:3px}
+.cat-int{background:rgba(37,99,235,.1);color:#1d4ed8}
+.cat-ext{background:rgba(194,65,12,.1);color:#c2410c}
+.ep-industry{background:#dbeafe;border-color:#93c5fd;color:#1d4ed8}
+.ep-workshop{background:#f5f3ff;border-color:#ddd6fe;color:#7c3aed}
+.ep-visit{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
+.ep-bonding{background:#fdf2f8;border-color:#fbcfe8;color:#be185d}
+.ep-external{background:#fff7ed;border-color:#fed7aa;color:#c2410c}
+.ep-extpartner{background:#fef9c3;border-color:#fde047;color:#a16207}
+.synced-dot{width:5px;height:5px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:3px;vertical-align:middle}
+
+/* ── POTENTIAL / UNCONFIRMED EVENTS ── */
+.ev.is-potential{border-style:dashed!important;border-width:1.5px!important;background-image:repeating-linear-gradient(135deg,rgba(147,51,234,.05) 0 8px,transparent 8px 16px)}
+.ev-continue.is-potential{border-style:dashed!important;border-width:1.5px!important}
+.status-pill{display:inline-flex;align-items:center;gap:3px;font-size:8px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle}
+.fp-status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;cursor:pointer;border:1px solid transparent;user-select:none;transition:opacity .15s}
+.fp-status.off{opacity:.3}
+.status-toggle-row{display:flex;gap:6px;margin:6px 0 2px}
+.status-opt{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 10px;border-radius:8px;border:1.5px solid var(--border2);background:var(--white);font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer;color:var(--muted);transition:all .12s}
+.status-opt.active{border-style:solid}
+.stat-box.is-potential-stat{border-style:dashed}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:16px;padding:24px 26px;width:min(520px,94vw);max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.modal.wide{width:min(720px,94vw)}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);line-height:1}
+.modal-close:hover{color:var(--text)}
+.modal-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.m-badge{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border-radius:5px;padding:3px 9px;border:1px solid transparent}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:3px}
+.modal-meta{font-size:12px;color:var(--muted);margin-bottom:10px}
+.modal-desc{font-size:13px;color:#374151;line-height:1.65;margin-bottom:14px}
+.modal-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.modal-tasks-section{border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:16px;background:#fafbfc}
+.modal-divider{border:none;border-top:1px solid var(--border);margin:6px 0 18px}
+.modal-tasks-hd{font-size:13px;font-weight:700;margin-bottom:10px}
+.m-field label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);display:block;margin-bottom:3px}
+.m-field input,.m-field select,.m-field textarea{width:100%;border:1px solid var(--border2);border-radius:7px;padding:6px 9px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--white);outline:none}
+.m-field input:focus,.m-field select:focus,.m-field textarea:focus{border-color:#2563eb}
+.m-field textarea{resize:vertical;min-height:60px}
+.modal-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer;border:1px solid;display:inline-flex;align-items:center;gap:6px;transition:filter .12s}
+.btn:hover{filter:brightness(.95)}
+.btn-save{background:#0f1117;color:#fff;border-color:#0f1117}
+.btn-delete{background:#fff5f5;color:#dc2626;border-color:#fecaca}
+.btn-sync{background:#ecfdf5;color:#059669;border-color:#a7f3d0}
+.btn-cancel{background:var(--white);color:var(--muted);border-color:var(--border2)}
+
+/* ── ADD EVENT ── */
+.add-wrap{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-top:14px}
+.add-title{font-size:13px;font-weight:700;margin-bottom:10px}
+.add-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.af{display:flex;flex-direction:column;gap:3px}
+.af label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.af input,.af select{border:1px solid var(--border2);border-radius:7px;padding:5px 8px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--white);height:30px;outline:none}
+.af input:focus,.af select:focus{border-color:#2563eb}
+.af textarea{border:1px solid var(--border2);border-radius:7px;padding:6px 8px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--white);outline:none;resize:vertical;min-height:44px;width:100%}
+.af textarea:focus{border-color:#2563eb}
+.btn-add-ev{height:30px;background:#0f1117;color:#fff;border:none;border-radius:7px;padding:0 14px;font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer}
+.btn-add-ev:hover{background:#374151}
+
+/* ── SYNC PANEL ── */
+.sync-wrap{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 20px;margin-top:10px}
+.todo-wrap{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 20px;margin-top:10px}
+.todo-wrap.in-modal{border:none;padding:0;margin-top:0;background:transparent}
+.todo-hd{font-size:14px;font-weight:700;margin-bottom:3px}
+.todo-sub{font-size:11px;color:var(--muted);margin-bottom:12px}
+.todo-add-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.todo-add-row input[type=text]{flex:1 1 160px;min-width:120px;border:1px solid var(--border2);border-radius:7px;padding:7px 10px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--white);outline:none}
+.todo-add-row input[type=text]:focus{border-color:#2563eb}
+.todo-add-row .todo-due-input{flex:0 0 auto}
+.todo-add-row .todo-due-inline-label{flex:0 0 auto}
+.todo-add-row .btn-add-todo{flex:0 0 auto;margin-left:auto}
+.todo-add-meta{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.todo-select{border:1px solid var(--border2);border-radius:7px;padding:5px 8px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--white);height:30px;outline:none;flex:1;min-width:150px}
+.todo-select:focus{border-color:#2563eb}
+.btn-add-todo{background:#0f1117;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;white-space:nowrap;transition:background .15s}
+.btn-add-todo:hover{background:#374151}
+.todo-item{display:flex;align-items:flex-start;gap:10px;padding:9px 2px;border-bottom:1px solid #f3f4f6}
+.todo-item:last-child{border-bottom:none}
+.todo-item input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:#0f1117;flex-shrink:0;margin-top:2px}
+.todo-num{font-size:12px;font-weight:600;color:#9ca3af;flex-shrink:0;min-width:16px;margin-top:1px;text-align:right}
+.todo-body{flex:1;min-width:0}
+.todo-text{font-size:13px;color:var(--text);line-height:1.4;display:block}
+.todo-text.done{text-decoration:line-through;color:#9ca3af}
+.todo-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center}
+.todo-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;border:1px solid;white-space:nowrap}
+.todo-due-chip{margin-left:2px}
+.todo-due-input{border:1px solid var(--border2);border-radius:7px;padding:5px 8px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--white);height:30px;outline:none}
+.todo-due-input:focus{border-color:#2563eb}
+.todo-due-inline-label{font-size:11px;font-weight:600;color:var(--muted);display:flex;align-items:center;white-space:nowrap}
+.todo-due-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;padding:3px 9px 3px 7px;border-radius:5px;border:1px solid;border-left-width:3px;white-space:nowrap;letter-spacing:.02em;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.todo-due-chip.due-future{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;border-left-color:#2563eb}
+.todo-due-chip.due-today{background:#fef3c7;color:#92400e;border-color:#fde68a;border-left-color:#d97706}
+.todo-due-chip.due-soon{background:#ffedd5;color:#9a3412;border-color:#fdba74;border-left-color:#ea580c}
+.todo-due-chip.due-overdue{background:#fee2e2;color:#991b1b;border-color:#fca5a5;border-left-color:#dc2626;box-shadow:0 1px 3px rgba(220,38,38,.18)}
+.todo-due-chip.due-done{background:#f1f5f9;color:#64748b;border-color:#e2e8f0;border-left-color:#cbd5e1;text-decoration:line-through;box-shadow:none}
+.todo-group{margin-bottom:2px}
+.todo-group-hd{font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;padding:12px 2px 7px;border-bottom:1px solid #e5e7eb;margin-bottom:2px}
+.todo-group:first-child .todo-group-hd{padding-top:0}
+.todo-group-hd.linked{cursor:pointer}
+.todo-group-hd.linked:hover{color:#0f1117}
+.todo-edit-btn{background:none;border:none;color:#d1d5db;cursor:pointer;font-size:12px;padding:3px 6px;border-radius:5px;flex-shrink:0;transition:color .15s,background .15s}
+.todo-edit-btn:hover{color:#2563eb;background:#eff6ff}
+.todo-del{background:none;border:none;color:#d1d5db;cursor:pointer;font-size:13px;padding:3px 7px;border-radius:5px;flex-shrink:0;transition:color .15s,background .15s}
+.todo-item.todo-editing{background:#f9fafb;border-radius:8px;margin:2px 0}
+.todo-edit-form{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.todo-edit-input{border:1px solid var(--border2);border-radius:7px;padding:6px 9px;font-size:13px;font-family:var(--font);color:var(--text);background:var(--white);outline:none}
+.todo-edit-input:focus{border-color:#2563eb}
+.todo-edit-row2{display:flex;gap:8px;flex-wrap:wrap}
+.todo-field-group{display:flex;flex-direction:column;gap:3px;flex:1;min-width:150px}
+.todo-field-group .todo-section-label{margin-top:0}
+.todo-field-group .todo-select,.todo-field-group .todo-due-input{width:100%}
+.todo-edit-actions{display:flex;gap:10px;align-items:center}
+.todo-section-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:4px}
+.todo-preview-list{display:flex;flex-direction:column}
+.todo-preview-item{display:flex;align-items:flex-start;gap:8px;padding:6px 2px;border-bottom:1px solid #f3f4f6}
+.todo-preview-item:last-child{border-bottom:none}
+.todo-preview-check{width:16px;height:16px;flex-shrink:0;margin-top:1px;accent-color:#9ca3af;opacity:.85;cursor:not-allowed}
+.todo-cat-multi{display:flex;flex-wrap:wrap;gap:6px}
+.todo-cat-pill{border:1px solid var(--border2);background:var(--white);color:var(--muted);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .12s}
+.todo-cat-pill.active{background:var(--pbg);color:var(--pc);border-color:var(--pb)}
+.todo-cat-pill:hover{opacity:.85}
+.todo-edit-textarea{resize:vertical;min-height:50px;font-family:var(--font)}
+.todo-links-edit{display:flex;flex-direction:column;gap:6px}
+.todo-link-row{display:flex;gap:6px;align-items:center}
+.todo-link-input{flex:1;border:1px solid var(--border2);border-radius:7px;padding:6px 9px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--white);outline:none;min-width:0}
+.todo-link-input:focus{border-color:#2563eb}
+.todo-link-remove{background:none;border:none;color:#d1d5db;cursor:pointer;font-size:13px;padding:4px 7px;border-radius:5px;flex-shrink:0}
+.todo-link-remove:hover{color:#ef4444;background:#fef2f2}
+.btn-add-link{align-self:flex-start;background:var(--white);border:1px dashed var(--border2);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;font-family:var(--font);color:#2563eb;cursor:pointer}
+.btn-add-link:hover{background:#eff6ff}
+.todo-images-edit{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.todo-img-thumb-wrap{position:relative;width:56px;height:56px;flex-shrink:0}
+.todo-img-thumb{width:56px;height:56px;border-radius:8px;object-fit:cover;border:1px solid var(--border)}
+.todo-img-remove{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#ef4444;color:#fff;border:none;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.btn-upload-img{display:flex;flex-direction:column;align-items:center;justify-content:center;width:90px;height:56px;border:1.5px dashed #93c5fd;border-radius:8px;color:#2563eb;font-size:10px;font-weight:600;cursor:pointer;text-align:center;gap:2px;flex-shrink:0}
+.btn-upload-img:hover{background:#eff6ff}
+.todo-desc{font-size:12px;color:#4b5563;line-height:1.5;margin-top:5px;white-space:pre-wrap}
+.todo-links{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+.todo-link-chip{font-size:11px;color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:3px 9px;text-decoration:none;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis;display:inline-block}
+.todo-link-chip:hover{background:#dbeafe}
+.todo-images{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.todo-thumb{width:44px;height:44px;border-radius:7px;object-fit:cover;border:1px solid var(--border);cursor:pointer}
+.todo-del:hover{color:#ef4444;background:#fef2f2}
+.todo-empty{font-size:12px;color:#9ca3af;text-align:center;padding:18px 0}
+.todo-clear{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;text-decoration:underline;margin-top:10px;padding:0;font-family:var(--font)}
+.todo-clear:hover{color:#374151}
+.sync-hd{font-size:13px;font-weight:700;margin-bottom:3px}
+.sync-sub{font-size:11px;color:var(--muted);margin-bottom:10px}
+.sync-btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn-si{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-se{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-sa{background:#f3f4f6;color:#374151;border:1px solid #d1d5db;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.sync-log{margin-top:10px;background:#f8f9fb;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--muted);max-height:140px;overflow-y:auto;display:none;line-height:1.8}
+.sync-log.show{display:block}
+.lok{color:#059669}.lerr{color:#dc2626}.linfo{color:var(--muted)}
+
+/* Footer */
+.footer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px}
+.footer-note{font-size:11px;color:var(--dim)}
+.btn-print{background:var(--white);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:500;font-family:var(--font);cursor:pointer;color:var(--muted)}
+.btn-print:hover{color:var(--text)}
+.print-menu{position:absolute;bottom:calc(100% + 6px);left:0;background:var(--white);border:1px solid var(--border);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.14);padding:6px;display:none;flex-direction:column;gap:2px;min-width:210px;z-index:50}
+.print-menu.open{display:flex}
+.print-menu button{background:none;border:none;text-align:left;padding:8px 10px;font-size:12px;font-family:var(--font);color:var(--text);cursor:pointer;border-radius:6px;white-space:nowrap}
+.print-menu button:hover{background:#f3f4f6}
+.spinner{display:inline-block;width:11px;height:11px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─── Agenda view ─── */
+.agenda-wrap{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-top:10px}
+.ag-section-hd{font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin:14px 0 6px;padding-bottom:4px;border-bottom:2px solid #e2e8f0}
+.ag-row{display:flex;align-items:flex-start;gap:12px;padding:8px 10px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+.ag-row:hover{background:#f8fafc;border-color:#e2e8f0}
+.ag-row.is-declined{opacity:.5}
+.ag-row.is-declined .ag-name{text-decoration:line-through}
+.ag-date{flex:0 0 150px;font-size:.8rem;color:#475569;font-weight:600;padding-top:2px}
+.ag-chip{display:inline-block;font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:99px;margin-left:6px;vertical-align:1px}
+.ag-d{background:#fee2e2;color:#b91c1c}
+.ag-t{background:#fef3c7;color:#b45309}
+.ag-name{font-weight:700;font-size:.92rem;color:#0f172a}
+.ag-meta{font-size:.76rem;color:#64748b;margin-top:2px}
+.agenda-wrap details summary{cursor:pointer;font-weight:700;font-size:.85rem;color:#64748b;padding:6px 0}
+
+/* ─── Declined events on grid ─── */
+.ev.is-declined{opacity:.55}
+.ev.is-declined .ev-name{text-decoration:line-through}
+
+/* ─── Due-soon rollup ─── */
+.due-soon-box{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;margin-bottom:12px}
+.due-soon-hd{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#b45309;margin-bottom:6px}
+.due-soon-row{display:flex;align-items:baseline;gap:8px;font-size:.82rem;padding:2px 0}
+.due-soon-row .ds-when{flex:0 0 92px;font-weight:700;color:#b45309;font-size:.74rem}
+.due-soon-row.overdue .ds-when{color:#b91c1c}
+.due-soon-text{color:#334155}
+.due-soon-ev{color:#64748b;font-size:.74rem}
+
+/* ─── Read-only (published snapshot) mode ─── */
+body.read-only .manage-only,
+body.read-only .edit-only,
+body.read-only .btn-add-top:not(.btn-add-top-secondary),
+body.read-only .todo-add-row,
+body.read-only .todo-add-meta,
+body.read-only .todo-edit-btn,
+body.read-only .todo-del,
+body.read-only .todo-clear,
+body.read-only .btn-add-link,
+body.read-only .btn-upload-img,
+body.read-only .btn-delete,
+body.read-only .btn-save{display:none!important}
+body.read-only .todo-item input[type=checkbox]{pointer-events:none}
+.ro-banner{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;border-radius:10px;padding:8px 14px;font-size:.82rem;font-weight:600;margin:10px 0}
+
+/* ─── Mobile ─── */
+.cal-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:760px){
+  body{padding:10px}
+  .month-strip,.week-row{min-width:840px}
+  .page-header{padding:14px 16px}
+  .agenda-wrap{padding:10px}
+  .ag-date{flex-basis:110px}
+}
+
+@media print{
+  body{background:#fff;padding:8px}
+  .add-wrap,.sync-wrap,.footer,.modal-bg,.print-menu{display:none!important}
+  .todo-wrap{
+    page-break-before:always;border:none;box-shadow:none;padding:0;
+    width:100%;max-width:100%;overflow:hidden
+  }
+  /* Constrain all todo content to page width */
+  .todo-wrap *{
+    max-width:100%;
+    word-break:break-word;
+    overflow-wrap:break-word;
+    box-sizing:border-box;
+  }
+  /* Prevent images from overflowing */
+  .todo-wrap img{max-width:100%;height:auto;display:block}
+  /* Prevent links/chips from overflowing */
+  .todo-link-chip{
+    border:1px solid #999;
+    max-width:100%;
+    white-space:normal;
+    word-break:break-all;
+    display:inline-block;
+  }
+  /* Prevent long text in task descriptions from overflowing */
+  .todo-item{padding:5px 2px;width:100%;overflow:hidden}
+  .todo-item-desc,.todo-item-title{
+    white-space:normal;
+    overflow-wrap:break-word;
+    word-break:break-word;
+  }
+  /* Table/grid layouts inside todo — force wrapping */
+  .todo-meta-row,.todo-tag-row{flex-wrap:wrap}
+  /* Hide interactive controls */
+  .todo-add-row,.todo-add-meta,.todo-edit-btn,.todo-del,.todo-clear{display:none!important}
+
+  body.print-cal-only .todo-wrap{display:none!important}
+  body.print-todo-only .top-bar,
+  body.print-todo-only .stats-strip,
+  body.print-todo-only .filter-bar,
+  body.print-todo-only .cal-wrap{display:none!important}
+  body.print-todo-only .todo-wrap{page-break-before:auto}
+}
+
+@media print{
+  body.print-poster .top-bar,
+  body.print-poster .stats-strip,
+  body.print-poster .filter-bar,
+  body.print-poster .live-clock{display:none!important}
+  body.print-poster .page-header{border:none}
+  body.print-poster .ag-row{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="logo-area">
+    <div class="logo-box" style="width:auto;height:68px;background:transparent;border-radius:0;padding:0">
+      <img src="data:image/png;base64,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/wCcyv224odkNHXR2o63cW06j1RID315ul1jlm59RG3OIx6uePErYV72g21vl2qLreNHWyurql5fNPUMLnvPmTleN2xO0WMfaBY/+Sf70GDdqCjnq6DRO62noXXWj07XMrZ/a4LnSUjwMvaPEDr6ls6ybnbf3iwMvtFq6ze0nR8b3vq2MMfLJDwSC0jxBCya1W2jtdqp7XQU7YaOmhbBDCOYYxowG8/DCw25bM7W3K4OuFboOwyVTncTnimDcnzIGAfmQay2sedyu0veNz7Ux79L2m3i1W+rewsbVy/hPjzzLRz+cL891t36687l1W2WltWWjR9PQMH2W1BXytD2k9YoGuIBfz6/uUhqCipbfRQ0VDSxU1NCA2KGFgYxg8mgcgFhFw2X2vuVdPcLhoq1VVXUSGSaaZjnPe4nJJOUGFbax7FaAmqLxDr2z3a+zsJqrxcbpHNUyeeDn3I9DQvf2m6bcXUej6Cx7cWx1wp7m4uuckVUyncaYYPdtkeQG8eccsnCvrtido3Ncw6AsmDy5QuB+fK2NTQx09PFBC3gjiYGMHkAMAIIvasu+8Fl2dumm49j7bZNP09rfC58OoIH9xFw83cIOXHqT4lZF2KLvrCp23tVruumYqHT9PQB1vuLagSOq3GR2ctB9xgeBW9b5aqC92mptV0pY6uiqWFk0L88L2nwOML8dMaftGmbPFZ7Fb4aCgiJMcEIIa3PM4yUF1REQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERB//2Q==" alt="NUS Semiconductor Club Logo" style="height:68px;width:auto;display:block">
+    </div>
+    <div>
+      <div class="club-name" style="font-size:20px;font-weight:700">NUS Semiconductor Club Events Calendar</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="ay-label">AY2026 / 2027</div>
+    <div class="ay-sub">Event Calendar · Aug 2026 – May 2027</div>
+    <div class="live-clock" id="live-clock"></div>
+  </div>
+</div>
+
+<!-- SEMESTER TABS + ADD EVENT -->
+<div class="top-bar">
+  <div class="sem-tabs">
+    <button class="sem-tab active" id="tab-s1" onclick="switchSem(1)">Semester 1 &nbsp;·&nbsp; Aug – Dec 2026</button>
+    <button class="sem-tab" id="tab-s2" onclick="switchSem(2)">Semester 2 &nbsp;·&nbsp; Jan – May 2027</button>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <input type="search" id="event-search" placeholder="🔍 Search events…" oninput="searchQuery=this.value.trim().toLowerCase();renderCal()" style="padding:8px 12px;border:1px solid var(--border2);border-radius:9px;font-family:var(--font);font-size:12px;min-width:170px;background:var(--white);outline:none">
+    <button class="btn-add-top btn-add-top-secondary" id="view-toggle-btn" onclick="toggleView()">📋 Agenda View</button>
+    <button class="btn-add-top btn-add-top-secondary" onclick="openTodoModal()">✅ View To-Do List</button>
+    <button class="btn-add-top" onclick="openAddModal()">&#10133; Add Event</button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-strip" id="stats-strip"></div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar" id="filter-bar"></div>
+
+<!-- CALENDAR -->
+<div class="cal-wrap" id="cal-wrap"></div>
+
+
+<div class="sync-wrap">
+  <div class="sync-hd">&#128197; Add to Google Calendar</div>
+  <div class="sync-sub">Works for <strong>anyone</strong> — no login needed here. Each link opens Google Calendar pre-filled with the event details. Anyone can add it to their own calendar in one click.</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+    <div id="gcal-quick-buttons" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    <button class="btn-sa" onclick="openAllLinks('all')">📅 Add all events</button>
+    <button class="btn-sa" onclick="downloadICS()" style="background:#ecfdf5;color:#059669;border-color:#a7f3d0">📆 Download .ics (import all at once)</button>
+  </div>
+  <div style="font-size:11px;color:#6b7280;margin-bottom:8px">Or expand below to copy individual event links to share with specific members:</div>
+  <div id="gcal-link-list"></div>
+</div>
+
+<div class="todo-wrap" id="todo-wrap">
+  <div class="todo-hd">✅ To-Do List</div>
+  <div class="todo-sub" id="todo-counter">No tasks yet</div>
+  <div class="todo-add-row">
+    <input type="text" id="todo-input" placeholder="e.g. Book venue for Welcome Night" onkeydown="if(event.key==='Enter')addTodo()">
+    <button class="btn-add-todo" onclick="addTodo()">&#10133; Add</button>
+  </div>
+  <div class="todo-add-meta">
+    <div id="todo-cat-multi" class="todo-cat-multi"></div>
+    <select id="todo-event" class="todo-select"></select>
+    <span class="todo-due-inline-label">📅 Due:</span>
+    <input type="date" id="todo-due" class="todo-due-input" title="Due date (optional)">
+    <input type="text" id="todo-owner" class="todo-due-input" placeholder="👤 Owner" title="Who's responsible (optional)" style="width:120px">
+  </div>
+  <div class="modal-divider"></div>
+  <div id="todo-list"></div>
+</div>
+
+<div class="footer">
+  <div style="display:flex;flex-direction:column;gap:3px">
+    <span class="footer-note">Changes auto-saved in browser · Click any event to edit or delete</span>
+    <span style="display:flex;gap:14px;flex-wrap:wrap"><span id="backup-status" class="footer-note"></span><span id="storage-meter" class="footer-note"></span></span>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <button class="btn-print" onclick="downloadICS()" style="color:#059669;border-color:#a7f3d0;background:#ecfdf5">📆 Download .ics</button>
+    <button class="btn-print manage-only" onclick="publishSnapshot()" style="color:#7c3aed;border-color:#ddd6fe;background:#f5f3ff">🌍 Publish view-only copy</button>
+    <button class="btn-print manage-only" onclick="backupEvents()">💾 Backup events &amp; tasks</button>
+    <label class="btn-print manage-only" style="cursor:pointer;margin:0">
+      📂 Restore from backup
+      <input type="file" id="restore-input" accept=".json" style="display:none" onchange="restoreEvents(event)">
+    </label>
+    <button class="btn-print manage-only" onclick="openSyncGuide()" style="color:#2563eb;border-color:#bfdbfe;background:#eff6ff">🔗 Sync guide</button>
+    <div style="position:relative;display:inline-block">
+      <button class="btn-print" onclick="event.stopPropagation();togglePrintMenu()">🖨️ Print / PDF &#9662;</button>
+      <div id="print-menu" class="print-menu">
+        <button onclick="printWith('both')">🖨️ Calendar + To-Do List</button>
+        <button onclick="printWith('cal')">📅 Calendar only</button>
+        <button onclick="printWith('todo')">✅ To-Do List only</button>
+        <button onclick="printWith('poster')">🌟 Semester poster (confirmed only)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SYNC GUIDE MODAL -->
+<div class="modal-bg" id="sync-guide-bg" onclick="if(event.target===this)closeSyncGuide()" style="z-index:300">
+  <div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto">
+    <button class="modal-close" onclick="closeSyncGuide()">&#x2715;</button>
+    <div style="font-family:var(--font);font-size:17px;font-weight:700;margin-bottom:4px">🔗 How to sync with your team</div>
+    <p style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:16px">This calendar saves data locally in your browser. To share events and tasks with your EXCO members, use the <strong>Backup → Share → Restore</strong> workflow below.</p>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+
+      <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:14px 16px">
+        <div style="font-weight:700;color:#059669;margin-bottom:6px;font-size:13px">⚡ Faster one-click options</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.65"><strong>📆 Download .ics</strong> — exports every event as one standard calendar file members can import into Google / Apple / Outlook Calendar in a single step.<br><strong>🌍 Publish view-only copy</strong> — downloads a read-only HTML version of this calendar with all events baked in. Drop it in the Telegram group; members just open it (no restore needed, and they can't edit anything).</div>
+      </div>
+
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px">
+        <div style="font-weight:700;color:#2563eb;margin-bottom:6px;font-size:13px">Step 1 — You (the updater) backup</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.65">Click <strong>💾 Backup events &amp; tasks</strong> in the footer. A file named <code style="background:#fff;padding:1px 5px;border-radius:4px;font-size:11px;border:1px solid #e0e0e0">NUSSemiCon_Events_Backup_YYYY-MM-DD.json</code> will download. This includes all events and to-do tasks.</div>
+      </div>
+
+      <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:14px 16px">
+        <div style="font-weight:700;color:#7c3aed;margin-bottom:6px;font-size:13px">Step 2 — Share the file with your team</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.65">
+          Send the <code style="background:#fff;padding:1px 5px;border-radius:4px;font-size:11px;border:1px solid #e0e0e0">.json</code> file to your EXCO via:
+          <ul style="margin:6px 0 0 16px;line-height:2.1">
+            <li><strong>Telegram</strong> — tap 📎 → File (not photo)</li>
+            <li><strong>Google Drive / SharePoint</strong> — drop into a shared EXCO folder</li>
+            <li><strong>WhatsApp</strong> — tap 📎 → Document</li>
+            <li><strong>Email</strong> — attach the .json file</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:14px 16px">
+        <div style="font-weight:700;color:#059669;margin-bottom:6px;font-size:13px">Step 3 — Members restore on their device</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.65">Each member opens the calendar HTML file in their browser, clicks <strong>📂 Restore from backup</strong> in the footer, selects the shared <code style="background:#fff;padding:1px 5px;border-radius:4px;font-size:11px;border:1px solid #e0e0e0">.json</code> file, and confirms. The calendar updates instantly with all events and tasks.</div>
+      </div>
+
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 16px">
+        <div style="font-weight:700;color:#d97706;margin-bottom:6px;font-size:13px">💡 Recommended EXCO workflow</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.65">
+          <strong>One person owns the master copy</strong> (e.g. President or Vice President). After every update — new event added, task edited, status changed — they backup and share the file to a <strong>pinned Telegram message</strong> or shared Google Drive folder.<br><br>
+          Members restore whenever they need the latest view. Tip: name your backups with a note like <code style="background:#fff;padding:1px 5px;border-radius:4px;font-size:11px;border:1px solid #e0e0e0">Calendar_Sem1_Week3.json</code> so it's easy to track which is the most recent.
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button onclick="backupEvents();closeSyncGuide()" style="flex:1;background:#0f1117;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">💾 Backup now</button>
+      <button onclick="closeSyncGuide()" style="background:var(--white);color:var(--muted);border:1px solid var(--border2);border-radius:8px;padding:10px 16px;font-size:13px;font-family:var(--font);cursor:pointer">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="if(event.target===this)attemptCloseModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="attemptCloseModal()">&#x2715;</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ─── Published-snapshot flags (rewritten by publishSnapshot() in view-only copies) ───
+const READ_ONLY=false;
+const SNAPSHOT_DATE='';
+
+// ─── Type config ───
+const TYPES={
+  industry:{label:'Company Talk',   icon:'🎤', color:'#1d4ed8',bg:'#dbeafe',border:'#93c5fd',cls:'ep-industry',fcls:'fp-industry'},
+  visit:   {label:'Company Visit', icon:'🏭', color:'#065f46',bg:'#d1fae5',border:'#6ee7b7',cls:'ep-visit',   fcls:'fp-visit'},
+  extpartner:{label:'External Partners', icon:'🌐', color:'#a16207', bg:'#fef9c3', border:'#fde047', cls:'ep-extpartner',fcls:'fp-extpartner'},
+  bonding: {label:'Club Bonding',  icon:'🤝', color:'#be185d',bg:'#fdf2f8',border:'#fbcfe8',cls:'ep-bonding', fcls:'fp-bonding'},
+  external:{label:'Others',         icon:'📌', color:'#c2410c',bg:'#fff7ed',border:'#fed7aa',cls:'ep-external',fcls:'fp-external'},
+};
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+// ─── Event status pipeline ───
+// Outreach lifecycle: Potential → Outreach Sent → In Discussion → Confirmed → Completed.
+// `tentative` statuses get dashed "not locked in" styling and [TENTATIVE] calendar exports.
+const STATUSES={
+  potential: {label:'Potential / Sourcing', icon:'🔍', color:'#9333ea', bg:'#faf5ff', border:'#e9d5ff', dashed:true, tentative:true},
+  contacted: {label:'Outreach Sent',        icon:'📨', color:'#0369a1', bg:'#f0f9ff', border:'#bae6fd', dashed:true, tentative:true},
+  discussion:{label:'In Discussion',        icon:'💬', color:'#b45309', bg:'#fffbeb', border:'#fde68a', dashed:true, tentative:true},
+  confirmed: {label:'Confirmed',            icon:'✅', color:'#15803d', bg:'#f0fdf4', border:'#bbf7d0'},
+  completed: {label:'Completed',            icon:'🏁', color:'#334155', bg:'#f8fafc', border:'#cbd5e1'},
+  declined:  {label:'Declined / Cancelled', icon:'🚫', color:'#b91c1c', bg:'#fef2f2', border:'#fecaca'},
+};
+function evStatus(ev){ return STATUSES[ev.status]?ev.status:'confirmed'; } // default to confirmed for older saved events
+// Build the status picker row used by both the Add ('am') and Edit ('e') Event modals
+function statusToggleHTML(prefix,current){
+  return `<div class="status-toggle-row" style="flex-wrap:wrap">`+Object.entries(STATUSES).map(([k,s])=>
+    `<button type="button" id="${prefix}-status-${k}" class="status-opt${current===k?' active':''}" style="${current===k?`border-color:${s.border};color:${s.color};background:${s.bg};`:''}${s.dashed?'border-style:dashed':''}" onclick="setPendingStatus('${prefix}','${k}')">${s.icon} ${s.label}</button>`
+  ).join('')+`</div>`;
+}
+function statusStyle(ev){ return STATUSES[evStatus(ev)]; }
+
+// NUS AY2026/27 week structure
+// mondayISO = ISO date string for that week's Monday (SGT)
+const SEM1_WEEKS=[
+  {id:'s1w0', wk:'Week 0',  dates:'3–8 Aug',      kind:'normal',  mon:'2026-08-03', months:['Aug 2026']},
+  {id:'s1w1', wk:'Week 1',  dates:'10–14 Aug',    kind:'normal',  mon:'2026-08-10', months:['Aug 2026']},
+  {id:'s1w2', wk:'Week 2',  dates:'17–21 Aug',    kind:'normal',  mon:'2026-08-17', months:['Aug 2026']},
+  {id:'s1w3', wk:'Week 3',  dates:'24–28 Aug',    kind:'normal',  mon:'2026-08-24', months:['Aug 2026']},
+  {id:'s1w4', wk:'Week 4',  dates:'31 Aug–4 Sep', kind:'normal',  mon:'2026-08-31', months:['Aug 2026','Sep 2026']},
+  {id:'s1w5', wk:'Week 5',  dates:'7–11 Sep',     kind:'normal',  mon:'2026-09-07', months:['Sep 2026']},
+  {id:'s1w6', wk:'Week 6',  dates:'14–18 Sep',    kind:'normal',  mon:'2026-09-14', months:['Sep 2026']},
+  {id:'s1wr_1', wk:'Recess (1/2)', dates:'19–25 Sep', kind:'recess', mon:'2026-09-19', months:['Sep 2026'], span:7},
+  {id:'s1wr_2', wk:'Recess (2/2)', dates:'26–27 Sep', kind:'recess', mon:'2026-09-26', months:['Sep 2026'], span:2},
+  {id:'s1w7', wk:'Week 7',  dates:'28 Sep–2 Oct', kind:'normal',  mon:'2026-09-28', months:['Sep 2026','Oct 2026']},
+  {id:'s1w8', wk:'Week 8',  dates:'5–9 Oct',      kind:'normal',  mon:'2026-10-05', months:['Oct 2026']},
+  {id:'s1w9', wk:'Week 9',  dates:'12–16 Oct',    kind:'normal',  mon:'2026-10-12', months:['Oct 2026']},
+  {id:'s1w10',wk:'Week 10', dates:'19–23 Oct',    kind:'normal',  mon:'2026-10-19', months:['Oct 2026']},
+  {id:'s1w11',wk:'Week 11', dates:'26–30 Oct',    kind:'normal',  mon:'2026-10-26', months:['Oct 2026']},
+  {id:'s1w12',wk:'Week 12', dates:'2–6 Nov',      kind:'normal',  mon:'2026-11-02', months:['Nov 2026']},
+  {id:'s1w13',wk:'Week 13', dates:'9–13 Nov',     kind:'normal',  mon:'2026-11-09', months:['Nov 2026']},
+  {id:'s1rd', wk:'Reading', dates:'14–20 Nov',    kind:'reading', mon:'2026-11-14', months:['Nov 2026']},
+  {id:'s1e1_1', wk:'Exam (1/3)', dates:'21–27 Nov', kind:'exam', mon:'2026-11-21', months:['Nov 2026'], span:7},
+  {id:'s1e1_2', wk:'Exam (2/3)', dates:'28 Nov–4 Dec', kind:'exam', mon:'2026-11-28', months:['Nov 2026','Dec 2026'], span:7},
+  {id:'s1e1_3', wk:'Exam (3/3)', dates:'5 Dec', kind:'exam', mon:'2026-12-05', months:['Dec 2026'], span:1},
+  {id:'s1vac_1', wk:'Vacation (1/6)', dates:'6–12 Dec', kind:'vac', mon:'2026-12-06', months:['Dec 2026'], span:7},
+  {id:'s1vac_2', wk:'Vacation (2/6)', dates:'13–19 Dec', kind:'vac', mon:'2026-12-13', months:['Dec 2026'], span:7},
+  {id:'s1vac_3', wk:'Vacation (3/6)', dates:'20–26 Dec', kind:'vac', mon:'2026-12-20', months:['Dec 2026'], span:7},
+  {id:'s1vac_4', wk:'Vacation (4/6)', dates:'27 Dec–2 Jan', kind:'vac', mon:'2026-12-27', months:['Dec 2026','Jan 2027'], span:7},
+  {id:'s1vac_5', wk:'Vacation (5/6)', dates:'3–9 Jan', kind:'vac', mon:'2027-01-03', months:['Jan 2027'], span:7},
+  {id:'s1vac_6', wk:'Vacation (6/6)', dates:'10 Jan', kind:'vac', mon:'2027-01-10', months:['Jan 2027'], span:1},
+];
+const SEM2_WEEKS=[
+  {id:'s2w1', wk:'Week 1',  dates:'11–15 Jan',    kind:'normal',  mon:'2027-01-11', months:['Jan 2027']},
+  {id:'s2w2', wk:'Week 2',  dates:'18–22 Jan',    kind:'normal',  mon:'2027-01-18', months:['Jan 2027']},
+  {id:'s2w3', wk:'Week 3',  dates:'25–29 Jan',    kind:'normal',  mon:'2027-01-25', months:['Jan 2027']},
+  {id:'s2w4', wk:'Week 4',  dates:'1–5 Feb',      kind:'normal',  mon:'2027-02-01', months:['Feb 2027']},
+  {id:'s2w5', wk:'Week 5',  dates:'8–12 Feb',     kind:'normal',  mon:'2027-02-08', months:['Feb 2027']},
+  {id:'s2w6', wk:'Week 6',  dates:'15–19 Feb',    kind:'normal',  mon:'2027-02-15', months:['Feb 2027']},
+  {id:'s2wr_1', wk:'Recess (1/2)', dates:'20–26 Feb', kind:'recess', mon:'2027-02-20', months:['Feb 2027'], span:7},
+  {id:'s2wr_2', wk:'Recess (2/2)', dates:'27–28 Feb', kind:'recess', mon:'2027-02-27', months:['Feb 2027'], span:2},
+  {id:'s2w7', wk:'Week 7',  dates:'1–6 Mar',      kind:'normal',  mon:'2027-03-01', months:['Mar 2027']},
+  {id:'s2w8', wk:'Week 8',  dates:'8–12 Mar',     kind:'normal',  mon:'2027-03-08', months:['Mar 2027']},
+  {id:'s2w9', wk:'Week 9',  dates:'15–19 Mar',    kind:'normal',  mon:'2027-03-15', months:['Mar 2027']},
+  {id:'s2w10',wk:'Week 10', dates:'22–26 Mar',    kind:'normal',  mon:'2027-03-22', months:['Mar 2027']},
+  {id:'s2w11',wk:'Week 11', dates:'29 Mar–2 Apr', kind:'normal',  mon:'2027-03-29', months:['Mar 2027','Apr 2027']},
+  {id:'s2w12',wk:'Week 12', dates:'5–9 Apr',      kind:'normal',  mon:'2027-04-05', months:['Apr 2027']},
+  {id:'s2w13',wk:'Week 13', dates:'12–16 Apr',    kind:'normal',  mon:'2027-04-12', months:['Apr 2027']},
+  {id:'s2rd', wk:'Reading', dates:'17–23 Apr',    kind:'reading', mon:'2027-04-17', months:['Apr 2027']},
+  {id:'s2e1_1', wk:'Exam (1/3)', dates:'24–30 Apr', kind:'exam', mon:'2027-04-24', months:['Apr 2027'], span:7},
+  {id:'s2e1_2', wk:'Exam (2/3)', dates:'1–7 May', kind:'exam', mon:'2027-05-01', months:['May 2027'], span:7},
+  {id:'s2e1_3', wk:'Exam (3/3)', dates:'8 May', kind:'exam', mon:'2027-05-08', months:['May 2027'], span:1},
+  {id:'s2vac_1', wk:'Vacation (1/13)', dates:'9–15 May', kind:'vac', mon:'2027-05-09', months:['May 2027'], span:7},
+  {id:'s2vac_2', wk:'Vacation (2/13)', dates:'16–22 May', kind:'vac', mon:'2027-05-16', months:['May 2027'], span:7},
+  {id:'s2vac_3', wk:'Vacation (3/13)', dates:'23–29 May', kind:'vac', mon:'2027-05-23', months:['May 2027'], span:7},
+  {id:'s2vac_4', wk:'Vacation (4/13)', dates:'30 May–5 Jun', kind:'vac', mon:'2027-05-30', months:['May 2027','Jun 2027'], span:7},
+  {id:'s2vac_5', wk:'Vacation (5/13)', dates:'6–12 Jun', kind:'vac', mon:'2027-06-06', months:['Jun 2027'], span:7},
+  {id:'s2vac_6', wk:'Vacation (6/13)', dates:'13–19 Jun', kind:'vac', mon:'2027-06-13', months:['Jun 2027'], span:7},
+  {id:'s2vac_7', wk:'Vacation (7/13)', dates:'20–26 Jun', kind:'vac', mon:'2027-06-20', months:['Jun 2027'], span:7},
+  {id:'s2vac_8', wk:'Vacation (8/13)', dates:'27 Jun–3 Jul', kind:'vac', mon:'2027-06-27', months:['Jun 2027','Jul 2027'], span:7},
+  {id:'s2vac_9', wk:'Vacation (9/13)', dates:'4–10 Jul', kind:'vac', mon:'2027-07-04', months:['Jul 2027'], span:7},
+  {id:'s2vac_10', wk:'Vacation (10/13)', dates:'11–17 Jul', kind:'vac', mon:'2027-07-11', months:['Jul 2027'], span:7},
+  {id:'s2vac_11', wk:'Vacation (11/13)', dates:'18–24 Jul', kind:'vac', mon:'2027-07-18', months:['Jul 2027'], span:7},
+  {id:'s2vac_12', wk:'Vacation (12/13)', dates:'25–31 Jul', kind:'vac', mon:'2027-07-25', months:['Jul 2027'], span:7},
+  {id:'s2vac_13', wk:'Vacation (13/13)', dates:'1 Aug', kind:'vac', mon:'2027-08-01', months:['Aug 2027'], span:1},
+];
+const SEM1_MONTHS=['Aug 2026','Sep 2026','Oct 2026','Nov 2026','Dec 2026'];
+const SEM2_MONTHS=['Jan 2027','Feb 2027','Mar 2027','Apr 2027','May 2027'];
+
+// Day offset index (Mon=0 … Sun=6)
+const DAY_IDX={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6};
+
+// Compute ISO date for a given week+day (pure UTC arithmetic — avoids local-timezone drift)
+function weekDayISO(mon, day){
+  const [y,m,d]=mon.split('-').map(Number);
+  const dt=new Date(Date.UTC(y,m-1,d));
+  dt.setUTCDate(dt.getUTCDate()+DAY_IDX[day]);
+  return dt.toISOString().slice(0,10);
+}
+
+// Format an ISO date (YYYY-MM-DD) as e.g. "5 Aug 2026"
+const MONTH_ABBR=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ─── "Today" detection across the academic calendar ───
+// Figures out, for the real current date, which semester/week row it falls
+// in (if any), which day-of-week column that is, and what kind of week it
+// is (normal teaching week vs recess/reading/exam/vacation) — so the header
+// clock and the calendar grid can both reflect it consistently.
+function todayISO(){
+  const d=new Date();
+  // Use the browser's local date (not UTC) — "today" should match the user's wall clock.
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
+}
+
+// ─── Task due-date → "X days left" label ───
+// Pure date-math (no time component), so "today" always reads as "Due today"
+// rather than drifting in/out by hours depending on when in the day it's checked.
+function daysUntil(dueISO){
+  const [y1,m1,d1]=todayISO().split('-').map(Number);
+  const [y2,m2,d2]=dueISO.split('-').map(Number);
+  const t0=Date.UTC(y1,m1-1,d1), t1=Date.UTC(y2,m2-1,d2);
+  return Math.round((t1-t0)/86400000);
+}
+function dueLabel(dueISO,done){
+  const n=daysUntil(dueISO);
+  const dateShort=fmtDateShort(dueISO);
+  let rel, cls;
+  if(done){ rel='Done'; cls='due-done'; }
+  else if(n<0){ rel=`Overdue by ${Math.abs(n)} day${Math.abs(n)===1?'':'s'}`; cls='due-overdue'; }
+  else if(n===0){ rel='Due today'; cls='due-today'; }
+  else if(n===1){ rel='Due tomorrow'; cls='due-soon'; }
+  else if(n<=3){ rel=`${n} days left`; cls='due-soon'; }
+  else { rel=`${n} days left`; cls='due-future'; }
+  return {text:`${dateShort} · ${rel}`, cls};
+}
+function getTodayInfo(){
+  const iso=todayISO();
+  for(const sem of [1,2]){
+    const weeks=sem===1?SEM1_WEEKS:SEM2_WEEKS;
+    for(const w of weeks){
+      const span=w.span||7;
+      for(let i=0;i<span && i<7;i++){
+        const cellISO=weekDayISO(w.mon,DAYS[i]);
+        if(cellISO===iso){
+          return {iso, sem, week:w, day:DAYS[i], dayIdx:i, kind:w.kind};
+        }
+      }
+    }
+  }
+  // Today doesn't fall inside any defined week row — i.e. genuine inter-semester vacation
+  // (the gap between Sem 2's last vacation week and a new academic year, etc.)
+  return {iso, sem:null, week:null, day:null, dayIdx:-1, kind:'outside'};
+}
+function kindLabel(kind){
+  return {normal:'Teaching Week', recess:'Recess Week', exam:'Exam Period', vac:'Vacation', reading:'Reading Week', outside:'Vacation'}[kind]||'—';
+}
+function fmtDate(iso){
+  const [y,m,d]=iso.split('-').map(Number);
+  return `${d} ${MONTH_ABBR[m-1]} ${y}`;
+}
+// Compact version without the year — used in tight inline UI like the due-date chip,
+// where the year is rarely needed since tasks live within a single academic year.
+function fmtDateShort(iso){
+  const [,m,d]=iso.split('-').map(Number);
+  return `${d} ${MONTH_ABBR[m-1]}`;
+}
+
+// Build <option> list for a Day select, showing the actual date for each weekday.
+// `span` limits how many of the 7 weekdays are valid for this row (partial weeks
+// at the tail end of a split Exam/Recess/Vacation block may have fewer than 7).
+function buildDayOptions(weekMon, selectedDay, span){
+  return DAYS.slice(0,span||7).map(d=>{
+    const iso=weekDayISO(weekMon,d);
+    return `<option value="${d}"${d===selectedDay?' selected':''}>${d} · ${fmtDate(iso)}</option>`;
+  }).join('');
+}
+
+// ─── Multi-day event support ───
+// Add `n` days to an ISO date string, pure UTC arithmetic.
+function addDaysISO(iso,n){
+  const [y,m,d]=iso.split('-').map(Number);
+  const dt=new Date(Date.UTC(y,m-1,d));
+  dt.setUTCDate(dt.getUTCDate()+n);
+  return dt.toISOString().slice(0,10);
+}
+
+// Resolve an event's full {startISO,endISO}. Events without endWeekId/endDay
+// (the common case) are single-day, so startISO===endISO.
+function eventDateRange(ev){
+  const allWeeks=[...SEM1_WEEKS,...SEM2_WEEKS];
+  const w=allWeeks.find(x=>x.id===ev.weekId);
+  const startISO=w?weekDayISO(w.mon,ev.day):null;
+  let endISO=startISO;
+  if(ev.endWeekId&&ev.endDay&&startISO){
+    const w2=allWeeks.find(x=>x.id===ev.endWeekId);
+    if(w2){
+      const cand=weekDayISO(w2.mon,ev.endDay);
+      if(cand>=startISO) endISO=cand; // guard against an accidental end-before-start
+    }
+  }
+  return {startISO,endISO};
+}
+
+// Expand a list of events into a lookup: ISO date -> [{ev,isStart}], so multi-day
+// events show their full pill on the start date and a slim "continues" marker on
+// every date afterward, however many calendar rows that spans.
+function buildDateMap(evs){
+  const map={};
+  evs.forEach(ev=>{
+    const {startISO,endISO}=eventDateRange(ev);
+    if(!startISO) return;
+    let cur=startISO;
+    while(true){
+      (map[cur]=map[cur]||[]).push({ev,isStart:cur===startISO});
+      if(cur===endISO) break;
+      cur=addDaysISO(cur,1);
+    }
+  });
+  return map;
+}
+
+// ─── Time-of-day helpers ───
+// Format a 24h "HH:MM" string as "2:00 PM"
+function fmtTime(t){
+  if(!t) return '';
+  const [h,m]=t.split(':').map(Number);
+  const period=h>=12?'PM':'AM';
+  const h12=h%12===0?12:h%12;
+  return `${h12}:${String(m).padStart(2,'0')} ${period}`;
+}
+// Add `mins` minutes to a 24h "HH:MM" string, wrapping past midnight if needed
+function addMinutesToTime(hhmm,mins){
+  const [h,m]=hhmm.split(':').map(Number);
+  let total=((h*60+m+mins)%1440+1440)%1440;
+  return `${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`;
+}
+// Human-readable time label for an event: "All day" or "2:00 PM – 4:00 PM"
+function timeLabel(ev){
+  if(ev.allDay) return 'All day';
+  if(!ev.startTime) return '';
+  return ev.endTime?`${fmtTime(ev.startTime)} – ${fmtTime(ev.endTime)}`:fmtTime(ev.startTime);
+}
+
+// ─── Events data (default — only used if nothing in localStorage) ───
+const DEFAULT_EVENTS=[];
+
+const STORAGE_KEY='nus_semicon_events_ay2627';
+const EDIT_TS_KEY='nus_semicon_last_edit_ay2627';   // ISO timestamp of the last local edit
+const BACKUP_TS_KEY='nus_semicon_last_backup_ay2627'; // ISO timestamp of the last backup download
+
+// Load from localStorage, fall back to defaults if nothing saved yet
+function loadEvents(){
+  if(READ_ONLY) return JSON.parse(JSON.stringify(DEFAULT_EVENTS)); // published snapshot: always show the baked-in data
+  try {
+    const saved=localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed=JSON.parse(saved);
+      if(Array.isArray(parsed)&&parsed.length>0) return parsed;
+    }
+  } catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_EVENTS)); // deep copy of defaults
+}
+
+// Save current events to localStorage
+function saveEvents(){
+  if(READ_ONLY) return;
+  try {
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(events));
+    localStorage.setItem(EDIT_TS_KEY,new Date().toISOString());
+  } catch(e){
+    showToast('⚠️ Could not save — browser storage is full. Remove some images, or Backup then clear old data.');
+  }
+  updateFooterStatus();
+}
+
+// ─── Migrate events created before Exam/Recess/Vacation were split into weekly sub-rows ───
+// (older saved data may reference e.g. 's1e1' or 's1vac', which no longer exist as single rows)
+const LEGACY_BLOCK_MON={
+  's1wr':'2026-09-19', 's1e1':'2026-11-21', 's1vac':'2026-12-06',
+  's2wr':'2027-02-20', 's2e1':'2027-04-24', 's2vac':'2027-05-09',
+};
+function migrateLegacyWeekIds(){
+  const allWeeks=[...SEM1_WEEKS,...SEM2_WEEKS];
+  let changed=false;
+  events.forEach(ev=>{
+    const legacyMon=LEGACY_BLOCK_MON[ev.weekId];
+    if(!legacyMon) return;
+    const trueDate=weekDayISO(legacyMon, ev.day);
+    const match=allWeeks.find(w=>{
+      const span=w.span||7;
+      const rowEnd=weekDayISO(w.mon, DAYS[span-1]);
+      return trueDate>=w.mon && trueDate<=rowEnd;
+    });
+    if(match){
+      const diffDays=Math.round((new Date(trueDate+'T00:00:00Z')-new Date(match.mon+'T00:00:00Z'))/86400000);
+      ev.weekId=match.id;
+      ev.day=DAYS[diffDays]||ev.day;
+      changed=true;
+    }
+  });
+  if(changed) saveEvents();
+}
+
+let events=loadEvents();
+migrateLegacyWeekIds();
+migrateRemovedTypes();
+let nextId=Math.max(...events.map(e=>e.id),99)+1;
+
+// ─── Migrate events whose type was later removed from TYPES (e.g. Workshop) ───
+function migrateRemovedTypes(){
+  let changed=false;
+  events.forEach(ev=>{
+    if(ev.type&&!TYPES[ev.type]){
+      ev.type='external'; // falls back to "Others"
+      changed=true;
+    }
+  });
+  if(changed) saveEvents();
+}
+// ─── To-Do List ───
+const TODO_STORAGE_KEY='nus_semicon_todos_ay2627';
+const DEFAULT_TODOS=[];
+function loadTodos(){
+  if(READ_ONLY) return JSON.parse(JSON.stringify(DEFAULT_TODOS)); // published snapshot: baked-in tasks
+  try{
+    const saved=localStorage.getItem(TODO_STORAGE_KEY);
+    if(saved){
+      const parsed=JSON.parse(saved);
+      if(Array.isArray(parsed)) return parsed;
+    }
+  }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_TODOS));
+}
+function saveTodos(){
+  if(READ_ONLY) return;
+  try{
+    localStorage.setItem(TODO_STORAGE_KEY,JSON.stringify(todos));
+    localStorage.setItem(EDIT_TS_KEY,new Date().toISOString());
+  }catch(e){
+    showToast('⚠️ Could not save — browser storage is full. Remove some images, or Backup then clear old data.');
+  }
+  updateFooterStatus();
+}
+let todos=loadTodos();
+let nextTodoId=todos.length?Math.max(...todos.map(t=>t.id))+1:1;
+
+function addTodo(){
+  const input=document.getElementById('todo-input');
+  const text=input.value.trim();
+  if(!text){ input.focus(); return; }
+  const cats=getSelectedCats('todo-cat-multi');
+  const eventId=document.getElementById('todo-event').value?parseInt(document.getElementById('todo-event').value):null;
+  const due=document.getElementById('todo-due').value||null;
+  const owner=document.getElementById('todo-owner')?.value.trim()||null;
+  todos.push({id:nextTodoId++, text, done:false, cats, eventId, due, owner});
+  saveTodos();
+  input.value='';
+  document.getElementById('todo-due').value='';
+  const ownerInput=document.getElementById('todo-owner');
+  if(ownerInput) ownerInput.value='';
+  refreshTodoViews();
+  input.focus();
+  takeNewTaskDraftSnapshot(); // freshly-cleared box — re-baseline so it isn't flagged as dirty
+}
+function toggleTodo(id){
+  const t=todos.find(x=>x.id===id);
+  if(!t) return;
+  t.done=!t.done;
+  saveTodos();
+  refreshTodoViews();
+}
+function deleteTodo(id){
+  const t=todos.find(x=>x.id===id);
+  if(!t) return;
+  if(!confirm(`Delete this task?\n\n"${t.text}"`)) return;
+  todos=todos.filter(x=>x.id!==id);
+  saveTodos();
+  refreshTodoViews();
+}
+function clearCompletedTodos(){
+  const doneCount=todos.filter(x=>x.done).length;
+  if(doneCount===0) return;
+  if(!confirm(`Clear ${doneCount} completed task${doneCount===1?'':'s'}? This can't be undone.`)) return;
+  todos=todos.filter(x=>!x.done);
+  saveTodos();
+  refreshTodoViews();
+}
+
+// ─── Inline task editing ───
+function editTodo(id){
+  editingTodoId=id;
+  todoFormSnapshot=null; // re-baseline once the fresh form renders
+  refreshTodoViews();
+}
+function cancelEditTodo(){
+  editingTodoId=null;
+  todoFormSnapshot=null;
+  refreshTodoViews();
+}
+function saveTodoEdit(id){
+  const t=todos.find(x=>x.id===id);
+  if(!t) return;
+  const textInput=document.getElementById(`todo-edit-text-${id}`);
+  const text=textInput.value.trim();
+  if(!text){ textInput.focus(); return; }
+  t.text=text;
+  t.cats=getSelectedCats(`todo-edit-catmulti-${id}`);
+  delete t.cat;
+  const evVal=document.getElementById(`todo-edit-event-${id}`).value;
+  t.eventId=evVal?parseInt(evVal):null;
+  t.desc=document.getElementById(`todo-edit-desc-${id}`).value.trim();
+  t.due=document.getElementById(`todo-edit-due-${id}`).value||null;
+  t.owner=document.getElementById(`todo-edit-owner-${id}`)?.value.trim()||null;
+  saveTodos();
+  editingTodoId=null;
+  todoFormSnapshot=null;
+  refreshTodoViews();
+}
+
+// ─── Task resource links ───
+function addTodoLink(id){
+  const t=todos.find(x=>x.id===id);
+  if(!t) return;
+  if(!t.links) t.links=[];
+  t.links.push({label:'',url:''});
+  saveTodos();
+  refreshTodoViews();
+}
+function updateTodoLink(id,idx,field,value){
+  const t=todos.find(x=>x.id===id);
+  if(!t||!t.links||!t.links[idx]) return;
+  t.links[idx][field]=value;
+  saveTodos();
+  refreshTodoViews();
+}
+function removeTodoLink(id,idx){
+  const t=todos.find(x=>x.id===id);
+  if(!t||!t.links) return;
+  t.links.splice(idx,1);
+  saveTodos();
+  refreshTodoViews();
+}
+
+// ─── Task images (resized client-side, stored as base64 in localStorage) ───
+// Images are stored as {name, src}. img() / imgName() also accept the older
+// plain-string format from before filenames were tracked, for backward compatibility.
+function imgSrc(img){ return typeof img==='string'?img:img.src; }
+function imgName(img){ return (typeof img==='string'?null:img.name)||'Image'; }
+function openTodoImage(idx,id){
+  const t=todos.find(x=>x.id===id);
+  if(!t||!t.images||!t.images[idx]) return;
+  const img=t.images[idx];
+  const src=imgSrc(img), name=imgName(img);
+  const win=window.open('','_blank');
+  if(!win) return; // popup blocked
+  const safeName=name.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  win.document.write(`<!DOCTYPE html><html><head><title>${safeName}</title><meta charset="utf-8">
+    <style>body{margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:100%;max-height:100vh;display:block}</style>
+    </head><body><img src="${src}" alt="${safeName}"></body></html>`);
+  win.document.close();
+}
+function handleTodoImageUpload(id,fileInput){
+  const file=fileInput.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const img=new Image();
+    img.onload=function(){
+      const maxDim=800;
+      let w=img.width, h=img.height;
+      if(w>maxDim||h>maxDim){
+        if(w>h){ h=Math.round(h*maxDim/w); w=maxDim; }
+        else{ w=Math.round(w*maxDim/h); h=maxDim; }
+      }
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const dataUrl=canvas.toDataURL('image/jpeg',0.75);
+      const t=todos.find(x=>x.id===id);
+      if(!t) return;
+      if(!t.images) t.images=[];
+      t.images.push({name:file.name,src:dataUrl});
+      saveTodos();
+      refreshTodoViews();
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+  fileInput.value='';
+}
+function removeTodoImage(id,idx){
+  const t=todos.find(x=>x.id===id);
+  if(!t||!t.images) return;
+  t.images.splice(idx,1);
+  saveTodos();
+  refreshTodoViews();
+}
+
+// Populate the "link to event" select with every event, sorted chronologically
+// Build <option> HTML for the linked-event select, sorted chronologically
+function buildEventOptionsHTML(selectedId){
+  const sorted=[...events].sort((a,b)=>{
+    const ra=eventDateRange(a), rb=eventDateRange(b);
+    return (ra.startISO||'')<(rb.startISO||'')?-1:1;
+  });
+  return `<option value="">No linked event</option>` + sorted.map(e=>{
+    const r=eventDateRange(e);
+    return `<option value="${e.id}"${selectedId===e.id?' selected':''}>${e.name}${r.startISO?' · '+fmtDate(r.startISO):''}</option>`;
+  }).join('');
+}
+// Build <option> HTML for the team (category) select
+// A task's teams as an array. Falls back to the older single `cat` field
+// (or 'internal') for tasks saved before multi-team support existed.
+function taskCats(t){
+  if(t.cats&&t.cats.length) return t.cats;
+  return t.cat?[t.cat]:['internal'];
+}
+// An event's teams as an array. Falls back to the older single `cat` field for
+// events saved before multi-team support existed.
+function eventCats(ev){
+  if(ev.cats&&ev.cats.length) return ev.cats;
+  return ev.cat?[ev.cat]:['internal'];
+}
+// Build a row of toggleable team pills. `containerId` is given to each pill's
+// wrapper so getSelectedCats() can find them later; selectedCats marks which start active.
+function catMultiPillsHTML(selectedCats){
+  return Object.entries(CAT_STYLES).map(([k,c])=>{
+    const active=selectedCats.includes(k);
+    return `<button type="button" class="todo-cat-pill${active?' active':''}" data-cat="${k}" onclick="this.classList.toggle('active')" style="--pc:${c.solid};--pbg:${c.solidBg};--pb:${c.border}">${c.icon} ${c.label}</button>`;
+  }).join('');
+}
+function getSelectedCats(containerId){
+  const container=document.getElementById(containerId);
+  if(!container) return [];
+  return [...container.querySelectorAll('.todo-cat-pill.active')].map(el=>el.dataset.cat);
+}
+
+function populateTodoEventSelect(){
+  const sel=document.getElementById('todo-event');
+  if(!sel) return;
+  const prev=sel.value;
+  sel.innerHTML=buildEventOptionsHTML(prev?parseInt(prev):null);
+}
+
+// Render a single task row (or its inline edit form), reused by both the
+// main To-Do panel and the per-event task section inside the Edit modal.
+function renderTodoItemHTML(t,num){
+  if(t.id===editingTodoId&&!editFormRenderedThisPass){
+    editFormRenderedThisPass=true;
+    // If this task's edit form is already in the DOM (an unrelated action — e.g.
+    // toggling a different task's checkbox — triggered this re-render), pull its
+    // CURRENT live values instead of rebuilding from the saved `t` data. Otherwise
+    // any unsaved typing would be silently wiped out on every re-render.
+    const liveTextEl=document.getElementById(`todo-edit-text-${t.id}`);
+    const isLiveRerender=!!liveTextEl;
+    const liveText=isLiveRerender?liveTextEl.value:t.text;
+    const liveDesc=isLiveRerender?(document.getElementById(`todo-edit-desc-${t.id}`)?.value??(t.desc||'')):(t.desc||'');
+    const liveDue=isLiveRerender?(document.getElementById(`todo-edit-due-${t.id}`)?.value??(t.due||'')):(t.due||'');
+    const liveOwner=isLiveRerender?(document.getElementById(`todo-edit-owner-${t.id}`)?.value??(t.owner||'')):(t.owner||'');
+    const liveEventVal=isLiveRerender?(document.getElementById(`todo-edit-event-${t.id}`)?.value??''):'';
+    const liveEventId=isLiveRerender?(liveEventVal?parseInt(liveEventVal):null):t.eventId;
+    const liveCats=isLiveRerender?getSelectedCats(`todo-edit-catmulti-${t.id}`):taskCats(t);
+
+    // Only baseline the dirty-check snapshot the FIRST time this task's edit form
+    // appears in this editing session (todoFormSnapshot is reset to null in editTodo()).
+    if(todoFormSnapshot===null){
+      setTimeout(()=>{ if(todoFormSnapshot===null) takeTodoFormSnapshot(t.id); },0);
+    }
+    const links=t.links||[];
+    const images=t.images||[];
+    const linksHTML=links.map((l,i)=>`
+          <div class="todo-link-row">
+            <input type="text" class="todo-link-input" placeholder="Label (optional)" value="${l.label||''}" onchange="updateTodoLink(${t.id},${i},'label',this.value)">
+            <input type="text" class="todo-link-input" placeholder="https://…" value="${l.url||''}" onchange="updateTodoLink(${t.id},${i},'url',this.value)">
+            <button class="todo-link-remove" onclick="removeTodoLink(${t.id},${i})" title="Remove link">✕</button>
+          </div>`).join('');
+    const imagesHTML=images.map((img,i)=>`
+            <div class="todo-img-thumb-wrap">
+              <img src="${imgSrc(img)}" class="todo-img-thumb" title="${imgName(img)}">
+              <button class="todo-img-remove" onclick="removeTodoImage(${t.id},${i})" title="Remove image">✕</button>
+            </div>`).join('');
+    return `
+      <div class="todo-item todo-editing">
+        <span class="todo-num">${num}.</span>
+        <div class="todo-edit-form">
+          <label class="todo-section-label">✏️ Task title</label>
+          <input type="text" id="todo-edit-text-${t.id}" class="todo-edit-input" value="${liveText}"
+            onkeydown="if(event.key==='Enter')saveTodoEdit(${t.id});if(event.key==='Escape')attemptCancelEditTodo(${t.id})">
+          <div class="todo-edit-row2">
+            <div class="todo-field-group">
+              <label class="todo-section-label">🔗 Linked event</label>
+              <select id="todo-edit-event-${t.id}" class="todo-select">${buildEventOptionsHTML(liveEventId)}</select>
+            </div>
+            <div class="todo-field-group">
+              <label class="todo-section-label">📅 Due date</label>
+              <input type="date" id="todo-edit-due-${t.id}" class="todo-due-input" title="Due date (optional)" value="${liveDue}">
+            </div>
+            <div class="todo-field-group">
+              <label class="todo-section-label">👤 Owner</label>
+              <input type="text" id="todo-edit-owner-${t.id}" class="todo-due-input" placeholder="e.g. Francis" value="${liveOwner}">
+            </div>
+          </div>
+          <label class="todo-section-label">👥 Teams involved</label>
+          <div class="todo-cat-multi" id="todo-edit-catmulti-${t.id}">${catMultiPillsHTML(liveCats)}</div>
+
+          <label class="todo-section-label">📝 Description / notes</label>
+          <textarea id="todo-edit-desc-${t.id}" class="todo-edit-input todo-edit-textarea" placeholder="Add any details…">${liveDesc}</textarea>
+
+          <label class="todo-section-label">🔗 Resource links</label>
+          <div class="todo-links-edit">${linksHTML}</div>
+          <button class="btn-add-link" onclick="addTodoLink(${t.id})">&#10133; Add link</button>
+
+          <label class="todo-section-label">🖼️ Images</label>
+          <div class="todo-images-edit">
+            ${imagesHTML}
+            <label class="btn-upload-img">
+              &#128247; Upload image
+              <input type="file" accept="image/*" style="display:none" onchange="handleTodoImageUpload(${t.id},this)">
+            </label>
+          </div>
+
+          <div class="todo-edit-actions">
+            <button class="btn-add-todo" onclick="saveTodoEdit(${t.id})">✅ Save</button>
+            <button class="todo-clear" style="margin-top:0" onclick="attemptCancelEditTodo(${t.id})">Cancel</button>
+          </div>
+        </div>
+      </div>`;
+  }
+  const catTag=taskCats(t).map(catKey=>{
+    const cs=catStyle(catKey);
+    return `<span class="todo-tag" style="background:${cs.solidBg};color:${cs.solid};border-color:${cs.border}">${CAT_ICONS[catKey]||'📌'} ${cs.label}</span>`;
+  }).join('');
+  const descHTML=t.desc?`<div class="todo-desc">${t.desc}</div>`:'';
+  const dueHTML=t.due?(()=>{const d=dueLabel(t.due,t.done);return `<span class="todo-due-chip ${d.cls}">📅 ${d.text}</span>`;})():'';
+  const ownerHTML=t.owner?`<span class="todo-tag" style="background:#f1f5f9;color:#334155;border-color:#cbd5e1">👤 ${t.owner}</span>`:'';
+  const linksHTML=(t.links&&t.links.length)?`<div class="todo-links">${t.links.filter(l=>l.url).map(l=>`<a href="${l.url}" target="_blank" rel="noopener" class="todo-link-chip">🔗 ${l.label||l.url}</a>`).join('')}</div>`:'';
+  const imagesHTML=(t.images&&t.images.length)?`<div class="todo-images">${t.images.map((img,i)=>`<img src="${imgSrc(img)}" class="todo-thumb" title="${imgName(img)}" onclick="openTodoImage(${i},${t.id})">`).join('')}</div>`:'';
+  return `
+      <div class="todo-item">
+        <span class="todo-num">${num}.</span>
+        <input type="checkbox" ${t.done?'checked':''} onchange="toggleTodo(${t.id})">
+        <div class="todo-body">
+          <span class="todo-text${t.done?' done':''}">${t.text}</span>
+          <div class="todo-tags">${catTag}${ownerHTML}${dueHTML}</div>
+          ${descHTML}
+          ${linksHTML}
+          ${imagesHTML}
+        </div>
+        <button class="todo-edit-btn" onclick="editTodo(${t.id})" title="Edit task">✏️</button>
+        <button class="todo-del" onclick="deleteTodo(${t.id})" title="Delete task">🗑️</button>
+      </div>`;
+}
+
+// Keep every visible task view in sync after any add/edit/delete/toggle —
+// the bottom panel, and (if open) the current event's task section in the modal.
+function refreshTodoViews(){
+  editFormRenderedThisPass=false;
+  if(document.getElementById('event-tasks-section')&&editingId!==null) renderEventTasksSection(editingId);
+  renderTodos();
+}
+
+function renderTodos(){
+  populateTodoEventSelect();
+  const doneCount=todos.filter(t=>t.done).length;
+  document.getElementById('todo-counter').textContent=
+    todos.length===0?'No tasks yet — add one below':`${doneCount} of ${todos.length} done`;
+
+  const list=document.getElementById('todo-list');
+  if(todos.length===0){
+    list.innerHTML=`<div class="todo-empty">Nothing on the list yet 🎉</div>`;
+    return;
+  }
+
+  // "Due soon" rollup — pending tasks overdue or due within the next 7 days, across ALL events
+  const soon=todos.filter(t=>!t.done&&t.due&&daysUntil(t.due)<=7).sort((a,b)=>a.due<b.due?-1:1);
+  const soonHTML=soon.length?`<div class="due-soon-box">
+      <div class="due-soon-hd">⏰ Due soon / overdue (${soon.length})</div>
+      ${soon.map(t=>{
+        const d=dueLabel(t.due,false);
+        const evName=t.eventId?(events.find(e=>e.id===t.eventId)?.name||''):'';
+        return `<div class="due-soon-row"><span class="todo-due-chip ${d.cls}">📅 ${d.text}</span><span class="due-soon-text">${t.text}</span>${t.owner?`<span class="todo-tag" style="background:#f1f5f9;color:#334155;border-color:#cbd5e1">👤 ${t.owner}</span>`:''}${evName?`<span class="due-soon-ev">🔗 ${evName}</span>`:''}</div>`;
+      }).join('')}
+    </div>`:'';
+
+  // Group tasks by linked event — unlinked tasks fall into a "General Tasks" group
+  const groups=new Map();
+  todos.forEach(t=>{
+    const key=t.eventId?String(t.eventId):'general';
+    if(!groups.has(key)) groups.set(key,[]);
+    groups.get(key).push(t);
+  });
+
+  // Order: General Tasks first, then linked-event groups sorted by the event's date
+  const entries=[...groups.entries()].map(([key,tasks])=>{
+    if(key==='general') return {key,label:'📋 General Tasks',dateISO:null,linkedEvent:null,tasks};
+    const linkedEvent=events.find(e=>e.id===parseInt(key));
+    const dateISO=linkedEvent?eventDateRange(linkedEvent).startISO:null;
+    return {key,label:linkedEvent?linkedEvent.name:'⚠️ Event removed',dateISO,linkedEvent,tasks};
+  });
+  entries.sort((a,b)=>{
+    if(a.key==='general') return -1;
+    if(b.key==='general') return 1;
+    return (a.dateISO||'9999-99-99')<(b.dateISO||'9999-99-99')?-1:1;
+  });
+
+  list.innerHTML=soonHTML+entries.map(grp=>{
+    const headerCls='todo-group-hd'+(grp.linkedEvent?' linked':'');
+    const headerClick=grp.linkedEvent?` onclick="openEdit(${grp.linkedEvent.id})" title="Open this event"`:'';
+    const tLabel=grp.linkedEvent?timeLabel(grp.linkedEvent):'';
+    const gSt=grp.linkedEvent?evStatus(grp.linkedEvent):null;
+    const statusTag=(gSt&&gSt!=='confirmed')?` <span class="status-pill" style="background:${STATUSES[gSt].bg};color:${STATUSES[gSt].color}">${STATUSES[gSt].icon} ${STATUSES[gSt].label}</span>`:'';
+    const header=`<div class="${headerCls}"${headerClick}>${grp.key==='general'?grp.label:'🔗 '+grp.label}${grp.dateISO?' · '+fmtDate(grp.dateISO):''}${tLabel?' · 🕐 '+tLabel:''}${statusTag}</div>`;
+    const items=grp.tasks.map((t,i)=>renderTodoItemHTML(t,i+1)).join('');
+    return `<div class="todo-group">${header}${items}</div>`;
+  }).join('') + (doneCount>0?`<button class="todo-clear" onclick="clearCompletedTodos()">Clear ${doneCount} completed</button>`:'');
+}
+
+// ─── Per-event task section (shown inside the Edit Event modal) ───
+function toggleTaskSectionEdit(eventId){
+  if(taskSectionEditMode&&newTaskDraftIsDirty()&&!confirm('You have an unsaved new task. Discard it?')) return;
+  taskSectionEditMode=!taskSectionEditMode;
+  openEdit(eventId, eventEditMode, true);
+}
+
+function renderEventTasksSection(eventId){
+  const container=document.getElementById('event-tasks-section');
+  if(!container) return;
+  const allTasks=todos.filter(t=>t.eventId===eventId);
+  if(allTasks.length===0){
+    container.innerHTML=`<div class="todo-empty" style="padding:10px 0">No tasks yet for this event</div>`;
+    return;
+  }
+  const filterSel=document.getElementById('et-task-filter');
+  const filterCat=filterSel?filterSel.value:'';
+
+  if(filterCat){
+    // A specific team is selected — flat numbered list of tasks involving that team
+    const tasks=allTasks.filter(t=>taskCats(t).includes(filterCat));
+    container.innerHTML=tasks.length
+      ? tasks.map((t,i)=>renderTodoItemHTML(t,i+1)).join('')
+      : `<div class="todo-empty" style="padding:10px 0">No ${catStyle(filterCat).label} tasks for this event</div>`;
+    return;
+  }
+
+  // "All Teams" — one flat list, no duplication. Each task already shows its own team badge(s).
+  container.innerHTML=allTasks.map((t,i)=>renderTodoItemHTML(t,i+1)).join('');
+}
+function addEventTask(eventId){
+  const input=document.getElementById('et-task-input');
+  const text=input.value.trim();
+  if(!text){ input.focus(); return; }
+  const cats=getSelectedCats('et-task-cat-multi');
+  const due=document.getElementById('et-task-due')?.value||null;
+  const owner=document.getElementById('et-task-owner')?.value.trim()||null;
+  todos.push({id:nextTodoId++, text, done:false, cats, eventId, due, owner});
+  saveTodos();
+  input.value='';
+  const dueInput=document.getElementById('et-task-due');
+  if(dueInput) dueInput.value='';
+  const ownerInput2=document.getElementById('et-task-owner');
+  if(ownerInput2) ownerInput2.value='';
+  refreshTodoViews();
+  input.focus();
+  takeNewTaskDraftSnapshot(); // freshly-cleared box — re-baseline so it isn't flagged as dirty
+}
+
+// ─── Global state ───
+let hiddenTypes=new Set();
+let hiddenCats=new Set();
+let hiddenStatuses=new Set();
+let activeSem=1;
+let editingId=null;
+let editingTodoId=null;
+let eventEditMode=false; // false = read-only view with an Edit button; true = the editable form
+let taskSectionEditMode=false; // false = read-only task list; true = the full add/manage controls
+let pendingEventLinks=[]; // resource links staged in the Add Event modal before the event exists
+let pendingEventImages=[]; // images staged in the Add Event modal before the event exists
+let pendingStatus={am:'confirmed', e:'confirmed'}; // status currently selected in the Add/Edit Event status toggle
+let calView='grid'; // 'grid' (week grid) | 'agenda' (chronological list)
+let searchQuery=''; // live lowercase text filter from the top-bar search box
+let editFormRenderedThisPass=false; // guards against duplicate edit-form DOM ids when a task appears in multiple groups (e.g. multi-team tasks)
+let formSnapshot=null; // serialized snapshot of the open Add/Edit form, taken right after it renders — used to detect unsaved changes before closing
+let todoFormSnapshot=null; // same idea, but for an in-progress inline To-Do task edit (separate because both can theoretically be relevant in the per-event task section)
+let newTaskDraftSnapshot=null; // same idea, but for the quick "new task" draft box (#todo-input / #et-task-input)
+
+// ─── Unsaved-changes guard for Add/Edit Event forms ───
+// Serializes every input/select/textarea inside #modal-body, plus the bits that
+// live outside normal form fields (status toggle, multi-team pills, staged
+// links/images), into one comparable string.
+function snapshotForm(){
+  const body=document.getElementById('modal-body');
+  if(!body) return null;
+  const fields=[...body.querySelectorAll('input,select,textarea')].map(el=>{
+    if(el.type==='checkbox') return el.id+':'+el.checked;
+    return el.id+':'+el.value;
+  });
+  const activePills=[...body.querySelectorAll('.todo-cat-pill.active')].map(el=>el.dataset.cat).sort();
+  const links=JSON.stringify(pendingEventLinks);
+  const images=pendingEventImages.length; // image count is enough; full base64 diff is overkill
+  const status=editingId===null?pendingStatus.am:pendingStatus.e;
+  return JSON.stringify({fields,activePills,links,images,status});
+}
+function takeFormSnapshot(){ formSnapshot=snapshotForm(); }
+function formIsDirty(){
+  if(formSnapshot===null) return false; // no form open, or snapshot never taken (read-only view) — nothing to lose
+  return snapshotForm()!==formSnapshot;
+}
+// Attempt to close the modal; if the open Add/Edit form (event, in-progress
+// task edit, or a new-task draft) has unsaved edits, confirm first.
+function attemptCloseModal(){
+  if(formIsDirty()&&!confirm('You have unsaved changes. Close without saving?')) return;
+  if(editingTodoId!==null&&todoFormIsDirty(editingTodoId)&&!confirm('You have unsaved changes to a task. Close without saving?')) return;
+  if(newTaskDraftIsDirty()&&!confirm('You have an unsaved new task. Close without saving?')) return;
+  closeModal();
+}
+// Attempt to back out of editing a specific event (switch back to read-only view); same guard.
+function cancelEditEvent(id){
+  if(formIsDirty()&&!confirm('You have unsaved changes. Discard them?')) return;
+  openEdit(id,false);
+}
+
+// ─── Unsaved-changes guard for the inline To-Do task edit form ───
+// Same idea as snapshotForm(), scoped to just the one task's edit fields
+// (id-suffixed, so it works whether the form is in the main To-Do panel or
+// inside an event's task section).
+function snapshotTodoForm(id){
+  const textEl=document.getElementById(`todo-edit-text-${id}`);
+  if(!textEl) return null; // form not actually open
+  const form=textEl.closest('.todo-edit-form');
+  const text=textEl.value;
+  const eventVal=document.getElementById(`todo-edit-event-${id}`)?.value||'';
+  const due=document.getElementById(`todo-edit-due-${id}`)?.value||'';
+  const owner=document.getElementById(`todo-edit-owner-${id}`)?.value||'';
+  const desc=document.getElementById(`todo-edit-desc-${id}`)?.value||'';
+  const cats=[...document.querySelectorAll(`#todo-edit-catmulti-${id} .todo-cat-pill.active`)].map(el=>el.dataset.cat).sort();
+  const links=form?[...form.querySelectorAll('.todo-link-input')].map(el=>el.value):[];
+  const imageCount=form?form.querySelectorAll('.todo-img-thumb-wrap').length:0;
+  return JSON.stringify({text,eventVal,due,owner,desc,cats,links,imageCount});
+}
+function takeTodoFormSnapshot(id){ todoFormSnapshot=snapshotTodoForm(id); }
+function todoFormIsDirty(id){
+  if(todoFormSnapshot===null) return false;
+  return snapshotTodoForm(id)!==todoFormSnapshot;
+}
+// Attempt to back out of editing a task; confirm first if anything was changed.
+function attemptCancelEditTodo(id){
+  if(todoFormIsDirty(id)&&!confirm('You have unsaved changes to this task. Discard them?')) return;
+  cancelEditTodo();
+}
+
+// ─── Unsaved-changes guard for the quick "new task" draft box ───
+// Covers both the main To-Do panel's #todo-input row and the per-event
+// task section's #et-task-input row. #todo-input lives permanently at the
+// bottom of the page (outside the modal) and stays in the DOM even while
+// the Edit Event modal is open showing #et-task-input instead — so we can't
+// just grab whichever one exists, we have to check which one is actually
+// inside the open modal right now.
+function snapshotNewTaskDraft(){
+  const modalBody=document.getElementById('modal-body');
+  const etInput=document.getElementById('et-task-input');
+  // #et-task-input only ever renders inside the modal, so its presence is unambiguous
+  if(etInput){
+    const text=etInput.value;
+    const due=document.getElementById('et-task-due')?.value||'';
+    const owner=document.getElementById('et-task-owner')?.value||'';
+    const cats=[...document.querySelectorAll('#et-task-cat-multi .todo-cat-pill.active')].map(el=>el.dataset.cat).sort();
+    return JSON.stringify({scope:'event',text,due,owner,cats});
+  }
+  // Otherwise, the main #todo-input only counts if it's currently parked inside the modal
+  // (i.e. the To-Do List modal is open) — not when it's just sitting at the bottom of the page.
+  const mainInput=document.getElementById('todo-input');
+  if(mainInput&&modalBody&&modalBody.contains(mainInput)){
+    const text=mainInput.value;
+    const eventVal=document.getElementById('todo-event')?.value||'';
+    const due=document.getElementById('todo-due')?.value||'';
+    const owner=document.getElementById('todo-owner')?.value||'';
+    const cats=[...document.querySelectorAll('#todo-cat-multi .todo-cat-pill.active')].map(el=>el.dataset.cat).sort();
+    return JSON.stringify({scope:'main',text,eventVal,due,owner,cats});
+  }
+  return null; // neither draft box is open in the modal right now
+}
+function takeNewTaskDraftSnapshot(){ newTaskDraftSnapshot=snapshotNewTaskDraft(); }
+function newTaskDraftIsDirty(){
+  if(newTaskDraftSnapshot===null) return false;
+  return snapshotNewTaskDraft()!==newTaskDraftSnapshot;
+}
+
+// ─── Status toggle (Confirmed / Potential) in Add/Edit Event modals ───
+function setPendingStatus(prefix,status){
+  pendingStatus[prefix]=status;
+  Object.entries(STATUSES).forEach(([k,s])=>{
+    const btn=document.getElementById(`${prefix}-status-${k}`);
+    if(!btn) return;
+    const active=k===status;
+    btn.classList.toggle('active',active);
+    btn.style.cssText=(active?`border-color:${s.border};color:${s.color};background:${s.bg};`:'')+(s.dashed?'border-style:dashed':'');
+  });
+}
+
+// ─── Category style lookup ───
+const CAT_STYLES={
+  presidential: {color:'#7c3aed', bg:'rgba(124,58,237,.1)', solid:'#7c3aed', solidBg:'#f5f3ff', border:'#ddd6fe', label:'Presidential Cell',           icon:'⭐'},
+  finance:      {color:'#92400e', bg:'rgba(146,64,14,.1)',  solid:'#92400e', solidBg:'#fffbeb', border:'#fde68a', label:'Finance',                     icon:'💰'},
+  hr:           {color:'#475569', bg:'rgba(71,85,105,.1)',  solid:'#475569', solidBg:'#f1f5f9', border:'#cbd5e1', label:'Human Resources & Welfare', icon:'🗂️'},
+  publicity:    {color:'#155e75', bg:'rgba(21,94,117,.1)',  solid:'#155e75', solidBg:'#ecfeff', border:'#a5f3fc', label:'Publicity',icon:'🎨'},
+  internal:     {color:'#1d4ed8', bg:'rgba(37,99,235,.1)',  solid:'#2563eb', solidBg:'#eff6ff', border:'#bfdbfe', label:'Internal',                    icon:'🏛️'},
+  external:     {color:'#065f46', bg:'rgba(6,95,70,.1)',  solid:'#065f46', solidBg:'#d1fae5', border:'#6ee7b7', label:'External',                    icon:'🚀'},
+  allmembers:   {color:'#312e81', bg:'rgba(49,46,129,.1)',  solid:'#312e81', solidBg:'#eef2ff', border:'#c7d2fe', label:'All Members',                 icon:'👥'},
+};
+function catStyle(cat){ return CAT_STYLES[cat]||CAT_STYLES.internal; }
+// Derived from CAT_STYLES so icons never drift out of sync with the category list
+const CAT_ICONS=Object.fromEntries(Object.entries(CAT_STYLES).map(([k,v])=>[k,v.icon]));
+// Shorter labels for tight spaces (stat boxes, quick-action buttons) — falls back to the full label
+const SHORT_CAT_LABEL={presidential:'Presidential', hr:'HR & Welfare'};
+function shortCatLabel(key){ return SHORT_CAT_LABEL[key]||CAT_STYLES[key].label; }
+// Build <option> HTML for any Category/Team select (Add/Edit Event modals, To-Do team picker)
+function catOptionsHTML(selectedCat){
+  return Object.entries(CAT_STYLES).map(([k,c])=>`<option value="${k}"${selectedCat===k?' selected':''}>${c.icon} ${c.label}</option>`).join('');
+}
+function switchSem(n){
+  activeSem=n;
+  document.getElementById('tab-s1').className='sem-tab'+(n===1?' active':'');
+  document.getElementById('tab-s2').className='sem-tab'+(n===2?' active':'');
+  refreshWeekOptions('am');
+  render();
+}
+
+// ─── Filtered events for current sem ───
+function semWeekIds(s){ return (s===1?SEM1_WEEKS:SEM2_WEEKS).map(w=>w.id); }
+function visibleEvents(sem){
+  const ids=new Set(semWeekIds(sem));
+  return events.filter(e=>ids.has(e.weekId)&&!hiddenTypes.has(e.type)&&eventCats(e).some(c=>!hiddenCats.has(c))&&!hiddenStatuses.has(evStatus(e))&&matchesSearch(e));
+}
+
+// ─── Filter bar ───
+function renderFilter(){
+  const el=document.getElementById('filter-bar');
+  el.innerHTML='';
+
+  // Row 1: Category filters
+  const catRow=document.createElement('div');
+  catRow.style.cssText='display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%';
+
+  const catLabel=document.createElement('span');
+  catLabel.className='filter-label';
+  catLabel.textContent='Team Managing:';
+  catRow.appendChild(catLabel);
+
+  const FILTER_LABEL_OVERRIDE={internal:'Internal Events', external:'External Events'};
+  const CATS=Object.entries(CAT_STYLES).map(([key,c])=>({
+    key, label:FILTER_LABEL_OVERRIDE[key]||c.label, icon:c.icon, color:c.solid, bg:c.solidBg, border:c.border,
+  }));
+  CATS.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='fp'+(hiddenCats.has(c.key)?' off':'');
+    d.style.cssText=`background:${c.bg};color:${c.color};border-color:${c.border};border:1px solid ${c.border};font-weight:600`;
+    d.innerHTML=`${c.icon} ${c.label}`;
+    d.onclick=()=>{hiddenCats.has(c.key)?hiddenCats.delete(c.key):hiddenCats.add(c.key);render();};
+    catRow.appendChild(d);
+  });
+  el.appendChild(catRow);
+
+  // Divider
+  const div=document.createElement('div');
+  div.style.cssText='width:100%;height:1px;background:#e4e6ea;margin:4px 0';
+  el.appendChild(div);
+
+  // Row 2: Type filters
+  const typeRow=document.createElement('div');
+  typeRow.style.cssText='display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%';
+
+  const typeLabel=document.createElement('span');
+  typeLabel.className='filter-label';
+  typeLabel.textContent='Event Types:';
+  typeRow.appendChild(typeLabel);
+
+  Object.entries(TYPES).forEach(([k,v])=>{
+    const d=document.createElement('div');
+    d.className='fp '+v.fcls+(hiddenTypes.has(k)?' off':'');
+    d.innerHTML=`${v.icon} ${v.label}`;
+    d.onclick=()=>{hiddenTypes.has(k)?hiddenTypes.delete(k):hiddenTypes.add(k);render();};
+    typeRow.appendChild(d);
+  });
+  el.appendChild(typeRow);
+
+  // Divider
+  const div2=document.createElement('div');
+  div2.style.cssText='width:100%;height:1px;background:#e4e6ea;margin:4px 0';
+  el.appendChild(div2);
+
+  // Row 3: Status filter (Confirmed / Potential)
+  const statusRow=document.createElement('div');
+  statusRow.style.cssText='display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%';
+
+  const statusLabel=document.createElement('span');
+  statusLabel.className='filter-label';
+  statusLabel.textContent='Status:';
+  statusRow.appendChild(statusLabel);
+
+  Object.entries(STATUSES).forEach(([k,v])=>{
+    const d=document.createElement('div');
+    d.className='fp-status'+(hiddenStatuses.has(k)?' off':'');
+    d.style.cssText=`background:${v.bg};color:${v.color};border-color:${v.border};border:1px${v.dashed?' dashed':' solid'} ${v.border};font-weight:600`;
+    d.innerHTML=`${v.icon} ${v.label}`;
+    d.onclick=()=>{hiddenStatuses.has(k)?hiddenStatuses.delete(k):hiddenStatuses.add(k);render();};
+    statusRow.appendChild(d);
+  });
+  el.appendChild(statusRow);
+}
+
+// ─── Stats ───
+function renderStats(){
+  const all=events.filter(e=>{
+    const ids=new Set(semWeekIds(activeSem));
+    return ids.has(e.weekId);
+  });
+  const vis=visibleEvents(activeSem);
+  const total=all.length;
+
+  function card(icon, val, lbl, color, bg, border, onclick, muted){
+    return `<div class="stat-box" style="border-color:${border};background:${bg};cursor:pointer;${muted?'opacity:.4':''}" onclick="${onclick}" title="Click to filter">
+      <span class="stat-icon">${icon}</span>
+      <span class="stat-val" style="color:${color}">${val}</span>
+      <span class="stat-lbl">${lbl}</span>
+      <div class="stat-bar" style="background:${color};opacity:.35"></div>
+    </div>`;
+  }
+
+  // Shorter labels just for the stat boxes, so longer team names still fit comfortably
+  const potentialCount=all.filter(e=>evStatus(e)==='potential').length;
+  document.getElementById('stats-strip').innerHTML=
+    card('📅', total, `Sem ${activeSem} Events`, '#0f1117', '#f8f9fa', '#e4e6ea', 'resetAllFilters()', false) +
+    `<div class="stat-box is-potential-stat" style="border-color:${STATUSES.potential.border};background:${STATUSES.potential.bg};cursor:pointer;${hiddenStatuses.has('potential')?'opacity:.4':''}" onclick="toggleStatStatus('potential')" title="Click to filter">
+      <span class="stat-icon">${STATUSES.potential.icon}</span>
+      <span class="stat-val" style="color:${STATUSES.potential.color}">${potentialCount}</span>
+      <span class="stat-lbl">Potential / Sourcing</span>
+      <div class="stat-bar" style="background:${STATUSES.potential.color};opacity:.35"></div>
+    </div>` +
+    Object.entries(CAT_STYLES).map(([key,c])=>{
+      const count=all.filter(e=>eventCats(e).includes(key)).length;
+      return card(c.icon, count, shortCatLabel(key), c.solid, c.solidBg, c.border, `toggleStatCat('${key}')`, hiddenCats.has(key));
+    }).join('');
+}
+
+// ─── Stat box click handlers ───
+function toggleStatCat(key){
+  hiddenCats.has(key)?hiddenCats.delete(key):hiddenCats.add(key);
+  render();
+}
+function toggleStatStatus(key){
+  hiddenStatuses.has(key)?hiddenStatuses.delete(key):hiddenStatuses.add(key);
+  render();
+}
+function resetAllFilters(){
+  hiddenCats.clear();
+  hiddenTypes.clear();
+  hiddenStatuses.clear();
+  render();
+}
+
+// ─── Calendar render ───
+function renderCal(){
+  if(calView==='agenda'){ renderAgenda(); return; }
+  const weeks=activeSem===1?SEM1_WEEKS:SEM2_WEEKS;
+  const months=activeSem===1?SEM1_MONTHS:SEM2_MONTHS;
+  const vis=visibleEvents(activeSem);
+  const dateMap=buildDateMap(vis);
+  // Count how many (non-declined) events START on each date — drives the clash ⚠️ marker
+  const startCount={};
+  vis.forEach(ev=>{ if(evStatus(ev)!=='declined'){ const r=eventDateRange(ev); if(r.startISO) startCount[r.startISO]=(startCount[r.startISO]||0)+1; } });
+  const todayInfo=getTodayInfo(); // only used to highlight today's row/cell when it falls in the semester currently being viewed
+
+  // grid: label col + 7 day cols = 8 cols per row
+  const LABEL_W='104px';
+  const gridStyle=`grid-template-columns:${LABEL_W} repeat(7,1fr)`;
+
+  let html=`<div class="month-strip" style="${gridStyle}">`;
+  html+=`<div class="mhdr">Month / Week</div>`;
+  DAYS.forEach(d=>html+=`<div class="mhdr">${d}</div>`);
+  html+='</div>';
+
+  // Track month changes to draw a divider
+  let lastMonth='';
+
+  weeks.forEach(w=>{
+    const rowCls=w.kind==='recess'?' rr-recess':w.kind==='exam'?' rr-exam':w.kind==='vac'?' rr-vac':'';
+
+    // Determine primary month for this week (first in months array)
+    const primaryMonth=w.months[0];
+    const shortMonth=primaryMonth.split(' ')[0].toUpperCase(); // e.g. "AUG"
+    const isNewMonth=primaryMonth!==lastMonth;
+    const spansTwo=w.months.length>1;
+    lastMonth=primaryMonth;
+
+    // Add a month-change border-top if month changed
+    const monthBorder=isNewMonth&&w.wk!=='Week 0'?'border-top:2px solid #e4e6ea;':'';
+    const isThisWeekToday=todayInfo.sem===activeSem&&todayInfo.week&&todayInfo.week.id===w.id;
+
+    html+=`<div class="week-row${rowCls}${isThisWeekToday?' is-today-row':''}" style="${gridStyle};${monthBorder}">`;
+
+    // label col — show month badge + week + dates
+    html+=`<div class="wlabel${isThisWeekToday?' is-today-label':''}">`;
+    // Month badge — show on every row so it's always visible
+    html+=`<div style="font-size:9px;font-weight:700;letter-spacing:.07em;color:#fff;background:#0f1117;border-radius:3px;padding:1px 5px;display:inline-block;margin-bottom:3px;width:fit-content">${shortMonth}${spansTwo?' /'+w.months[1].split(' ')[0].toUpperCase().slice(0,3):''}</div>`;
+    html+=`<div class="wk-num">${w.wk}</div>`;
+    html+=`<div class="wk-dates">${w.dates}</div>`;
+    if(w.kind==='recess') html+=`<span class="wk-tag t-recess">Recess</span>`;
+    if(w.kind==='exam')   html+=`<span class="wk-tag t-exam">Exam</span>`;
+    if(w.kind==='vac')    html+=`<span class="wk-tag t-vac">Vacation</span>`;
+    if(w.kind==='reading')html+=`<span class="wk-tag t-reading">Reading</span>`;
+    if(isThisWeekToday)   html+=`<span class="today-pill">📍 This Week</span>`;
+    html+=`</div>`;
+
+    // day columns
+    const rowSpan=w.span||7;
+    DAYS.forEach((day,di)=>{
+      // inactive day: weekends on normal weeks could still have events.
+      // Columns beyond this row's actual span (e.g. the tail end of a split
+      // Exam/Recess/Vacation block) belong to the *next* row, so they're disabled here.
+      const beyondSpan=di>=rowSpan;
+      const dayDate=weekDayISO(w.mon,day);
+      const entries=beyondSpan?[]:(dateMap[dayDate]||[]);
+      const inactive=beyondSpan||(entries.length===0&&w.kind==='vac');
+      const isTodayCol=dayDate===todayInfo.iso;
+      html+=`<div class="day-col${inactive?' day-inactive':''}${isTodayCol?' is-today-col':''}">`;
+      entries.forEach(({ev,isStart})=>{
+        const t=TYPES[ev.type];
+        const stKey=evStatus(ev);
+        const sStyle=STATUSES[stKey];
+        const isPotential=!!sStyle.tentative;
+        const isDeclined=stKey==='declined';
+        const catTags=eventCats(ev).map(catKey=>{
+          const c=catStyle(catKey);
+          return `<span class="ev-cat" style="background:${c.bg};color:${c.color}">${CAT_ICONS[catKey]||'📌'} ${c.label}</span>`;
+        }).join('');
+        if(isStart){
+          const sync=ev.synced?'<span class="synced-dot"></span>':'';
+          const {startISO,endISO}=eventDateRange(ev);
+          const dateLabel=startISO===endISO?fmtDate(dayDate):`${fmtDate(startISO)} – ${fmtDate(endISO)}`;
+          const statusBadge=stKey!=='confirmed'?`<span class="status-pill" style="background:${sStyle.bg};color:${sStyle.color}">${sStyle.icon} ${sStyle.label}</span>`:'';
+          html+=`<div class="ev ${t.cls}${isPotential?' is-potential':''}${isDeclined?' is-declined':''}" onclick="openEdit(${ev.id})">
+            <div class="ev-type">${t.icon} ${t.label}${statusBadge}</div>
+            <div class="ev-name">${sync}${ev.name}</div>
+            <div class="ev-date">${dateLabel}${startCount[dayDate]>1&&!isDeclined?' <span title="Clash — another event shares this date">⚠️</span>':''}</div>
+            ${timeLabel(ev)?`<div class="ev-time">${timeLabel(ev)}</div>`:''}
+            ${ev.venue?`<div class="ev-venue">📍 ${ev.venue}</div>`:''}
+            ${catTags}
+          </div>`;
+        } else {
+          html+=`<div class="ev ev-continue ${t.cls}${isPotential?' is-potential':''}${isDeclined?' is-declined':''}" onclick="openEdit(${ev.id})" title="${ev.name} (continued)">
+            <div class="ev-continue-label">↳ ${ev.name}</div>
+          </div>`;
+        }
+      });
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+  });
+
+  document.getElementById('cal-wrap').innerHTML=html;
+}
+
+// ─── Week select inside Add Event modal ───
+// ─── Week select — shared by Add Event ('am') and Edit Event ('e') modals ───
+function refreshWeekOptions(prefix){
+  const sel=document.getElementById(prefix+'-week');
+  if(!sel) return;
+  const semSel=document.getElementById(prefix+'-sem');
+  const semVal=parseInt(semSel?semSel.value:activeSem)||activeSem;
+  const weeks=semVal===1?SEM1_WEEKS:SEM2_WEEKS;
+  const prevWeek=sel.value;
+  sel.innerHTML='';
+  weeks.forEach(w=>{
+    const o=document.createElement('option');
+    o.value=w.id;
+    o.textContent=w.wk+' · '+w.dates;
+    if(w.id===prevWeek) o.selected=true;
+    sel.appendChild(o);
+  });
+  refreshDayOptions(prefix);
+  const multidayCb=document.getElementById(prefix+'-multiday');
+  if(multidayCb&&multidayCb.checked) refreshEndWeekOptions(prefix);
+}
+
+// ─── Day select — shows the actual date for each weekday, limited to the chosen week's span ───
+function refreshDayOptions(prefix){
+  const weekSel=document.getElementById(prefix+'-week');
+  const daySel=document.getElementById(prefix+'-day');
+  if(!weekSel||!daySel) return;
+  const w=[...SEM1_WEEKS,...SEM2_WEEKS].find(x=>x.id===weekSel.value);
+  if(!w) return;
+  const prevDay=daySel.value||'Mon';
+  daySel.innerHTML=buildDayOptions(w.mon,prevDay,w.span);
+}
+
+// ─── Multi-day toggle — show/hide the "Ends" Week/Day fields ───
+function toggleMultiDay(prefix){
+  const cb=document.getElementById(prefix+'-multiday');
+  const wrap=document.getElementById(prefix+'-end-fields');
+  if(!cb||!wrap) return;
+  wrap.style.display=cb.checked?'contents':'none';
+  if(cb.checked) refreshEndWeekOptions(prefix);
+}
+
+// ─── All-day toggle — show/hide the Start/End time fields ───
+function toggleAllDay(prefix){
+  const cb=document.getElementById(prefix+'-allday');
+  const wrap=document.getElementById(prefix+'-time-fields');
+  if(!cb||!wrap) return;
+  wrap.style.display=cb.checked?'none':'contents';
+}
+
+// ─── "Ends" Week select — same semester as the start, defaults to the start week ───
+function refreshEndWeekOptions(prefix){
+  const endSel=document.getElementById(prefix+'-endweek');
+  if(!endSel) return;
+  const semSel=document.getElementById(prefix+'-sem');
+  const startWeekSel=document.getElementById(prefix+'-week');
+  const semVal=parseInt(semSel?semSel.value:activeSem)||activeSem;
+  const weeks=semVal===1?SEM1_WEEKS:SEM2_WEEKS;
+  const prevEndWeek=endSel.value;
+  endSel.innerHTML='';
+  weeks.forEach(w=>{
+    const o=document.createElement('option');
+    o.value=w.id;
+    o.textContent=w.wk+' · '+w.dates;
+    endSel.appendChild(o);
+  });
+  if(prevEndWeek&&weeks.some(w=>w.id===prevEndWeek)) endSel.value=prevEndWeek;
+  else if(startWeekSel&&startWeekSel.value) endSel.value=startWeekSel.value;
+  refreshEndDayOptions(prefix);
+}
+
+// ─── "Ends" Day select — limited to the chosen end week's span ───
+function refreshEndDayOptions(prefix){
+  const endWeekSel=document.getElementById(prefix+'-endweek');
+  const endDaySel=document.getElementById(prefix+'-endday');
+  if(!endWeekSel||!endDaySel) return;
+  const w=[...SEM1_WEEKS,...SEM2_WEEKS].find(x=>x.id===endWeekSel.value);
+  if(!w) return;
+  const prevDay=endDaySel.value||'Mon';
+  endDaySel.innerHTML=buildDayOptions(w.mon,prevDay,w.span);
+}
+
+// ─── Open the Add Event modal ───
+function openAddModal(){
+  restoreTodoPanelIfNeeded();
+  editingId=null;
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-title" style="margin-bottom:3px">&#10133; Add New Event</div>
+    <div class="modal-meta" style="margin-bottom:12px">Fill in the details and it'll be added straight to the calendar.</div>
+    <div class="modal-fields">
+      <div class="m-field" style="grid-column:1/-1"><label>Event name</label><input id="am-name" placeholder="e.g. TSMC Company Talk"></div>
+      <div class="m-field" style="grid-column:1/-1">
+        <label>Status</label>
+        ${statusToggleHTML('am','confirmed')}
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Outreach pipeline: <strong>Potential → Outreach Sent → In Discussion → Confirmed</strong>. Mark <strong>Completed</strong> after the event, or <strong>Declined</strong> if it falls through.</div>
+      </div>
+      <div class="m-field" style="grid-column:1/-1"><label>Category (one or more teams)</label>
+        <div id="am-cat-multi" class="todo-cat-multi">${catMultiPillsHTML(['internal'])}</div>
+      </div>
+      <div class="m-field"><label>Type</label>
+        <select id="am-type">
+          ${Object.entries(TYPES).map(([k,v])=>`<option value="${k}">${v.icon} ${v.label}</option>`).join('')}
+        </select>
+      </div>
+      <div class="m-field"><label>Semester</label>
+        <select id="am-sem" onchange="refreshWeekOptions('am')">
+          <option value="1"${activeSem===1?' selected':''}>Semester 1</option>
+          <option value="2"${activeSem===2?' selected':''}>Semester 2</option>
+        </select>
+      </div>
+      <div class="m-field"><label>Week</label><select id="am-week" onchange="refreshDayOptions('am')"></select></div>
+      <div class="m-field"><label>Day</label>
+        <select id="am-day"></select>
+      </div>
+      <div class="m-field" style="grid-column:1/-1">
+        <label style="text-transform:none;letter-spacing:0;font-size:12px;color:#374151;display:flex;align-items:center;gap:7px;cursor:pointer">
+          <input type="checkbox" id="am-multiday" onchange="toggleMultiDay('am')" style="width:14px;height:14px;margin:0">
+          This event spans multiple consecutive days
+        </label>
+      </div>
+      <div id="am-end-fields" style="display:none">
+        <div class="m-field"><label>Ends · Week</label><select id="am-endweek" onchange="refreshEndDayOptions('am')"></select></div>
+        <div class="m-field"><label>Ends · Day</label><select id="am-endday"></select></div>
+      </div>
+      <div class="m-field" style="grid-column:1/-1">
+        <label style="text-transform:none;letter-spacing:0;font-size:12px;color:#374151;display:flex;align-items:center;gap:7px;cursor:pointer">
+          <input type="checkbox" id="am-allday" onchange="toggleAllDay('am')" style="width:14px;height:14px;margin:0">
+          All-day event (no specific time)
+        </label>
+      </div>
+      <div id="am-time-fields" style="display:contents">
+        <div class="m-field"><label>🕐 Start time</label><input type="time" id="am-starttime" value="14:00"></div>
+        <div class="m-field"><label>🕐 End time</label><input type="time" id="am-endtime" value="16:00"></div>
+      </div>
+      <div class="m-field"><label>📍 Venue</label><input id="am-venue" placeholder="e.g. E4 LT65"></div>
+      <div class="m-field"><label>👥 Expected pax</label><input type="number" id="am-expected" min="0" placeholder="e.g. 80"></div>
+      <div class="m-field"><label>💰 Budget (SGD)</label><input type="number" id="am-budget" min="0" step="0.01" placeholder="e.g. 200"></div>
+      <div class="m-field" style="grid-column:1/-1"><label>📝 Description (optional)</label>
+        <textarea id="am-desc" placeholder="Add any details, agenda, or notes about this event…"></textarea>
+      </div>
+      <div class="m-field" style="grid-column:1/-1">
+        <label class="todo-section-label" style="margin-top:0">🔗 Resource links</label>
+        <div class="todo-links-edit" id="am-links-edit"></div>
+        <button type="button" class="btn-add-link" onclick="addPendingEventLink()">&#10133; Add link</button>
+      </div>
+      <div class="m-field" style="grid-column:1/-1">
+        <label class="todo-section-label">🖼️ Images</label>
+        <div class="todo-images-edit" id="am-images-edit"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-save" onclick="addEvent()">&#10133; Add Event</button>
+      <button class="btn btn-cancel" onclick="attemptCloseModal()">Cancel</button>
+    </div>
+  `;
+  document.getElementById('modal-bg').classList.add('open');
+  refreshWeekOptions('am');
+  pendingEventLinks=[];
+  pendingEventImages=[];
+  pendingStatus.am='confirmed';
+  renderPendingEventLinksImages();
+  document.getElementById('am-name').focus();
+  takeFormSnapshot();
+}
+
+// ─── Add event (submits the Add Event modal) ───
+// ─── Resource links / images staged in the Add Event modal (event doesn't exist yet) ───
+function renderPendingEventLinksImages(){
+  const linksEl=document.getElementById('am-links-edit');
+  const imagesEl=document.getElementById('am-images-edit');
+  if(!linksEl||!imagesEl) return;
+  linksEl.innerHTML=pendingEventLinks.map((l,i)=>`
+      <div class="todo-link-row">
+        <input type="text" class="todo-link-input" placeholder="Label (optional)" value="${l.label||''}" onchange="updatePendingEventLink(${i},'label',this.value)">
+        <input type="text" class="todo-link-input" placeholder="https://…" value="${l.url||''}" onchange="updatePendingEventLink(${i},'url',this.value)">
+        <button class="todo-link-remove" onclick="removePendingEventLink(${i})" title="Remove link">✕</button>
+      </div>`).join('');
+  imagesEl.innerHTML=pendingEventImages.map((img,i)=>`
+        <div class="todo-img-thumb-wrap">
+          <img src="${imgSrc(img)}" class="todo-img-thumb" title="${imgName(img)}">
+          <button class="todo-img-remove" onclick="removePendingEventImage(${i})" title="Remove image">✕</button>
+        </div>`).join('')+`
+        <label class="btn-upload-img">
+          &#128247; Upload image
+          <input type="file" accept="image/*" style="display:none" onchange="handlePendingEventImageUpload(this)">
+        </label>`;
+}
+function addPendingEventLink(){ pendingEventLinks.push({label:'',url:''}); renderPendingEventLinksImages(); }
+function updatePendingEventLink(idx,field,value){ if(pendingEventLinks[idx]) pendingEventLinks[idx][field]=value; }
+function removePendingEventLink(idx){ pendingEventLinks.splice(idx,1); renderPendingEventLinksImages(); }
+function removePendingEventImage(idx){ pendingEventImages.splice(idx,1); renderPendingEventLinksImages(); }
+function handlePendingEventImageUpload(fileInput){
+  const file=fileInput.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const img=new Image();
+    img.onload=function(){
+      const maxDim=800;
+      let w=img.width, h=img.height;
+      if(w>maxDim||h>maxDim){
+        if(w>h){ h=Math.round(h*maxDim/w); w=maxDim; }
+        else{ w=Math.round(w*maxDim/h); h=maxDim; }
+      }
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      pendingEventImages.push({name:file.name,src:canvas.toDataURL('image/jpeg',0.75)});
+      renderPendingEventLinksImages();
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+  fileInput.value='';
+}
+
+function addEvent(){
+  const name=document.getElementById('am-name').value.trim();
+  if(!name){document.getElementById('am-name').focus();return;}
+  const cats=getSelectedCats('am-cat-multi');
+  const type=document.getElementById('am-type').value;
+  const sem=parseInt(document.getElementById('am-sem').value);
+  const weekId=document.getElementById('am-week').value;
+  const day=document.getElementById('am-day').value;
+  const venue=document.getElementById('am-venue').value.trim();
+  const desc=document.getElementById('am-desc').value.trim();
+  const expected=parseInt(document.getElementById('am-expected').value)||null;
+  const budget=parseFloat(document.getElementById('am-budget').value)||null;
+  const isMultiDay=document.getElementById('am-multiday').checked;
+  const endWeekId=isMultiDay?document.getElementById('am-endweek').value:null;
+  const endDay=isMultiDay?document.getElementById('am-endday').value:null;
+  const allDay=document.getElementById('am-allday').checked;
+  const startTime=allDay?null:document.getElementById('am-starttime').value||null;
+  const endTime=allDay?null:document.getElementById('am-endtime').value||null;
+  const links=[...pendingEventLinks];
+  const images=[...pendingEventImages];
+  const status=STATUSES[pendingStatus.am]?pendingStatus.am:'confirmed';
+  const newEv={id:nextId++,weekId,day,endWeekId,endDay,allDay,startTime,endTime,type,cats,status,name,venue,desc,expected,actual:null,budget,links,images,synced:false};
+  events.push(newEv);
+  pendingEventLinks=[];
+  pendingEventImages=[];
+  saveEvents();
+  closeModal();
+  if(sem!==activeSem) switchSem(sem); else render();
+  postSaveNotices(newEv);
+}
+
+// ─── Open edit modal ───
+function openEdit(id, startInEditMode, preserveTaskMode){
+  restoreTodoPanelIfNeeded();
+  editingId=id;
+  eventEditMode=!!startInEditMode;
+  if(!preserveTaskMode) taskSectionEditMode=false;
+  const ev=events.find(e=>e.id===id);
+  if(!ev) return;
+  pendingStatus.e=evStatus(ev);
+  const t=TYPES[ev.type];
+  const w=[...SEM1_WEEKS,...SEM2_WEEKS].find(x=>x.id===ev.weekId);
+  const evSem=w?(SEM1_WEEKS.includes(w)?1:2):activeSem;
+  const catBadges=eventCats(ev).map(catKey=>{
+    const c=catStyle(catKey);
+    return `<span class="m-badge" style="background:${c.solidBg};color:${c.solid};border-color:${c.border}">${CAT_ICONS[catKey]||'📌'} ${c.label}</span>`;
+  }).join('');
+  const syncBadge=ev.synced?`<span class="m-badge" style="background:#f0fdf4;color:#16a34a;border-color:#bbf7d0">✅ Synced</span>`:'';
+  const sStyle=statusStyle(ev);
+  const statusBadgeModal=evStatus(ev)!=='confirmed'?`<span class="m-badge" style="background:${sStyle.bg};color:${sStyle.color};border-color:${sStyle.border}${sStyle.dashed?';border-style:dashed':''}">${sStyle.icon} ${sStyle.label}</span>`:'';
+
+  const linkedTasks=todos.filter(t=>t.eventId===id);
+  const taskPreviewListHTML=linkedTasks.length?`
+    <div class="todo-preview-list">
+      ${linkedTasks.map((t,i)=>{
+        const tags=taskCats(t).map(k=>{const c=catStyle(k);return `<span class="todo-tag" style="background:${c.solidBg};color:${c.solid};border-color:${c.border}">${CAT_ICONS[k]||'📌'} ${c.label}</span>`;}).join('');
+        const dueTag=t.due?(()=>{const d=dueLabel(t.due,t.done);return `<span class="todo-due-chip ${d.cls}">📅 ${d.text}</span>`;})():'';
+        return `<div class="todo-preview-item">
+          <span class="todo-num">${i+1}.</span>
+          <input type="checkbox" disabled ${t.done?'checked':''} class="todo-preview-check" title="Read-only — use Edit Tasks to change">
+          <div class="todo-body">
+            <span class="todo-text${t.done?' done':''}">${t.text}</span>
+            <div class="todo-tags">${tags}${dueTag}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `:`<div class="todo-empty" style="padding:6px 0">No tasks yet for this event</div>`;
+
+  const linksImagesHTML=`
+    ${(ev.links&&ev.links.filter(l=>l.url).length)?`<div class="todo-links">${ev.links.filter(l=>l.url).map(l=>`<a href="${l.url}" target="_blank" rel="noopener" class="todo-link-chip">🔗 ${l.label||l.url}</a>`).join('')}</div>`:''}
+    ${(ev.images&&ev.images.length)?`<div class="todo-images">${ev.images.map((img,i)=>`<img src="${imgSrc(img)}" class="todo-thumb" title="${imgName(img)}" onclick="openEventImage(${i},${ev.id})">`).join('')}</div>`:''}
+  `;
+
+  const viewBlock=`
+    <div class="modal-title" id="m-title-disp">${ev.name}</div>
+    <div class="modal-meta">📅 ${w?w.wk+' · '+w.dates:''} · ${(()=>{const r=eventDateRange(ev);return r.startISO===r.endISO?ev.day+', '+fmtDate(r.startISO):fmtDate(r.startISO)+' – '+fmtDate(r.endISO);})()}${timeLabel(ev)?' · 🕐 '+timeLabel(ev):''}${ev.venue?' · 📍 '+ev.venue:''}${ev.expected?' · 👥 '+ev.expected+' expected':''}${(ev.actual||ev.actual===0)?' · ✅ '+ev.actual+' attended':''}${ev.budget?' · 💰 S$'+ev.budget:''}</div>
+    ${ev.desc?`<div class="modal-desc">${ev.desc}</div>`:''}
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-top:6px">
+      <div style="flex:1;min-width:0">${linksImagesHTML}</div>
+      <button class="btn-add-top edit-only" style="flex-shrink:0" onclick="openEdit(${ev.id},true)">✏️ Edit Event</button>
+    </div>
+  `;
+
+  const formBlock=`
+    <div class="modal-fields">
+      <div class="m-field" style="grid-column:1/-1"><label>Event name</label><input id="e-name" value="${ev.name}"></div>
+      <div class="m-field" style="grid-column:1/-1">
+        <label>Status</label>
+        ${statusToggleHTML('e',evStatus(ev))}
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Outreach pipeline: <strong>Potential → Outreach Sent → In Discussion → Confirmed</strong>. Mark <strong>Completed</strong> after the event, or <strong>Declined</strong> if it falls through.</div>
+      </div>
+      <div class="m-field" style="grid-column:1/-1"><label>Category (one or more teams)</label>
+        <div id="e-cat-multi" class="todo-cat-multi">${catMultiPillsHTML(eventCats(ev))}</div>
+      </div>
+      <div class="m-field"><label>Type</label>
+        <select id="e-type">
+          ${Object.entries(TYPES).map(([k,v])=>`<option value="${k}"${ev.type===k?' selected':''}>${v.icon} ${v.label}</option>`).join('')}
+        </select>
+      </div>
+      <div class="m-field"><label>Semester</label>
+        <select id="e-sem" onchange="refreshWeekOptions('e')">
+          <option value="1"${evSem===1?' selected':''}>Semester 1</option>
+          <option value="2"${evSem===2?' selected':''}>Semester 2</option>
+        </select>
+      </div>
+      <div class="m-field"><label>Week</label><select id="e-week" onchange="refreshDayOptions('e')"></select></div>
+      <div class="m-field"><label>Day</label><select id="e-day"></select></div>
+      <div class="m-field" style="grid-column:1/-1">
+        <label style="text-transform:none;letter-spacing:0;font-size:12px;color:#374151;display:flex;align-items:center;gap:7px;cursor:pointer">
+          <input type="checkbox" id="e-multiday" onchange="toggleMultiDay('e')" style="width:14px;height:14px;margin:0" ${ev.endWeekId&&ev.endDay?'checked':''}>
+          This event spans multiple consecutive days
+        </label>
+      </div>
+      <div id="e-end-fields" style="display:${ev.endWeekId&&ev.endDay?'contents':'none'}">
+        <div class="m-field"><label>Ends · Week</label><select id="e-endweek" onchange="refreshEndDayOptions('e')"></select></div>
+        <div class="m-field"><label>Ends · Day</label><select id="e-endday"></select></div>
+      </div>
+      <div class="m-field" style="grid-column:1/-1">
+        <label style="text-transform:none;letter-spacing:0;font-size:12px;color:#374151;display:flex;align-items:center;gap:7px;cursor:pointer">
+          <input type="checkbox" id="e-allday" onchange="toggleAllDay('e')" style="width:14px;height:14px;margin:0" ${ev.allDay?'checked':''}>
+          All-day event (no specific time)
+        </label>
+      </div>
+      <div id="e-time-fields" style="display:${ev.allDay?'none':'contents'}">
+        <div class="m-field"><label>🕐 Start time</label><input type="time" id="e-starttime" value="${ev.startTime||'14:00'}"></div>
+        <div class="m-field"><label>🕐 End time</label><input type="time" id="e-endtime" value="${ev.endTime||'16:00'}"></div>
+      </div>
+      <div class="m-field"><label>📍 Venue</label><input id="e-venue" value="${ev.venue||''}"></div>
+      <div class="m-field"><label>👥 Expected pax</label><input type="number" id="e-expected" min="0" value="${ev.expected??''}" placeholder="e.g. 80"></div>
+      <div class="m-field"><label>✅ Actual attendance</label><input type="number" id="e-actual" min="0" value="${ev.actual??''}" placeholder="fill in after the event"></div>
+      <div class="m-field"><label>💰 Budget (SGD)</label><input type="number" id="e-budget" min="0" step="0.01" value="${ev.budget??''}"></div>
+      <div class="m-field" style="grid-column:1/-1"><label>📝 Description</label>
+        <textarea id="e-desc">${ev.desc||''}</textarea>
+      </div>
+      <div class="m-field" style="grid-column:1/-1">
+        <label class="todo-section-label" style="margin-top:0">🔗 Resource links</label>
+        <div class="todo-links-edit" id="e-links-edit"></div>
+        <button type="button" class="btn-add-link" onclick="addEventLink(${ev.id})">&#10133; Add link</button>
+      </div>
+      <div class="m-field" style="grid-column:1/-1">
+        <label class="todo-section-label">🖼️ Images</label>
+        <div class="todo-images-edit" id="e-images-edit"></div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('modal-body').innerHTML=`
+    <div class="modal-badges">
+      <span class="m-badge" style="background:${t.bg};color:${t.color};border-color:${t.border}">${t.icon} ${t.label}</span>
+      ${catBadges}
+      ${statusBadgeModal}
+      ${syncBadge}
+    </div>
+    ${eventEditMode?formBlock:viewBlock}
+    <div class="modal-divider"></div>
+    <div class="modal-tasks-section">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="modal-tasks-hd" style="margin-bottom:0">✅ Tasks for this event:</div>
+        <button class="btn-add-top btn-add-top-secondary edit-only" style="padding:6px 14px;font-size:11px" onclick="toggleTaskSectionEdit(${ev.id})">${taskSectionEditMode?'✅ Done':'✏️ Edit Tasks'}</button>
+      </div>
+      ${taskSectionEditMode?`
+        <div class="todo-add-row" style="margin-top:10px;margin-bottom:8px">
+          <input type="text" id="et-task-input" placeholder="Add a task for this event…" onkeydown="if(event.key==='Enter')addEventTask(${ev.id})">
+          <span class="todo-due-inline-label">📅 Due:</span>
+          <input type="date" id="et-task-due" class="todo-due-input" title="Due date (optional)">
+          <input type="text" id="et-task-owner" class="todo-due-input" placeholder="👤 Owner" title="Who's responsible (optional)" style="width:110px">
+          <button class="btn-add-todo" onclick="addEventTask(${ev.id})">&#10133; Add</button>
+        </div>
+        <div id="et-task-cat-multi" class="todo-cat-multi" style="margin-bottom:10px">${catMultiPillsHTML(eventCats(ev))}</div>
+        <select id="et-task-filter" class="todo-select" style="width:100%;margin-bottom:10px" onchange="renderEventTasksSection(${ev.id})">
+          <option value="">👀 All Teams</option>
+          ${Object.entries(CAT_STYLES).map(([k,c])=>`<option value="${k}">${c.icon} ${c.label}</option>`).join('')}
+        </select>
+        <div id="event-tasks-section"></div>
+      `:`<div style="margin-top:10px">${taskPreviewListHTML}</div>`}
+    </div>
+    <div class="modal-actions">
+      ${eventEditMode?`
+        <button class="btn btn-save" onclick="saveEdit()">✅ Save changes</button>
+        <button class="btn btn-cancel" onclick="cancelEditEvent(${ev.id})">Cancel</button>
+      `:`
+        <button class="btn btn-sync" onclick="openGcalLink(${ev.id})">📅 Add to Google Calendar</button>
+        <button class="btn btn-delete" onclick="deleteEvent(${ev.id})">🗑️ Delete</button>
+        <button class="btn btn-cancel" onclick="closeModal()">Close</button>
+      `}
+    </div>
+  `;
+  document.getElementById('modal-bg').classList.add('open');
+  if(eventEditMode) renderEventLinksImages(ev.id);
+  refreshTodoViews();
+  takeNewTaskDraftSnapshot(); // baseline the per-event "new task" draft box, if it's showing
+
+  if(eventEditMode){
+    // Populate Week options for this event's semester, with its actual week pre-selected
+    const weekSel=document.getElementById('e-week');
+    const weeks=evSem===1?SEM1_WEEKS:SEM2_WEEKS;
+    weekSel.innerHTML='';
+    weeks.forEach(wk=>{
+      const o=document.createElement('option');
+      o.value=wk.id;
+      o.textContent=wk.wk+' · '+wk.dates;
+      if(wk.id===ev.weekId) o.selected=true;
+      weekSel.appendChild(o);
+    });
+    // Populate Day options for the resolved week, with the event's actual day pre-selected
+    const dayBuildWeek=w||weeks[0];
+    document.getElementById('e-day').innerHTML=buildDayOptions(dayBuildWeek.mon,ev.day,dayBuildWeek.span);
+
+    // If this is a multi-day event, populate the End Week/Day selects too
+    if(ev.endWeekId&&ev.endDay){
+      const endWeekSel=document.getElementById('e-endweek');
+      endWeekSel.innerHTML='';
+      weeks.forEach(wk=>{
+        const o=document.createElement('option');
+        o.value=wk.id;
+        o.textContent=wk.wk+' · '+wk.dates;
+        if(wk.id===ev.endWeekId) o.selected=true;
+        endWeekSel.appendChild(o);
+      });
+      const endW=weeks.find(wk=>wk.id===ev.endWeekId)||weeks[0];
+      document.getElementById('e-endday').innerHTML=buildDayOptions(endW.mon,ev.endDay,endW.span);
+    }
+    takeFormSnapshot();
+  } else {
+    formSnapshot=null; // read-only view has nothing editable to lose
+  }
+}
+
+function saveEdit(){
+  const ev=events.find(e=>e.id===editingId);
+  if(!ev) return;
+  ev.name=document.getElementById('e-name').value.trim()||ev.name;
+  ev.status=STATUSES[pendingStatus.e]?pendingStatus.e:'confirmed';
+  ev.cats=getSelectedCats('e-cat-multi');
+  delete ev.cat;
+  ev.type=document.getElementById('e-type').value;
+  ev.weekId=document.getElementById('e-week').value;
+  ev.day=document.getElementById('e-day').value;
+  const isMultiDay=document.getElementById('e-multiday').checked;
+  ev.endWeekId=isMultiDay?document.getElementById('e-endweek').value:null;
+  ev.endDay=isMultiDay?document.getElementById('e-endday').value:null;
+  ev.allDay=document.getElementById('e-allday').checked;
+  ev.startTime=ev.allDay?null:document.getElementById('e-starttime').value||null;
+  ev.endTime=ev.allDay?null:document.getElementById('e-endtime').value||null;
+  ev.venue=document.getElementById('e-venue').value.trim();
+  ev.desc=document.getElementById('e-desc').value.trim();
+  ev.expected=parseInt(document.getElementById('e-expected').value)||null;
+  ev.actual=(document.getElementById('e-actual').value!==''?parseInt(document.getElementById('e-actual').value):null);
+  if(Number.isNaN(ev.actual)) ev.actual=null;
+  ev.budget=parseFloat(document.getElementById('e-budget').value)||null;
+  ev.synced=false;
+  saveEvents();
+  const newSem=parseInt(document.getElementById('e-sem').value)||activeSem;
+  closeModal();
+  if(newSem!==activeSem) switchSem(newSem); else render();
+  postSaveNotices(ev);
+}
+
+// ─── Event resource links / images (Edit modal — applies immediately) ───
+function renderEventLinksImages(id){
+  const ev=events.find(e=>e.id===id);
+  if(!ev) return;
+  const linksEl=document.getElementById('e-links-edit');
+  const imagesEl=document.getElementById('e-images-edit');
+  if(!linksEl||!imagesEl) return;
+  const links=ev.links||[], images=ev.images||[];
+  linksEl.innerHTML=links.map((l,i)=>`
+      <div class="todo-link-row">
+        <input type="text" class="todo-link-input" placeholder="Label (optional)" value="${l.label||''}" onchange="updateEventLink(${id},${i},'label',this.value)">
+        <input type="text" class="todo-link-input" placeholder="https://…" value="${l.url||''}" onchange="updateEventLink(${id},${i},'url',this.value)">
+        <button class="todo-link-remove" onclick="removeEventLink(${id},${i})" title="Remove link">✕</button>
+      </div>`).join('');
+  imagesEl.innerHTML=images.map((img,i)=>`
+        <div class="todo-img-thumb-wrap">
+          <img src="${imgSrc(img)}" class="todo-img-thumb" title="${imgName(img)}">
+          <button class="todo-img-remove" onclick="removeEventImage(${id},${i})" title="Remove image">✕</button>
+        </div>`).join('')+`
+        <label class="btn-upload-img">
+          &#128247; Upload image
+          <input type="file" accept="image/*" style="display:none" onchange="handleEventImageUpload(${id},this)">
+        </label>`;
+}
+function addEventLink(id){
+  const ev=events.find(e=>e.id===id);
+  if(!ev) return;
+  if(!ev.links) ev.links=[];
+  ev.links.push({label:'',url:''});
+  saveEvents();
+  renderEventLinksImages(id);
+}
+function updateEventLink(id,idx,field,value){
+  const ev=events.find(e=>e.id===id);
+  if(!ev||!ev.links||!ev.links[idx]) return;
+  ev.links[idx][field]=value;
+  saveEvents();
+}
+function removeEventLink(id,idx){
+  const ev=events.find(e=>e.id===id);
+  if(!ev||!ev.links) return;
+  ev.links.splice(idx,1);
+  saveEvents();
+  renderEventLinksImages(id);
+}
+function handleEventImageUpload(id,fileInput){
+  const file=fileInput.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const img=new Image();
+    img.onload=function(){
+      const maxDim=800;
+      let w=img.width, h=img.height;
+      if(w>maxDim||h>maxDim){
+        if(w>h){ h=Math.round(h*maxDim/w); w=maxDim; }
+        else{ w=Math.round(w*maxDim/h); h=maxDim; }
+      }
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const ev=events.find(e=>e.id===id);
+      if(!ev) return;
+      if(!ev.images) ev.images=[];
+      ev.images.push({name:file.name,src:canvas.toDataURL('image/jpeg',0.75)});
+      saveEvents();
+      renderEventLinksImages(id);
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+  fileInput.value='';
+}
+function removeEventImage(id,idx){
+  const ev=events.find(e=>e.id===id);
+  if(!ev||!ev.images) return;
+  ev.images.splice(idx,1);
+  saveEvents();
+  renderEventLinksImages(id);
+}
+function openEventImage(idx,eventId){
+  const ev=events.find(e=>e.id===eventId);
+  if(!ev||!ev.images||!ev.images[idx]) return;
+  const img=ev.images[idx];
+  const src=imgSrc(img), name=imgName(img);
+  const win=window.open('','_blank');
+  if(!win) return;
+  const safeName=name.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  win.document.write(`<!DOCTYPE html><html><head><title>${safeName}</title><meta charset="utf-8">
+    <style>body{margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh}img{max-width:100%;max-height:100vh;display:block}</style>
+    </head><body><img src="${src}" alt="${safeName}"></body></html>`);
+  win.document.close();
+}
+
+function deleteEvent(id){
+  if(!confirm('Delete this event?')) return;
+  events=events.filter(e=>e.id!==id);
+  saveEvents();
+  closeModal();render();
+}
+
+// ─── To-Do List modal (the panel is physically moved into/out of the shared modal) ───
+let todoModalParent=null, todoModalNextSibling=null;
+function restoreTodoPanelIfNeeded(){
+  const panel=document.getElementById('todo-wrap');
+  const body=document.getElementById('modal-body');
+  if(panel&&todoModalParent&&body.contains(panel)){
+    panel.classList.remove('in-modal');
+    todoModalParent.insertBefore(panel,todoModalNextSibling);
+    document.querySelector('.modal').classList.remove('wide');
+  }
+  todoModalParent=null;
+  todoModalNextSibling=null;
+}
+function openTodoModal(){
+  restoreTodoPanelIfNeeded(); // safety: in case it was somehow already parked elsewhere
+  const panel=document.getElementById('todo-wrap');
+  todoModalParent=panel.parentNode;
+  todoModalNextSibling=panel.nextSibling;
+  const body=document.getElementById('modal-body');
+  body.innerHTML='';
+  panel.classList.add('in-modal');
+  body.appendChild(panel);
+  document.querySelector('.modal').classList.add('wide');
+  document.getElementById('modal-bg').classList.add('open');
+  formSnapshot=null; // the To-Do panel isn't the Add/Edit Event form — no event-level unsaved-changes guard here
+  takeNewTaskDraftSnapshot();
+}
+
+function closeModal(){
+  restoreTodoPanelIfNeeded();
+  document.getElementById('modal-bg').classList.remove('open');
+  editingId=null;
+  formSnapshot=null;
+  newTaskDraftSnapshot=null;
+  if(editingTodoId!==null){
+    editingTodoId=null;
+    todoFormSnapshot=null;
+    renderTodos();
+  }
+}
+
+// ─── Google Calendar URL helpers ───
+// Builds a Google Calendar "Add event" URL that works for ANY user — no API, no auth.
+// Format: https://calendar.google.com/calendar/render?action=TEMPLATE&...
+function gcalURL(ev){
+  const allWeeks=[...SEM1_WEEKS,...SEM2_WEEKS];
+  const w=allWeeks.find(x=>x.id===ev.weekId);
+  const {startISO,endISO}=eventDateRange(ev);
+  const isMultiDay=startISO!==endISO;
+  const isAllDay=!!ev.allDay;
+  const tLabel=timeLabel(ev);
+
+  const catLabel=eventCats(ev).map(c=>catStyle(c).label).join(' + ');
+  const gStatus=evStatus(ev);
+  const isPotential=!!STATUSES[gStatus].tentative;
+  const title=`${isPotential?'[TENTATIVE] ':''}[${catLabel}] [NUS SemiCon] ${ev.name}`;
+  const whenLine=isMultiDay
+    ? `NUS Week: ${w?w.wk+' ('+w.dates+')':'TBD'} · ${fmtDate(startISO)} – ${fmtDate(endISO)}${tLabel?' · '+tLabel:''}`
+    : `NUS Week: ${w?w.wk+' ('+w.dates+')':'TBD'} · ${ev.day||''}${tLabel?' · '+tLabel:''}`;
+  const desc=[
+    isPotential?'⚠️ STATUS: '+STATUSES[gStatus].label.toUpperCase()+' — not yet confirmed.':'',
+    `${TYPES[ev.type].label}`,
+    `Category: ${catLabel}`,
+    whenLine,
+    `Venue: ${ev.venue||'TBD'}`,
+    '',
+    ev.desc||'',
+    '',
+    '— NUS Semiconductor Club AY2026/27'
+  ].filter(Boolean).join('\n');
+
+  // Build the dates param directly from ISO date components — no local-Date getters,
+  // so the result doesn't drift depending on the viewer's browser timezone.
+  let datesParam;
+  if(isAllDay){
+    // All-day event (single or multi-day). Google Calendar's end date is EXCLUSIVE, so add 1 day.
+    const startYMD=startISO.replace(/-/g,'');
+    const endYMD=addDaysISO(endISO,1).replace(/-/g,'');
+    datesParam=`${startYMD}/${endYMD}`;
+  } else {
+    // Timed event — use the actual start/end time set for this event (defaulting
+    // to a 9am-11am SGT slot only if the event was somehow saved without one).
+    const st=ev.startTime||'09:00';
+    const et=ev.endTime||addMinutesToTime(st,120);
+    const [sy,sm,sd]=startISO.split('-');
+    const [ey,em,ed]=endISO.split('-');
+    datesParam=`${sy}${sm}${sd}T${st.replace(':','')}00/${ey}${em}${ed}T${et.replace(':','')}00`;
+  }
+
+  const params=new URLSearchParams({
+    action:'TEMPLATE',
+    text:title,
+    dates:datesParam,
+    ctz:'Asia/Singapore',
+    details:desc,
+    location:ev.venue||'NUS, Singapore',
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+// Open a single event's Google Calendar link
+function openGcalLink(id){
+  const ev=events.find(e=>e.id===id);
+  if(!ev) return;
+  window.open(gcalURL(ev),'_blank');
+}
+
+// Open all links for a category (with a small delay between tabs so browser allows)
+// Build the "Add all [Team]" quick buttons from CAT_STYLES, so new teams show up automatically
+function renderGcalQuickButtons(){
+  const el=document.getElementById('gcal-quick-buttons');
+  if(!el) return;
+  el.innerHTML=Object.entries(CAT_STYLES).map(([key,c])=>
+    `<button class="btn-si" style="background:${c.solidBg};color:${c.solid};border-color:${c.border}" onclick="openAllLinks('${key}')">${c.icon} Add all ${shortCatLabel(key)}</button>`
+  ).join('');
+}
+
+function openAllLinks(cat){
+  const toOpen=events.filter(e=>evStatus(e)!=='declined'&&(cat==='all'||eventCats(e).includes(cat)));
+  if(!toOpen.length) return;
+  if(toOpen.length>1){
+    const ok=confirm(`This will open ${toOpen.length} Google Calendar tabs — one per event.\n\nIf your browser blocks popups, allow popups for this page first.\n\nContinue?`);
+    if(!ok) return;
+  }
+  toOpen.forEach((ev,i)=>{
+    setTimeout(()=>window.open(gcalURL(ev),'_blank'), i*400);
+  });
+}
+
+// Render the individual link list in the sync panel
+function renderLinkList(){
+  const el=document.getElementById('gcal-link-list');
+  if(!el) return;
+  const allWeeks=[...SEM1_WEEKS,...SEM2_WEEKS];
+  const cats=Object.keys(CAT_STYLES);
+  let html='';
+  cats.forEach(cat=>{
+    const catEvs=events.filter(e=>evStatus(e)!=='declined'&&eventCats(e).includes(cat));
+    if(!catEvs.length) return;
+    const cs2=catStyle(cat);
+    const catColor=cs2.solid;
+    const catBg=cs2.solidBg;
+    const catBorder=cs2.border;
+    const catIconLabel=`${CAT_ICONS[cat]||'📌'} ${cs2.label}`;
+    html+=`<details style="margin-bottom:8px;border:1px solid ${catBorder};border-radius:8px;overflow:hidden">
+      <summary style="padding:9px 14px;cursor:pointer;font-size:12px;font-weight:700;color:${catColor};background:${catBg};list-style:none;display:flex;justify-content:space-between;align-items:center">
+        <span>${catIconLabel} Events &nbsp;(${catEvs.length})</span>
+        <span style="font-weight:400;font-size:11px;opacity:.7">click to expand</span>
+      </summary>
+      <div style="padding:8px 10px;display:flex;flex-direction:column;gap:6px">`;
+    catEvs.forEach(ev=>{
+      const w=allWeeks.find(x=>x.id===ev.weekId);
+      const t=TYPES[ev.type];
+      const url=gcalURL(ev);
+      const rowSt=evStatus(ev);
+      const rowPotential=!!STATUSES[rowSt].tentative;
+      const rowStatusTag=rowSt!=='confirmed'?` <span class="status-pill" style="background:${STATUSES[rowSt].bg};color:${STATUSES[rowSt].color}">${STATUSES[rowSt].icon} ${STATUSES[rowSt].label}</span>`:'';
+      html+=`<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 10px;background:#fff;border:1px${rowPotential?' dashed':' solid'} #e4e6ea;border-radius:7px;flex-wrap:wrap">
+        <div style="min-width:0">
+          <div style="font-size:12px;font-weight:600;color:#0f1117;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.icon} ${ev.name}${rowStatusTag}</div>
+          <div style="font-size:10px;color:#6b7280;margin-top:1px">${t.label} &nbsp;·&nbsp; ${(()=>{const r=eventDateRange(ev);return r.startISO===r.endISO?(ev.day||'')+(w?', '+fmtDate(r.startISO):''):fmtDate(r.startISO)+' – '+fmtDate(r.endISO);})()}${timeLabel(ev)?' · 🕐 '+timeLabel(ev):''}${ev.venue?' · 📍 '+ev.venue:''}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <a href="${url}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:6px;font-size:11px;font-weight:700;font-family:inherit;text-decoration:none;background:${catBg};color:${catColor};border:1px solid ${catBorder}">&#128197; Add to my Google Cal</a>
+          <button onclick="navigator.clipboard.writeText('${url.replace(/'/g,"\\'")}').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy link',1500)})" style="padding:5px 11px;border-radius:6px;font-size:11px;font-weight:600;font-family:inherit;background:#f3f4f6;color:#374151;border:1px solid #d1d5db;cursor:pointer">Copy link</button>
+        </div>
+      </div>`;
+    });
+    html+=`</div></details>`;
+  });
+  el.innerHTML=html;
+}
+
+// ─── Backup & Restore ───
+// ─── Print menu: choose Calendar / To-Do / Both before printing ───
+function togglePrintMenu(){
+  document.getElementById('print-menu').classList.toggle('open');
+}
+window.addEventListener('click',()=>{
+  const menu=document.getElementById('print-menu');
+  if(menu) menu.classList.remove('open');
+});
+function printWith(mode){
+  document.getElementById('print-menu').classList.remove('open');
+  document.body.classList.remove('print-cal-only','print-todo-only','print-poster');
+  closeModal();
+  if(mode==='poster'){
+    // "Semester at a Glance" — grid view, confirmed + completed events only, chrome hidden
+    const prevHidden=new Set(hiddenStatuses), prevView=calView;
+    Object.keys(STATUSES).forEach(k=>{ if(k!=='confirmed'&&k!=='completed') hiddenStatuses.add(k); });
+    calView='grid';
+    document.body.classList.add('print-cal-only','print-poster');
+    render();
+    window.print();
+    hiddenStatuses=prevHidden; calView=prevView;
+    document.body.classList.remove('print-cal-only','print-poster');
+    render();
+    return;
+  }
+  if(mode==='cal') document.body.classList.add('print-cal-only');
+  if(mode==='todo') document.body.classList.add('print-todo-only');
+  window.print();
+}
+
+function backupEvents(){
+  const backup={
+    version:1,
+    exported: new Date().toISOString(),
+    club:'NUS Semiconductor Club',
+    ay:'AY2026/27',
+    events:events,
+    todos:todos,
+  };
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const dateStr=new Date().toISOString().slice(0,10); // YYYY-MM-DD
+  a.href=url;
+  a.download=`NUSSemiCon_Events_Backup_${dateStr}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  try{ localStorage.setItem(BACKUP_TS_KEY,new Date().toISOString()); }catch(e){}
+  updateFooterStatus();
+  showToast('💾 Backup downloaded — drop it in your pinned EXCO Telegram message or shared Drive');
+}
+
+function restoreEvents(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      // Support both raw array and wrapped backup format
+      const loaded=Array.isArray(data)?data:(data.events&&Array.isArray(data.events)?data.events:null);
+      if(!loaded) throw new Error('Invalid backup file format.');
+      const loadedTodos=(!Array.isArray(data)&&Array.isArray(data.todos))?data.todos:null;
+      const todoNote=loadedTodos?` and ${loadedTodos.length} task(s)`:'';
+      if(!confirm(`Restore ${loaded.length} event(s)${todoNote} from backup?\n\nThis will replace your current events${loadedTodos?' and tasks':''}.`)){
+        e.target.value=''; return;
+      }
+      events=loaded;
+      nextId=Math.max(...events.map(x=>x.id),99)+1;
+      saveEvents();
+      if(loadedTodos){
+        todos=loadedTodos;
+        nextTodoId=todos.length?Math.max(...todos.map(t=>t.id))+1:1;
+        saveTodos();
+      }
+      render();
+      // Show brief success toast
+      const toast=document.createElement('div');
+      toast.textContent=`✅ Restored ${loaded.length} event(s)${todoNote} from backup`;
+      toast.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0f1117;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2)';
+      document.body.appendChild(toast);
+      setTimeout(()=>toast.remove(),3000);
+    }catch(err){
+      alert('Could not restore: '+err.message);
+    }
+    e.target.value=''; // reset input so same file can be re-selected
+  };
+  reader.readAsText(file);
+}
+
+// ─── Toast helper ───
+function showToast(msg){
+  const toast=document.createElement('div');
+  toast.textContent=msg;
+  toast.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0f1117;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:90vw;text-align:center';
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),4500);
+}
+
+// ─── Search filter (top-bar search box) ───
+function matchesSearch(e){
+  if(!searchQuery) return true;
+  return [e.name,e.venue,e.desc].some(v=>v&&v.toLowerCase().includes(searchQuery));
+}
+
+// ─── Grid ⇄ Agenda view toggle ───
+function toggleView(){
+  calView=calView==='grid'?'agenda':'grid';
+  const btn=document.getElementById('view-toggle-btn');
+  if(btn) btn.innerHTML=calView==='grid'?'📋 Agenda View':'🗓️ Grid View';
+  renderCal();
+}
+
+// ─── Agenda view: chronological list with countdowns, upcoming first ───
+function renderAgenda(){
+  const vis=visibleEvents(activeSem);
+  const today=todayISO();
+  const withDates=vis.map(ev=>({ev,...eventDateRange(ev)})).filter(x=>x.startISO);
+  withDates.sort((a,b)=>(a.startISO+(a.ev.startTime||''))<(b.startISO+(b.ev.startTime||''))?-1:1);
+  const upcoming=withDates.filter(x=>x.endISO>=today);
+  const past=withDates.filter(x=>x.endISO<today);
+  const rowHTML=x=>{
+    const {ev,startISO,endISO}=x;
+    const t=TYPES[ev.type], stKey=evStatus(ev), s=STATUSES[stKey];
+    const n=daysUntil(startISO);
+    let chip;
+    if(endISO<today) chip='Past';
+    else if(n<0) chip='Ongoing';
+    else if(n===0) chip='Today';
+    else if(n===1) chip='Tomorrow';
+    else chip=`in ${n} days`;
+    const cats=eventCats(ev).map(k=>{const c=catStyle(k);return `<span class="ev-cat" style="background:${c.bg};color:${c.color}">${CAT_ICONS[k]||'📌'} ${c.label}</span>`;}).join('');
+    const dateTxt=startISO===endISO?fmtDate(startISO):fmtDate(startISO)+' – '+fmtDate(endISO);
+    return `<div class="ag-row${stKey==='declined'?' is-declined':''}" onclick="openEdit(${ev.id})">
+      <div class="ag-date"><span class="ag-chip">${chip}</span><div class="ag-d">${dateTxt}</div>${timeLabel(ev)?`<div class="ag-t">🕐 ${timeLabel(ev)}</div>`:''}</div>
+      <div class="ag-main">
+        <div class="ag-name">${t.icon} ${ev.name}${stKey!=='confirmed'?` <span class="status-pill" style="background:${s.bg};color:${s.color}">${s.icon} ${s.label}</span>`:''}</div>
+        <div class="ag-meta">${t.label}${ev.venue?' · 📍 '+ev.venue:''}${ev.expected?' · 👥 '+ev.expected+' expected':''}${(ev.actual||ev.actual===0)?' · ✅ '+ev.actual+' attended':''}</div>
+        <div style="margin-top:4px">${cats}</div>
+      </div>
+    </div>`;
+  };
+  let html=`<div class="agenda-wrap">`;
+  html+=`<div class="ag-section-hd">📌 Upcoming — Semester ${activeSem} (${upcoming.length})</div>`;
+  html+=upcoming.length?upcoming.map(rowHTML).join(''):`<div class="todo-empty" style="padding:14px 0">No upcoming events match the current filters</div>`;
+  if(past.length){
+    html+=`<details style="margin-top:14px"><summary class="ag-section-hd" style="cursor:pointer;list-style:none">🗄️ Past events (${past.length}) — click to expand</summary><div style="margin-top:8px">${past.slice().reverse().map(rowHTML).join('')}</div></details>`;
+  }
+  html+=`</div>`;
+  document.getElementById('cal-wrap').innerHTML=html;
+}
+
+// ─── Post-save notices: same-date clashes + break-week scheduling nudges ───
+function postSaveNotices(ev){
+  const {startISO}=eventDateRange(ev);
+  if(!startISO) return;
+  const msgs=[];
+  const others=events.filter(e=>e.id!==ev.id&&evStatus(e)!=='declined'&&eventDateRange(e).startISO===startISO);
+  if(others.length) msgs.push(`⚠️ ${others.length===1?'"'+others[0].name+'" is':others.length+' other events are'} also on ${fmtDate(startISO)}`);
+  const w=[...SEM1_WEEKS,...SEM2_WEEKS].find(x=>x.id===ev.weekId);
+  if(w&&w.kind!=='normal') msgs.push(`ℹ️ Note: scheduled during ${kindLabel(w.kind)}`);
+  if(msgs.length) showToast(msgs.join('   ·   '));
+}
+
+// ─── Footer status: backup staleness + storage usage meter ───
+function updateFooterStatus(){
+  const bEl=document.getElementById('backup-status');
+  const sEl=document.getElementById('storage-meter');
+  if(!bEl||!sEl) return;
+  if(READ_ONLY){ bEl.style.display='none'; sEl.style.display='none'; return; }
+  let lastB=null,lastE=null;
+  try{ lastB=localStorage.getItem(BACKUP_TS_KEY); lastE=localStorage.getItem(EDIT_TS_KEY); }catch(e){}
+  let txt,color;
+  if(!lastB){
+    txt='💾 Never backed up';
+    color=(events.length||todos.length)?'#dc2626':'var(--muted)';
+  } else {
+    const days=Math.floor((Date.now()-new Date(lastB).getTime())/86400000);
+    const dirty=!!(lastE&&lastE>lastB);
+    txt=`💾 Last backup: ${days===0?'today':days===1?'yesterday':days+' days ago'}${dirty?' · edits since then':''}`;
+    color=dirty&&days>=7?'#dc2626':dirty?'#b45309':'#15803d';
+  }
+  bEl.textContent=txt; bEl.style.color=color;
+  let bytes=0;
+  try{ bytes=(localStorage.getItem(STORAGE_KEY)||'').length+(localStorage.getItem(TODO_STORAGE_KEY)||'').length; }catch(e){}
+  const mb=bytes/1048576, pct=Math.min(100,Math.round(mb/5*100));
+  sEl.textContent=`🗄️ Storage: ${mb<0.1?Math.round(bytes/1024)+' KB':mb.toFixed(1)+' MB'} of ~5 MB${pct>=70?' — getting full, avoid large images':''}`;
+  sEl.style.color=pct>=90?'#dc2626':pct>=70?'#b45309':'var(--muted)';
+}
+
+// ─── .ics export — one file, importable into Google / Apple / Outlook Calendar ───
+function icsEscape(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n'); }
+function foldLine(line){ // RFC 5545: fold at 75 octets (UTF-8), continuation lines start with a space
+  const octets=ch=>{const c=ch.codePointAt(0);return c<0x80?1:c<0x800?2:c<0x10000?3:4;};
+  let out='',cur='',len=0;
+  for(const ch of line){ const o=octets(ch);
+    if(len+o>74){ out+=cur+'\r\n '; cur=ch; len=1+o; } else { cur+=ch; len+=o; } }
+  return out+cur; }
+function buildICS(evs){
+  const now=new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
+  const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//NUS Semiconductor Club//Event Calendar AY2026-27//EN','CALSCALE:GREGORIAN',
+    'X-WR-CALNAME:NUS Semiconductor Club AY2026/27','X-WR-TIMEZONE:Asia/Singapore',
+    'BEGIN:VTIMEZONE','TZID:Asia/Singapore','BEGIN:STANDARD','DTSTART:19700101T000000','TZOFFSETFROM:+0800','TZOFFSETTO:+0800','TZNAME:+08','END:STANDARD','END:VTIMEZONE'];
+  evs.forEach(ev=>{
+    const {startISO,endISO}=eventDateRange(ev);
+    if(!startISO) return;
+    const st=evStatus(ev);
+    const tentative=!!STATUSES[st].tentative;
+    const catLabel=eventCats(ev).map(c=>catStyle(c).label).join(' + ');
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:nusscc-ay2627-'+ev.id+'@nussemiconductorclub');
+    lines.push('DTSTAMP:'+now);
+    if(ev.allDay||!ev.startTime){
+      lines.push('DTSTART;VALUE=DATE:'+startISO.replace(/-/g,''));
+      lines.push('DTEND;VALUE=DATE:'+addDaysISO(endISO,1).replace(/-/g,'')); // DTEND is exclusive for all-day events
+    } else {
+      const et=ev.endTime||addMinutesToTime(ev.startTime,120);
+      lines.push('DTSTART;TZID=Asia/Singapore:'+startISO.replace(/-/g,'')+'T'+ev.startTime.replace(':','')+'00');
+      lines.push('DTEND;TZID=Asia/Singapore:'+endISO.replace(/-/g,'')+'T'+et.replace(':','')+'00');
+    }
+    lines.push(foldLine('SUMMARY:'+icsEscape((tentative?'[TENTATIVE] ':'')+'[NUS SemiCon] '+ev.name)));
+    lines.push(foldLine('DESCRIPTION:'+icsEscape([
+      (tentative?'STATUS: '+STATUSES[st].label+' — not yet confirmed':''),
+      TYPES[ev.type].label,
+      'Team: '+catLabel,
+      ev.venue?'Venue: '+ev.venue:'',
+      ev.desc||'',
+      '— NUS Semiconductor Club AY2026/27'
+    ].filter(Boolean).join('\n'))));
+    if(ev.venue) lines.push(foldLine('LOCATION:'+icsEscape(ev.venue)));
+    lines.push('STATUS:'+(tentative?'TENTATIVE':'CONFIRMED'));
+    lines.push('END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  return lines.join('\r\n');
+}
+function downloadICS(){
+  const evs=events.filter(e=>evStatus(e)!=='declined');
+  if(!evs.length){ showToast('No events to export yet — add some first'); return; }
+  const blob=new Blob([buildICS(evs)],{type:'text/calendar;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='NUSSemiCon_Calendar_AY2627.ics';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`📆 Exported ${evs.length} event${evs.length===1?'':'s'} — members can import the .ics into any calendar app in one step`);
+}
+
+// ─── Publish view-only snapshot ───
+// Downloads a standalone read-only copy of this HTML with the CURRENT events & tasks
+// baked in as defaults — perfect for dropping in the EXCO Telegram group. Members just
+// open it; no restore step, no way for them to accidentally edit the master data.
+function publishSnapshot(){
+  restoreTodoPanelIfNeeded();
+  closeModal();
+  // Needles built by concatenation so this function's own source never matches them
+  const needleEv='const DEFAULT_EVENTS'+'=[];';
+  const needleTd='const DEFAULT_TODOS'+'=[];';
+  const needleRo='const READ_ONLY'+'=false;';
+  const needleDt='const SNAPSHOT_DATE'+"='';";
+  const safe=o=>JSON.stringify(o).replace(/<\//g,'<\\/'); // never emit a literal closing script tag
+  let out='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+  if(!out.includes(needleEv)||!out.includes(needleRo)){ showToast('⚠️ Could not build the snapshot from this page'); return; }
+  out=out.replace(needleEv,'const DEFAULT_EVENTS='+safe(events)+';');
+  out=out.replace(needleTd,'const DEFAULT_TODOS='+safe(todos)+';');
+  out=out.replace(needleRo,'const READ_ONLY'+'=true;');
+  out=out.replace(needleDt,'const SNAPSHOT_DATE'+"='"+fmtDate(todayISO())+"';");
+  const blob=new Blob([out],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`NUSSemiCon_Calendar_ViewOnly_${todayISO()}.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('🌍 View-only copy downloaded — share the HTML file with members (they just open it)');
+}
+
+// ─── Live clock + current-week indicator in the page header ───
+function renderLiveClock(){
+  const el=document.getElementById('live-clock');
+  if(!el) return;
+  const now=new Date();
+  const dateLabel=now.toLocaleDateString('en-SG',{weekday:'short',day:'numeric',month:'short'});
+  const timeLabel=now.toLocaleTimeString('en-SG',{hour:'numeric',minute:'2-digit',hour12:true});
+  const info=getTodayInfo();
+  let weekLine, weekCls;
+  if(info.week){
+    const semTag=`Sem ${info.sem}`;
+    if(info.kind==='normal'){
+      weekLine=`${semTag} · ${info.week.wk}`;
+      weekCls='is-teaching';
+    } else {
+      weekLine=`${semTag} · ${kindLabel(info.kind)}`;
+      weekCls='is-break';
+    }
+  } else {
+    weekLine='Vacation — outside semester';
+    weekCls='is-break';
+  }
+  el.innerHTML=`
+    <span class="lc-icon">🕐</span>
+    <span class="lc-text">
+      <div class="lc-date">Today · ${dateLabel}</div>
+      <div class="lc-time">${timeLabel}</div>
+      <div class="lc-week ${weekCls}">${weekLine}</div>
+    </span>`;
+}
+setInterval(renderLiveClock,1000);
+
+// ─── Master render ───
+function render(){
+  renderFilter();
+  renderStats();
+  renderCal();
+  renderLinkList();
+  renderTodos();
+  renderLiveClock();
+  updateFooterStatus();
+}
+
+// ─── Sync Guide ───
+function openSyncGuide(){ document.getElementById('sync-guide-bg').classList.add('open'); }
+function closeSyncGuide(){ document.getElementById('sync-guide-bg').classList.remove('open'); }
+
+// ─── Init ───
+document.getElementById('todo-cat-multi').innerHTML=catMultiPillsHTML(['internal']);
+renderGcalQuickButtons();
+if(READ_ONLY){
+  document.body.classList.add('read-only');
+  const roBanner=document.createElement('div');
+  roBanner.style.cssText='background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:10px 16px;font-size:12px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px';
+  roBanner.innerHTML='👁️ <span>View-only copy'+(SNAPSHOT_DATE?' · published '+SNAPSHOT_DATE:'')+'. Browse events, add them to your own Google Calendar, download the .ics, or print — editing is disabled. Ask the calendar owner for the latest version.</span>';
+  document.querySelector('.page-header').after(roBanner);
+}
+render();
+</script>
+</body>
+</html>

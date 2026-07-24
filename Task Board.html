@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My NUSSCC Task Board — Private</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --white:#fff;--bg:#f7f8fa;--border:#e4e6ea;--border2:#d0d3da;
+  --text:#0f1117;--muted:#6b7280;--dim:#adb5bd;--font:'Inter',Arial,sans-serif;
+  --accent:#4f46e5;--accent-soft:#eef2ff;--accent-border:#c7d2fe;--accent-ink:#3730a3;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;padding:24px 20px 60px;max-width:960px;margin:0 auto}
+
+/* ── HEADER ── */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin-bottom:14px;gap:14px;flex-wrap:wrap}
+.logo-area{display:flex;align-items:center;gap:13px}
+.logo-box{width:auto;height:46px;background:transparent;border-radius:0;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-box img{height:46px;width:auto;display:block;border-radius:9px}
+.club-name{font-size:16px;font-weight:800;letter-spacing:-.01em}
+.club-sub{font-size:11px;color:var(--muted);margin-top:2px;max-width:420px}
+.priv-badge{display:inline-flex;align-items:center;gap:5px;background:var(--accent-soft);color:var(--accent-ink);border:1px solid var(--accent-border);border-radius:20px;padding:5px 11px;font-size:11px;font-weight:700;white-space:nowrap}
+
+/* ── EVENT SOURCE CARD ── */
+.src-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:13px 16px;margin-bottom:14px}
+.src-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.src-status{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600}
+.src-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.src-dot.on{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.16)}
+.src-dot.off{background:#d1d5db}
+.src-count{font-size:11px;color:var(--muted);font-weight:500}
+.src-btns{display:flex;gap:8px;flex-wrap:wrap}
+.sbtn{border:1px solid var(--border2);background:var(--white);color:var(--text);border-radius:8px;padding:7px 13px;font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all .12s;white-space:nowrap}
+.sbtn:hover{background:#f3f4f6;border-color:#9ca3af}
+.sbtn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.sbtn.primary:hover{background:#4338ca}
+.src-hint{font-size:11px;color:var(--muted);margin-top:9px;line-height:1.6}
+.src-hint b{color:var(--text);font-weight:600}
+.paste-area{display:none;margin-top:10px}
+.paste-area.open{display:block}
+.paste-area textarea{width:100%;min-height:90px;border:1px solid var(--border2);border-radius:8px;padding:10px;font-size:11px;font-family:ui-monospace,Menlo,Consolas,monospace;resize:vertical;outline:none}
+.paste-area textarea:focus{border-color:var(--accent)}
+.paste-row{display:flex;gap:8px;margin-top:8px}
+
+/* ── STATS ── */
+.stats-strip{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.stat-box{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:13px 16px;flex:1;min-width:110px;position:relative;overflow:hidden}
+.stat-bar{position:absolute;bottom:0;left:0;height:3px;right:0}
+.stat-val{font-size:25px;font-weight:800;line-height:1;margin-bottom:3px;display:block}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;display:block}
+
+/* ── ADD TASK ── */
+.add-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.add-hd{font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.add-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.add-row input[type=text]{flex:1 1 220px;min-width:160px;border:1px solid var(--border2);border-radius:8px;padding:9px 11px;font-size:13px;font-family:var(--font);color:var(--text);outline:none}
+.add-row input[type=text]:focus{border-color:var(--accent)}
+.fld{border:1px solid var(--border2);border-radius:8px;padding:8px 9px;font-size:12px;font-family:var(--font);color:var(--text);background:var(--white);height:36px;outline:none}
+.fld:focus{border-color:var(--accent)}
+.fld.ev-fld{flex:1 1 180px;min-width:150px}
+.btn-add{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;white-space:nowrap;transition:background .15s}
+.btn-add:hover{background:#4338ca}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.seg{display:inline-flex;background:var(--white);border:1px solid var(--border);border-radius:9px;padding:3px}
+.seg button{border:none;background:none;font-family:var(--font);font-size:12px;font-weight:600;color:var(--muted);padding:6px 14px;border-radius:7px;cursor:pointer;transition:all .12s}
+.seg button.active{background:var(--text);color:#fff}
+.seg button[data-f="open"]{color:var(--accent-ink)}
+.seg button[data-f="open"].active{background:var(--accent);color:#fff}
+.seg button[data-f="done"]{color:#15803d}
+.seg button[data-f="done"].active{background:#16a34a;color:#fff}
+.tool-right{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* ── TASK GROUPS ── */
+.empty{background:var(--white);border:1px dashed var(--border2);border-radius:12px;padding:38px 20px;text-align:center;color:var(--muted)}
+.empty .big{font-size:26px;margin-bottom:8px}
+.empty .msg{font-size:13px;font-weight:600;color:var(--text)}
+.empty .sub{font-size:12px;margin-top:4px}
+
+.tgroup{background:var(--white);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden;border-left:5px solid var(--border)}
+.tgroup-hd{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);background:#fafbfc;flex-wrap:wrap;cursor:pointer}
+.tgroup-hd::-webkit-details-marker{display:none}
+.tgroup-hd::marker{content:''}
+.tgroup:not([open])>.tgroup-hd{border-bottom:none}
+.tgroup-hd .g-name{font-size:13px;font-weight:700}
+.tgroup-hd .g-meta{font-size:11px;color:var(--muted);font-weight:500}
+.tgroup-hd .g-count{margin-left:auto;font-size:11px;font-weight:700;color:var(--accent-ink);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:2px 9px}
+.tgroup-hd.general{background:#fff}
+.g-when{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.g-when.soon{background:#ffedd5;color:#9a3412}
+.g-when.today{background:#fef3c7;color:#92400e}
+.g-when.past{background:#f1f5f9;color:#64748b}
+.g-when.future{background:#eff6ff;color:#1d4ed8}
+.acc-chevron{font-size:11px;color:var(--muted);transition:transform .15s;flex-shrink:0;margin-left:6px}
+.tgroup[open]>.tgroup-hd .acc-chevron{transform:rotate(180deg)}
+.team-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap}
+.team-select{max-width:190px}
+
+/* ── TASK ROW ── */
+.task{display:flex;align-items:flex-start;gap:11px;padding:11px 16px;border-bottom:1px solid #f3f4f6;transition:background .1s}
+.task.dragging{opacity:.4}
+.task.drag-over{background:var(--accent-soft);box-shadow:inset 0 2px 0 var(--accent)}
+.drag-handle{cursor:grab;color:#d5d9df;font-size:14px;line-height:1.4;flex-shrink:0;user-select:none;padding:0 1px;margin-top:1px}
+.drag-handle:hover{color:#9aa4b2}
+.drag-handle:active{cursor:grabbing}
+.task:last-child{border-bottom:none}
+.task input.chk{width:17px;height:17px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;margin-top:1px}
+.task-body{flex:1;min-width:0}
+.task-text{font-size:13px;color:var(--text);line-height:1.4;word-break:break-word}
+.task-text.done{text-decoration:line-through;color:#9ca3af}
+.task-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;align-items:center}
+.chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap;letter-spacing:.01em}
+.pri-high{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+.pri-med{background:#ffedd5;color:#9a3412;border-color:#fdba74}
+.pri-low{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+.due-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;padding:2px 8px;border-radius:5px;border:1px solid;border-left-width:3px;white-space:nowrap}
+.due-future{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe;border-left-color:#2563eb}
+.due-today{background:#fef3c7;color:#92400e;border-color:#fde68a;border-left-color:#d97706}
+.due-soon{background:#ffedd5;color:#9a3412;border-color:#fdba74;border-left-color:#ea580c}
+.due-overdue{background:#fee2e2;color:#991b1b;border-color:#fca5a5;border-left-color:#dc2626}
+.due-done{background:#f1f5f9;color:#64748b;border-color:#e2e8f0;border-left-color:#cbd5e1;text-decoration:line-through}
+.task-link{font-size:11px;font-weight:600;color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:3px}
+.task-link:hover{text-decoration:underline}
+.img-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:2px 8px 2px 2px;border-radius:20px;border:1px solid var(--accent-border);background:var(--accent-soft);color:var(--accent-ink);cursor:pointer;white-space:nowrap}
+.img-chip img{width:18px;height:18px;border-radius:5px;object-fit:cover;display:block}
+.img-chip:hover{background:#e0e7ff}
+.img-upload-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.img-upload-row input[type=file]{display:none}
+.img-upload-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text);background:var(--white);border:1px solid var(--border2);border-radius:8px;padding:8px 13px;cursor:pointer;transition:all .12s;white-space:nowrap}
+.img-upload-btn:hover{background:#f3f4f6;border-color:#9ca3af}
+.img-preview{display:flex;align-items:center;gap:8px}
+.img-preview img{width:36px;height:36px;border-radius:7px;object-fit:cover;border:1px solid var(--border2)}
+.img-preview-name{font-size:11px;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.img-remove{background:none;border:none;color:#d5dae0;cursor:pointer;font-size:12px;padding:2px 7px;border-radius:5px;line-height:1}
+.img-remove:hover{color:#ef4444;background:#fef2f2}
+.lightbox-overlay{position:fixed;inset:0;background:rgba(15,17,23,.82);display:flex;align-items:center;justify-content:center;z-index:300;padding:30px;cursor:zoom-out}
+.lightbox-overlay img{max-width:min(90vw,900px);max-height:88vh;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.lightbox-close{position:absolute;top:18px;right:22px;background:none;border:none;color:#fff;font-size:26px;cursor:pointer;line-height:1;opacity:.85}
+.lightbox-close:hover{opacity:1}
+.task-acts{display:flex;gap:2px;flex-shrink:0}
+.iconbtn{background:none;border:none;color:#cbd0d6;cursor:pointer;font-size:13px;padding:3px 7px;border-radius:5px;transition:all .12s}
+.iconbtn:hover{color:var(--accent);background:var(--accent-soft)}
+.iconbtn.del:hover{color:#ef4444;background:#fef2f2}
+
+/* ── CHECKLIST ── */
+.chev{background:none;border:none;color:#c0c5cc;cursor:pointer;font-size:12px;padding:3px 6px;border-radius:5px;transition:all .12s;flex-shrink:0}
+.chev:hover{color:var(--accent);background:var(--accent-soft)}
+.chev .caret{display:inline-block;transition:transform .15s;font-size:11px}
+.chev.open .caret{transform:rotate(90deg)}
+.cl-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap;cursor:pointer;letter-spacing:.01em}
+.cl-chip.part{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.cl-chip.full{background:#dcfce7;color:#15803d;border-color:#86efac}
+.cl-chip.none{background:#f8fafc;color:#64748b;border-color:#e2e8f0}
+.cl-chip.none:hover{background:#f1f5f9}
+.drawer{margin:0 16px 12px 43px;background:#f6faf7;border:1px solid #dcfce7;border-left:3px solid #22c55e;border-radius:10px;padding:12px 14px}
+.cl-hd{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.cl-title{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#15803d;white-space:nowrap}
+.cl-prog{flex:1;height:6px;background:#e5e7eb;border-radius:20px;overflow:hidden;min-width:40px}
+.cl-prog>span{display:block;height:100%;background:#22c55e;border-radius:20px;transition:width .25s}
+.cl-frac{font-size:11px;font-weight:800;color:#15803d;white-space:nowrap}
+.cl-item{display:flex;align-items:center;gap:9px;padding:4px 2px}
+.cl-item input[type=checkbox]{width:15px;height:15px;accent-color:#16a34a;cursor:pointer;flex-shrink:0}
+.cl-text{cursor:text}
+.cl-text:hover{background:#eaf6ee;border-radius:4px}
+.cl-item-editing{background:#eefdf3;border-radius:7px}
+.cl-edit-input{flex:1;border:1px solid #86efac;border-radius:6px;padding:3px 7px;font-size:12.5px;font-family:var(--font);color:var(--text);background:#fff;outline:none}
+.cl-edit-input:focus{border-color:#16a34a}
+.cl-num{font-size:11px;font-weight:700;color:#9ca3af;min-width:15px;text-align:right;flex-shrink:0}
+.cl-text{flex:1;font-size:12.5px;color:var(--text);word-break:break-word}
+.cl-text.done{text-decoration:line-through;color:#9ca3af}
+.cl-del{background:none;border:none;color:#d5dae0;cursor:pointer;font-size:12px;padding:2px 7px;border-radius:5px;flex-shrink:0;line-height:1}
+.cl-del:hover{color:#ef4444;background:#fef2f2}
+.cl-add{display:flex;align-items:center;gap:9px;margin-top:6px;padding-top:9px;border-top:1px dashed #c7ecd5}
+.group-add-row{display:flex;align-items:center;gap:9px;padding:10px 16px;border-top:1px dashed var(--border2);background:#fafbff}
+.group-add-row .plus{color:var(--accent);font-weight:800;font-size:15px;line-height:1;flex-shrink:0}
+.group-add-row input{flex:1;border:none;background:none;font-family:var(--font);font-size:12.5px;color:var(--text);outline:none;padding:3px 0}
+.group-add-row input::placeholder{color:#9aa4b2}
+.cl-add .plus{color:#16a34a;font-weight:800;font-size:15px;line-height:1}
+.cl-add input{flex:1;border:none;background:none;font-family:var(--font);font-size:12.5px;color:var(--text);outline:none;padding:3px 0}
+.cl-add input::placeholder{color:#9aa4b2}
+
+/* ── INLINE EDIT ── */
+.edit-form{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.edit-form input[type=text],.edit-form .fld{width:100%}
+.edit-grid{display:flex;gap:8px;flex-wrap:wrap}
+.edit-grid>*{flex:1;min-width:130px}
+.edit-acts{display:flex;gap:9px;align-items:center;margin-top:2px}
+.mini{font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;border-radius:7px;padding:7px 15px;border:none}
+.mini.save{background:var(--accent);color:#fff}
+.mini.cancel{background:none;color:var(--muted);border:1px solid var(--border2)}
+
+/* ── FOOTER ── */
+.foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+.foot-btns{display:flex;gap:8px;flex-wrap:wrap}
+.foot-status{font-size:11px;color:var(--dim)}
+.foot-status b{color:var(--muted);font-weight:600}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f1117;color:#fff;font-size:12px;font-weight:600;padding:11px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:all .25s;z-index:200;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media print{
+  body{padding:0;max-width:none}
+  .src-card,.add-card,.toolbar,.foot,.stat-bar,.iconbtn,.priv-badge,.chev,.cl-del,.cl-add,.acc-chevron,.drag-handle,.group-add-row{display:none!important}
+  .drawer{break-inside:avoid}
+  .tgroup{break-inside:avoid;border-color:#ccc}
+  .tgroup-hd{cursor:default}
+  .page-header{border:none;padding:0 0 10px}
+}
+@media (max-width:560px){
+  .add-row input[type=text]{flex-basis:100%}
+  .fld.ev-fld{flex-basis:100%}
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="logo-area">
+    <div class="logo-box"><img src="data:image/jpeg;base64,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/wCcyv224odkNHXR2o63cW06j1RID315ul1jlm59RG3OIx6uePErYV72g21vl2qLreNHWyurql5fNPUMLnvPmTleN2xO0WMfaBY/+Sf70GDdqCjnq6DRO62noXXWj07XMrZ/a4LnSUjwMvaPEDr6ls6ybnbf3iwMvtFq6ze0nR8b3vq2MMfLJDwSC0jxBCya1W2jtdqp7XQU7YaOmhbBDCOYYxowG8/DCw25bM7W3K4OuFboOwyVTncTnimDcnzIGAfmQay2sedyu0veNz7Ux79L2m3i1W+rewsbVy/hPjzzLRz+cL891t36687l1W2WltWWjR9PQMH2W1BXytD2k9YoGuIBfz6/uUhqCipbfRQ0VDSxU1NCA2KGFgYxg8mgcgFhFw2X2vuVdPcLhoq1VVXUSGSaaZjnPe4nJJOUGFbax7FaAmqLxDr2z3a+zsJqrxcbpHNUyeeDn3I9DQvf2m6bcXUej6Cx7cWx1wp7m4uuckVUyncaYYPdtkeQG8eccsnCvrtido3Ncw6AsmDy5QuB+fK2NTQx09PFBC3gjiYGMHkAMAIIvasu+8Fl2dumm49j7bZNP09rfC58OoIH9xFw83cIOXHqT4lZF2KLvrCp23tVruumYqHT9PQB1vuLagSOq3GR2ctB9xgeBW9b5aqC92mptV0pY6uiqWFk0L88L2nwOML8dMaftGmbPFZ7Fb4aCgiJMcEIIa3PM4yUF1REQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERB//2Q==" alt="NUS Semiconductor Club Logo"></div>
+    <div>
+      <div class="club-name">My NUSSCC Task Board</div>
+      <div class="club-sub">Your private to-dos for the club, linked to real events on the shared calendar. Stored only in this file &amp; browser — never added to the club calendar or anything you publish from it.</div>
+    </div>
+  </div>
+  <div class="priv-badge">🔒 Private · this device only</div>
+</div>
+
+<!-- EVENT SOURCE -->
+<div class="src-card">
+  <div class="src-top">
+    <div class="src-status">
+      <span class="src-dot off" id="src-dot"></span>
+      <span id="src-label">No club events loaded yet</span>
+      <span class="src-count" id="src-count"></span>
+    </div>
+    <div class="src-btns">
+      <button class="sbtn primary" onclick="syncFromBrowser()">⟳ Sync from this browser</button>
+      <button class="sbtn" onclick="document.getElementById('ics-file').click()">Import .ics</button>
+      <button class="sbtn" onclick="togglePaste()">Paste JSON</button>
+    </div>
+  </div>
+  <div class="src-hint">
+    <b>How events get here:</b> Open your club calendar in this same browser and click <b>Sync from this browser</b> — or on any device, use the calendar's <b>Export .ics</b> button and <b>Import .ics</b> here. Your tasks stay in this file; only event names &amp; dates are read in, so you can link tasks to them.
+  </div>
+  <div class="paste-area" id="paste-area">
+    <textarea id="paste-box" placeholder="Paste the raw events array (JSON) copied from the calendar's local storage or a backup file…"></textarea>
+    <div class="paste-row">
+      <button class="sbtn primary" onclick="importJSON()">Load events</button>
+      <button class="sbtn" onclick="togglePaste()">Cancel</button>
+    </div>
+  </div>
+  <input type="file" id="ics-file" accept=".ics,text/calendar" style="display:none" onchange="importICS(event)">
+</div>
+
+<!-- STATS -->
+<div class="stats-strip" id="stats"></div>
+
+<!-- ADD TASK -->
+<div class="add-card">
+  <div class="add-hd">➕ Add a task</div>
+  <div class="add-row">
+    <input type="text" id="t-text" placeholder="What do you need to do? (e.g. Confirm speaker AV setup)" onkeydown="if(event.key==='Enter')addTask()">
+    <select class="fld ev-fld" id="t-event"><option value="">No event</option></select>
+    <select class="fld team-select" id="t-team">
+      <option value="">No team</option>
+      <option value="presidential">⭐ Presidential Cell</option>
+      <option value="finance">💰 Finance</option>
+      <option value="hr">🗂️ HR &amp; Welfare</option>
+      <option value="publicity">🎨 Publicity</option>
+      <option value="internal">🏛️ Internal</option>
+      <option value="external">🚀 External</option>
+      <option value="allmembers">👥 All Members</option>
+    </select>
+    <select class="fld" id="t-pri">
+      <option value="med">Priority: Medium</option>
+      <option value="high">Priority: High</option>
+      <option value="low">Priority: Low</option>
+    </select>
+    <input type="date" class="fld" id="t-due">
+    <button class="btn-add" onclick="addTask()">Add task</button>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="seg" id="status-seg">
+    <button class="active" data-f="open" onclick="setStatusFilter('open')">Open</button>
+    <button data-f="done" onclick="setStatusFilter('done')">Done</button>
+    <button data-f="all" onclick="setStatusFilter('all')">All</button>
+  </div>
+  <div class="tool-right">
+    <select class="fld" id="f-event" onchange="render()"><option value="">All events</option></select>
+    <select class="fld team-select" id="f-team" onchange="render()">
+      <option value="">All teams</option>
+      <option value="presidential">⭐ Presidential Cell</option>
+      <option value="finance">💰 Finance</option>
+      <option value="hr">🗂️ HR &amp; Welfare</option>
+      <option value="publicity">🎨 Publicity</option>
+      <option value="internal">🏛️ Internal</option>
+      <option value="external">🚀 External</option>
+      <option value="allmembers">👥 All Members</option>
+      <option value="__none__">— No team —</option>
+    </select>
+    <select class="fld" id="f-pri" onchange="render()">
+      <option value="">Any priority</option>
+      <option value="high">High only</option>
+      <option value="med">Medium only</option>
+      <option value="low">Low only</option>
+    </select>
+  </div>
+</div>
+
+<!-- LIST -->
+<div id="list"></div>
+
+<!-- FOOTER -->
+<div class="foot">
+  <div class="foot-btns">
+    <button class="sbtn" onclick="backupTasks()">⭳ Backup tasks</button>
+    <button class="sbtn" onclick="document.getElementById('restore-file').click()">Restore tasks</button>
+    <button class="sbtn" onclick="printAllExpanded()">🖨 Print checklist</button>
+    <button class="sbtn" onclick="clearDone()">Clear completed</button>
+  </div>
+  <div class="foot-status" id="foot-status"></div>
+  <input type="file" id="restore-file" accept=".json,application/json" style="display:none" onchange="restoreTasks(event)">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   MY NUSSCC TASK BOARD — private companion to the club Event Calendar.
+   Tasks live under a private storage key and never touch club data.
+   ═══════════════════════════════════════════════════════════════════ */
+
+// Private storage — deliberately different key from the club calendar's.
+const TASK_KEY='nusscc_my_tasks_private_v1';
+// The club calendar writes its events to this key (same browser = auto sync).
+const CLUB_EVENTS_KEY='nus_semicon_events_ay2627';
+
+// Academic-week → Monday date, mirrored from the club calendar so we can
+// resolve a real date for any event that only stores {weekId, day}.
+const WEEK_MON={
+ s1w0:'2026-08-03',s1w1:'2026-08-10',s1w2:'2026-08-17',s1w3:'2026-08-24',s1w4:'2026-08-31',
+ s1w5:'2026-09-07',s1w6:'2026-09-14',s1wr_1:'2026-09-19',s1wr_2:'2026-09-26',s1w7:'2026-09-28',
+ s1w8:'2026-10-05',s1w9:'2026-10-12',s1w10:'2026-10-19',s1w11:'2026-10-26',s1w12:'2026-11-02',
+ s1w13:'2026-11-09',s1rd:'2026-11-14',s1e1_1:'2026-11-21',s1e1_2:'2026-11-28',s1e1_3:'2026-12-05',
+ s1vac_1:'2026-12-06',s1vac_2:'2026-12-13',s1vac_3:'2026-12-20',s1vac_4:'2026-12-27',s1vac_5:'2027-01-03',s1vac_6:'2027-01-10',
+ s2w1:'2027-01-11',s2w2:'2027-01-18',s2w3:'2027-01-25',s2w4:'2027-02-01',s2w5:'2027-02-08',
+ s2w6:'2027-02-15',s2wr_1:'2027-02-20',s2wr_2:'2027-02-27',s2w7:'2027-03-01',s2w8:'2027-03-08',
+ s2w9:'2027-03-15',s2w10:'2027-03-22',s2w11:'2027-03-29',s2w12:'2027-04-05',s2w13:'2027-04-12',
+ s2rd:'2027-04-17',s2e1_1:'2027-04-24',s2e1_2:'2027-05-01',s2e1_3:'2027-05-08',
+ s2vac_1:'2027-05-09',s2vac_2:'2027-05-16',s2vac_3:'2027-05-23',s2vac_4:'2027-05-30',s2vac_5:'2027-06-06',
+ s2vac_6:'2027-06-13',s2vac_7:'2027-06-20',s2vac_8:'2027-06-27',s2vac_9:'2027-07-04',s2vac_10:'2027-07-11',
+ s2vac_11:'2027-07-18',s2vac_12:'2027-07-25',s2vac_13:'2027-08-01'
+};
+const DAY_OFFSET={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6};
+if(typeof requestAnimationFrame==='undefined'){window.requestAnimationFrame=cb=>setTimeout(cb,0);}
+
+// ── Club teams — mirrors the calendar's own CAT_STYLES so colors match exactly ──
+const TEAM_STYLES={
+  presidential: {solid:'#7c3aed', solidBg:'#f5f3ff', border:'#ddd6fe', label:'Presidential Cell', icon:'⭐'},
+  finance:      {solid:'#92400e', solidBg:'#fffbeb', border:'#fde68a', label:'Finance',            icon:'💰'},
+  hr:           {solid:'#475569', solidBg:'#f1f5f9', border:'#cbd5e1', label:'HR & Welfare',        icon:'🗂️'},
+  publicity:    {solid:'#155e75', solidBg:'#ecfeff', border:'#a5f3fc', label:'Publicity',           icon:'🎨'},
+  internal:     {solid:'#2563eb', solidBg:'#eff6ff', border:'#bfdbfe', label:'Internal',            icon:'🏛️'},
+  external:     {solid:'#065f46', solidBg:'#d1fae5', border:'#6ee7b7', label:'External',            icon:'🚀'},
+  allmembers:   {solid:'#312e81', solidBg:'#eef2ff', border:'#c7d2fe', label:'All Members',         icon:'👥'},
+};
+function teamStyle(key){return TEAM_STYLES[key]||null;}
+// Reverse lookup (label → key) so we can recover a team from the calendar's .ics "Team: X" line
+const TEAM_LABEL_TO_KEY=Object.fromEntries(Object.entries(TEAM_STYLES).map(([k,v])=>[v.label.toLowerCase(),k]));
+function resolveEventCats(raw){
+  if(Array.isArray(raw.cats)&&raw.cats.length) return raw.cats.filter(c=>TEAM_STYLES[c]);
+  if(raw.cat&&TEAM_STYLES[raw.cat]) return [raw.cat];
+  return ['internal'];
+}
+
+// ── State ──
+let tasks=loadTasks();
+tasks.forEach((t,i)=>{
+  if(!Array.isArray(t.checklist))t.checklist=[];
+  if(!('team' in t))t.team=null;
+  if(typeof t.order!=='number')t.order=i;   // preserves whatever order they were already in
+});
+let clubEvents=loadCachedEvents();   // [{id,name,date,venue,type}]
+let statusFilter='open';
+let editingId=null;
+let clOverride={};                    // task id -> true/false, explicit user override of default open state
+let groupCollapsed={};                // group key -> true if manually collapsed (default: expanded)
+let editingCheck=null;                // {taskId, idx} of checklist item currently being edited
+let dragTaskId=null;                  // id of the task currently being drag-reordered
+let nextId=tasks.length?Math.max(...tasks.map(t=>t.id))+1:1;
+
+// Group key for a task: its own group of tasks sharing the same event (or none)
+function groupKeyOf(t){return t.eventId!=null?('ev_'+t.eventId):'__general__';}
+function nextOrderInGroup(eventId){
+  const gk=eventId!=null?('ev_'+eventId):'__general__';
+  const siblings=tasks.filter(t=>groupKeyOf(t)===gk);
+  return siblings.length?Math.max(...siblings.map(t=>t.order??0))+1:0;
+}
+
+// ── Persistence (private) ──
+function loadTasks(){
+  try{const s=localStorage.getItem(TASK_KEY);if(s){const p=JSON.parse(s);if(Array.isArray(p))return p;}}catch(e){}
+  return [];
+}
+function saveTasks(){
+  try{localStorage.setItem(TASK_KEY,JSON.stringify(tasks));}
+  catch(e){toast('⚠️ Could not save — browser storage may be full.');}
+  updateFootStatus();
+}
+// We cache the last synced events so links keep their labels between visits.
+const EVENTS_CACHE_KEY='nusscc_my_tasks_events_cache_v1';
+function loadCachedEvents(){
+  try{const s=localStorage.getItem(EVENTS_CACHE_KEY);if(s){const p=JSON.parse(s);if(Array.isArray(p))return p;}}catch(e){}
+  return [];
+}
+function cacheEvents(){try{localStorage.setItem(EVENTS_CACHE_KEY,JSON.stringify(clubEvents));}catch(e){}}
+
+// ── Date helpers ──
+function todayISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function addDaysISO(iso,n){const d=new Date(iso+'T00:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function daysBetween(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
+function fmtDate(iso){if(!iso)return '';const d=new Date(iso+'T00:00:00');return d.toLocaleDateString('en-SG',{weekday:'short',day:'numeric',month:'short'});}
+function fmtDateShort(iso){if(!iso)return '';const d=new Date(iso+'T00:00:00');return d.toLocaleDateString('en-SG',{day:'numeric',month:'short'});}
+
+// ── Resolve a raw club event {weekId,day,...} into a real date ──
+function resolveEventDate(ev){
+  if(ev.date) return ev.date;                       // already resolved (from .ics)
+  if(ev.weekId && WEEK_MON[ev.weekId]){
+    const off=DAY_OFFSET[ev.day]??0;
+    return addDaysISO(WEEK_MON[ev.weekId],off);
+  }
+  return null;
+}
+
+/* ─────────────────  EVENT SOURCE: three ways in  ───────────────── */
+
+// 1) Same-browser auto sync — read the club calendar's own storage.
+function syncFromBrowser(){
+  let raw=null;
+  try{raw=localStorage.getItem(CLUB_EVENTS_KEY);}catch(e){}
+  if(!raw){toast('No club calendar found in this browser. Open the calendar here first, or use Import .ics.');return;}
+  let parsed;
+  try{parsed=JSON.parse(raw);}catch(e){toast('Club event data looked corrupted — try Import .ics instead.');return;}
+  if(!Array.isArray(parsed)||!parsed.length){toast('The club calendar has no events yet.');return;}
+  clubEvents=parsed.map(e=>({id:e.id,name:e.name,date:resolveEventDate(e),venue:e.venue||'',type:e.type||'',cats:resolveEventCats(e)}));
+  cacheEvents();rebuildEventPickers();render();
+  toast('⟳ Synced '+clubEvents.length+' event'+(clubEvents.length===1?'':'s')+' from this browser');
+}
+
+// 2) Import the .ics the calendar exports (fully-resolved dates, portable).
+function importICS(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{ parseICS(r.result); e.target.value=''; };
+  r.readAsText(f);
+}
+function parseICS(text){
+  // Unfold folded lines (continuation lines start with a space or tab).
+  const unfolded=text.replace(/\r\n/g,'\n').replace(/\n[ \t]/g,'');
+  const blocks=unfolded.split('BEGIN:VEVENT').slice(1);
+  const out=[];
+  blocks.forEach(b=>{
+    const body=b.split('END:VEVENT')[0];
+    const get=(key)=>{const m=body.match(new RegExp('^'+key+'[^:]*:(.*)$','m'));return m?m[1].trim():'';};
+    const uid=get('UID');
+    const idm=uid.match(/nusscc-ay2627-(\d+)/);
+    const id=idm?parseInt(idm[1]):('ics_'+out.length);
+    let name=get('SUMMARY').replace(/^\[TENTATIVE\]\s*/i,'').replace(/^\[NUS SemiCon\]\s*/i,'').trim();
+    name=name.replace(/\\,/g,',').replace(/\\;/g,';').replace(/\\n/gi,' ').replace(/\\\\/g,'\\');
+    const dtRaw=get('DTSTART');
+    let date=null;const dm=dtRaw.match(/(\d{4})(\d{2})(\d{2})/);
+    if(dm)date=dm[1]+'-'+dm[2]+'-'+dm[3];
+    let venue=get('LOCATION').replace(/\\,/g,',').replace(/\\;/g,';').replace(/\\\\/g,'\\');
+    // The calendar's .ics writes a "Team: X + Y" line inside DESCRIPTION — recover it so
+    // the group header here can show the same team colors as the calendar.
+    const descRaw=get('DESCRIPTION').replace(/\\n/gi,'\n').replace(/\\,/g,',').replace(/\\;/g,';').replace(/\\\\/g,'\\');
+    const teamLine=descRaw.split('\n').find(l=>l.trim().toLowerCase().startsWith('team:'));
+    let cats=['internal'];
+    if(teamLine){
+      const keys=teamLine.replace(/^team:\s*/i,'').split('+').map(s=>TEAM_LABEL_TO_KEY[s.trim().toLowerCase()]).filter(Boolean);
+      if(keys.length)cats=keys;
+    }
+    out.push({id,name:name||'(untitled event)',date,venue,type:'',cats});
+  });
+  if(!out.length){toast('No events found in that .ics file.');return;}
+  clubEvents=out;cacheEvents();rebuildEventPickers();render();
+  toast('📆 Imported '+out.length+' event'+(out.length===1?'':'s')+' from .ics');
+}
+
+// 3) Paste a raw events JSON array.
+function togglePaste(){document.getElementById('paste-area').classList.toggle('open');}
+function importJSON(){
+  const box=document.getElementById('paste-box');
+  let parsed;
+  try{parsed=JSON.parse(box.value.trim());}catch(e){toast('That was not valid JSON.');return;}
+  if(!Array.isArray(parsed)||!parsed.length){toast('Expected a non-empty array of events.');return;}
+  clubEvents=parsed.map(e=>({id:e.id,name:e.name,date:e.date||resolveEventDate(e),venue:e.venue||'',type:e.type||'',cats:resolveEventCats(e)}));
+  cacheEvents();rebuildEventPickers();render();box.value='';togglePaste();
+  toast('Loaded '+clubEvents.length+' event'+(clubEvents.length===1?'':'s')+' from pasted JSON');
+}
+
+function eventById(id){return clubEvents.find(e=>String(e.id)===String(id));}
+
+// Fill the "add task" and "filter" event dropdowns, grouped upcoming/past.
+function rebuildEventPickers(){
+  const today=todayISO();
+  const withDate=clubEvents.filter(e=>e.date).sort((a,b)=>a.date<b.date?-1:1);
+  const noDate=clubEvents.filter(e=>!e.date);
+  const upcoming=withDate.filter(e=>e.date>=today);
+  const past=withDate.filter(e=>e.date<today);
+  const opt=e=>`<option value="${e.id}">${esc(e.name)}${e.date?' — '+fmtDateShort(e.date):''}</option>`;
+  const grp=(label,arr)=>arr.length?`<optgroup label="${label}">${arr.map(opt).join('')}</optgroup>`:'';
+  const body=grp('Upcoming',upcoming)+grp('Past',past)+grp('No date set',noDate);
+
+  const add=document.getElementById('t-event');
+  const keepAdd=add.value;
+  add.innerHTML='<option value="">No event</option>'+body;
+  add.value=keepAdd;
+
+  const filt=document.getElementById('f-event');
+  const keepFilt=filt.value;
+  filt.innerHTML='<option value="">All events</option>'+body+'<option value="__none__">— No event —</option>';
+  filt.value=keepFilt;
+
+  const dot=document.getElementById('src-dot'),lab=document.getElementById('src-label'),cnt=document.getElementById('src-count');
+  if(clubEvents.length){
+    dot.className='src-dot on';lab.textContent='Club events loaded';
+    cnt.textContent='· '+clubEvents.length+' event'+(clubEvents.length===1?'':'s')+' available to link';
+  }else{
+    dot.className='src-dot off';lab.textContent='No club events loaded yet';cnt.textContent='';
+  }
+}
+
+/* ─────────────────  TASKS  ───────────────── */
+function addTask(){
+  const input=document.getElementById('t-text');
+  const text=input.value.trim();
+  if(!text){input.focus();return;}
+  const evVal=document.getElementById('t-event').value;
+  const ev=evVal?eventById(evVal):null;
+  const eventId=evVal?ev?.id??evVal:null;
+  tasks.push({
+    id:nextId++,text,done:false,
+    eventId,
+    eventName:ev?ev.name:null,          // cached label, resilient to un-synced sessions
+    priority:document.getElementById('t-pri').value,
+    due:document.getElementById('t-due').value||null,
+    team:document.getElementById('t-team').value||null,
+    link:null,checklist:[],order:nextOrderInGroup(eventId),created:todayISO()
+  });
+  saveTasks();
+  input.value='';document.getElementById('t-due').value='';
+  render();input.focus();
+  toast('Task added');
+}
+// Quick-add straight inside an event card (or My Tasks), no dropdown needed —
+// the group you typed it in is the group it belongs to.
+function addTaskToGroup(key){
+  const inp=document.getElementById('grp-add-'+key);
+  if(!inp)return;
+  const text=inp.value.trim();
+  if(!text){inp.focus();return;}
+  let eventId=null,eventName=null;
+  if(key!=='__general__'){
+    const rawId=key.slice(3);
+    const ev=eventById(rawId);
+    eventId=ev?ev.id:rawId;
+    eventName=ev?ev.name:null;
+  }
+  tasks.push({
+    id:nextId++,text,done:false,
+    eventId,eventName,
+    priority:'med',due:null,team:null,
+    link:null,checklist:[],order:nextOrderInGroup(eventId),created:todayISO()
+  });
+  saveTasks();
+  render();
+  requestAnimationFrame(()=>{const el=document.getElementById('grp-add-'+key);if(el)el.focus();});
+}
+// Small "+ Add a task…" row rendered at the bottom of every event/My-Tasks card.
+function groupAddRowHTML(key,label){
+  return `<div class="group-add-row">
+    <span class="plus">＋</span>
+    <input type="text" id="grp-add-${key}" placeholder="Add a task to ${esc(label)}…" onkeydown="if(event.key==='Enter')addTaskToGroup('${key}')">
+  </div>`;
+}
+function toggleTask(id){const t=tasks.find(x=>x.id===id);if(!t)return;t.done=!t.done;saveTasks();render();}
+
+/* ── Drag-to-reorder (within the same event/section only) ── */
+function onTaskDragStart(e,id){
+  dragTaskId=id;
+  e.dataTransfer.effectAllowed='move';
+  try{e.dataTransfer.setData('text/plain',String(id));}catch(err){}  // Firefox requires setData to allow the drag
+  const row=e.target.closest('.task');
+  if(row)row.classList.add('dragging');
+}
+function onTaskDragEnd(e){
+  document.querySelectorAll('.task.dragging').forEach(el=>el.classList.remove('dragging'));
+  document.querySelectorAll('.task.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  dragTaskId=null;
+}
+function onTaskDragOver(e){
+  if(dragTaskId==null)return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  const row=e.currentTarget;
+  if(row.dataset.taskId!==String(dragTaskId))row.classList.add('drag-over');
+}
+function onTaskDragLeave(e){
+  e.currentTarget.classList.remove('drag-over');
+}
+function onTaskDrop(e,targetId){
+  e.preventDefault();
+  document.querySelectorAll('.task.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  if(dragTaskId==null||dragTaskId===targetId)return;
+  const dragT=tasks.find(x=>x.id===dragTaskId);
+  const targetT=tasks.find(x=>x.id===targetId);
+  dragTaskId=null;
+  if(!dragT||!targetT)return;
+  if(groupKeyOf(dragT)!==groupKeyOf(targetT)){
+    toast('Tasks can only be reordered within the same section — edit the task to move it between events.');
+    return;
+  }
+  const gk=groupKeyOf(targetT);
+  const siblings=tasks.filter(t=>groupKeyOf(t)===gk).sort((a,b)=>(a.order??0)-(b.order??0));
+  const fromIdx=siblings.findIndex(t=>t.id===dragT.id);
+  const toIdx=siblings.findIndex(t=>t.id===targetT.id);
+  if(fromIdx<0||toIdx<0)return;
+  const [moved]=siblings.splice(fromIdx,1);
+  siblings.splice(toIdx,0,moved);
+  siblings.forEach((t,i)=>{t.order=i;});
+  saveTasks();render();
+}
+
+function deleteTask(id){const t=tasks.find(x=>x.id===id);if(!t)return;if(!confirm('Delete this task?\n\n"'+t.text+'"'))return;tasks=tasks.filter(x=>x.id!==id);saveTasks();render();}
+function clearDone(){
+  const n=tasks.filter(t=>t.done).length;
+  if(!n){toast('No completed tasks to clear.');return;}
+  if(!confirm('Clear '+n+' completed task'+(n===1?'':'s')+'?'))return;
+  tasks=tasks.filter(t=>!t.done);saveTasks();render();
+}
+function editTask(id){editingId=id;render();}
+function cancelEdit(){editingId=null;render();}
+function saveEdit(id){
+  const t=tasks.find(x=>x.id===id);if(!t)return;
+  const text=document.getElementById('e-text-'+id).value.trim();
+  if(!text){document.getElementById('e-text-'+id).focus();return;}
+  t.text=text;
+  const evVal=document.getElementById('e-event-'+id).value;
+  const ev=evVal?eventById(evVal):null;
+  const newEventId=evVal?ev?.id??evVal:null;
+  if(String(newEventId??'')!==String(t.eventId??'')){
+    t.order=nextOrderInGroup(newEventId);   // moved to a different group — put it at the end there
+  }
+  t.eventId=newEventId;
+  t.eventName=ev?ev.name:(evVal?t.eventName:null);
+  t.priority=document.getElementById('e-pri-'+id).value;
+  t.due=document.getElementById('e-due-'+id).value||null;
+  t.team=document.getElementById('e-team-'+id).value||null;
+  const url=document.getElementById('e-link-'+id).value.trim();
+  const label=document.getElementById('e-linklabel-'+id).value.trim();
+  t.link=url?{url,label:label||url}:null;
+  saveTasks();editingId=null;render();
+}
+
+// ── Image attachments (stored as compressed base64 data URLs, client-side only) ──
+function resizeImageFile(file,maxDim,quality){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    const reader=new FileReader();
+    reader.onerror=()=>reject(new Error('read failed'));
+    reader.onload=()=>{
+      img.onerror=()=>reject(new Error('decode failed'));
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        if(w>maxDim||h>maxDim){
+          if(w>=h){h=Math.round(h*maxDim/w);w=maxDim;}
+          else{w=Math.round(w*maxDim/h);h=maxDim;}
+        }
+        const canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function attachImage(id,inputEl){
+  const file=inputEl.files&&inputEl.files[0];
+  if(!file)return;
+  if(!file.type.startsWith('image/')){toast('Please choose an image file.');inputEl.value='';return;}
+  const t=tasks.find(x=>x.id===id);if(!t)return;
+  resizeImageFile(file,900,0.72).then(dataUrl=>{
+    t.image={dataUrl,name:file.name};
+    saveTasks();render();
+    toast('🖼️ Image attached');
+  }).catch(()=>{toast("Couldn't read that image — try a different file.");});
+  inputEl.value='';
+}
+function removeImage(id){
+  const t=tasks.find(x=>x.id===id);if(!t)return;
+  t.image=null;saveTasks();render();
+}
+function openLightbox(id){
+  const t=tasks.find(x=>x.id===id);
+  if(!t||!t.image)return;
+  const overlay=document.createElement('div');
+  overlay.className='lightbox-overlay';
+  overlay.onclick=()=>overlay.remove();
+  const img=document.createElement('img');
+  img.src=t.image.dataUrl;
+  img.onclick=e=>e.stopPropagation();
+  const close=document.createElement('button');
+  close.className='lightbox-close';close.innerHTML='&times;';close.onclick=()=>overlay.remove();
+  overlay.appendChild(img);overlay.appendChild(close);
+  document.body.appendChild(overlay);
+}
+
+// ── Due-date styling ──
+function dueMeta(t){
+  if(!t.due)return null;
+  if(t.done)return{cls:'due-done',txt:fmtDateShort(t.due)};
+  const d=daysBetween(todayISO(),t.due);
+  if(d<0)return{cls:'due-overdue',txt:(-d)+'d overdue'};
+  if(d===0)return{cls:'due-today',txt:'Due today'};
+  if(d<=3)return{cls:'due-soon',txt:'Due in '+d+'d'};
+  return{cls:'due-future',txt:'Due '+fmtDateShort(t.due)};
+}
+
+/* ─────────────────  RENDER  ───────────────── */
+function setStatusFilter(f){
+  statusFilter=f;
+  document.querySelectorAll('#status-seg button').forEach(b=>b.classList.toggle('active',b.dataset.f===f));
+  render();
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+function renderStats(){
+  const open=tasks.filter(t=>!t.done);
+  const today=todayISO();
+  const soon=open.filter(t=>t.due&&daysBetween(today,t.due)>=0&&daysBetween(today,t.due)<=3).length;
+  const over=open.filter(t=>t.due&&daysBetween(today,t.due)<0).length;
+  const done=tasks.filter(t=>t.done).length;
+  const box=(val,lbl,color)=>`<div class="stat-box"><span class="stat-val" style="color:${color}">${val}</span><span class="stat-lbl">${lbl}</span><div class="stat-bar" style="background:${color}"></div></div>`;
+  document.getElementById('stats').innerHTML=
+    box(open.length,'Open tasks','#4f46e5')+
+    box(soon,'Due soon','#ea580c')+
+    box(over,'Overdue','#dc2626')+
+    box(done,'Completed','#16a34a');
+}
+
+function passesFilters(t){
+  if(statusFilter==='open'&&t.done)return false;
+  if(statusFilter==='done'&&!t.done)return false;
+  const fe=document.getElementById('f-event').value;
+  if(fe==='__none__'&&t.eventId)return false;
+  if(fe&&fe!=='__none__'&&String(t.eventId)!==String(fe))return false;
+  const fp=document.getElementById('f-pri').value;
+  if(fp&&t.priority!==fp)return false;
+  const ft=document.getElementById('f-team').value;
+  if(ft==='__none__'&&t.team)return false;
+  if(ft&&ft!=='__none__'&&t.team!==ft)return false;
+  return true;
+}
+
+function taskRowHTML(t){
+  if(editingId===t.id)return editRowHTML(t);
+  const priLabel={high:'High',med:'Medium',low:'Low'}[t.priority]||'Medium';
+  const dm=dueMeta(t);
+  const link=t.link?`<a class="task-link" href="${esc(t.link.url)}" target="_blank" rel="noopener">🔗 ${esc(t.link.label)}</a>`:'';
+  const imgChip=t.image?`<span class="img-chip" onclick="openLightbox(${t.id})"><img src="${t.image.dataUrl}" alt="">image</span>`:'';
+  const cl=Array.isArray(t.checklist)?t.checklist:[];
+  const cDone=cl.filter(i=>i.done).length;
+  const defaultOpen=cl.length>0;                                  // default: open once it has items
+  const isOpen=clOverride.hasOwnProperty(t.id)?clOverride[t.id]:defaultOpen;
+  const clChip=cl.length
+    ?`<span class="cl-chip ${cDone===cl.length?'full':'part'}" onclick="toggleExpand(${t.id})">☑ ${cDone}/${cl.length}</span>`
+    :`<span class="cl-chip none" onclick="toggleExpand(${t.id})">＋ checklist</span>`;
+  const ts=t.team?teamStyle(t.team):null;
+  const teamChip=ts?`<span class="team-chip" style="background:${ts.solidBg};color:${ts.solid};border-color:${ts.border}">${ts.icon} ${ts.label}</span>`:'';
+  return `<div class="task" data-task-id="${t.id}" ondragover="onTaskDragOver(event)" ondragleave="onTaskDragLeave(event)" ondrop="onTaskDrop(event,${t.id})">
+    <span class="drag-handle" draggable="true" title="Drag to reorder" ondragstart="onTaskDragStart(event,${t.id})" ondragend="onTaskDragEnd(event)">⠿</span>
+    <input type="checkbox" class="chk" ${t.done?'checked':''} onclick="toggleTask(${t.id})">
+    <div class="task-body">
+      <div class="task-text ${t.done?'done':''}">${esc(t.text)}</div>
+      <div class="task-tags">
+        ${teamChip}
+        <span class="chip pri-${t.priority}">${priLabel}</span>
+        ${dm?`<span class="due-chip ${dm.cls}">${dm.txt}</span>`:''}
+        ${clChip}
+        ${link}
+        ${imgChip}
+      </div>
+    </div>
+    <div class="task-acts">
+      <button class="chev ${isOpen?'open':''}" title="${isOpen?'Hide':'Show'} checklist" onclick="toggleExpand(${t.id})"><span class="caret">▸</span></button>
+      <button class="iconbtn" title="Edit" onclick="editTask(${t.id})">✎</button>
+      <button class="iconbtn del" title="Delete" onclick="deleteTask(${t.id})">🗑</button>
+    </div>
+  </div>${isOpen?checklistHTML(t):''}`;
+}
+
+/* ── Checklist (sub-items per task) ── */
+function checklistHTML(t){
+  const cl=Array.isArray(t.checklist)?t.checklist:[];
+  const done=cl.filter(i=>i.done).length;
+  const pct=cl.length?Math.round(done/cl.length*100):0;
+  const items=cl.map((it,i)=>{
+    const isEditing=editingCheck&&editingCheck.taskId===t.id&&editingCheck.idx===i;
+    if(isEditing){
+      return `<div class="cl-item cl-item-editing">
+        <input type="checkbox" ${it.done?'checked':''} onclick="toggleCheck(${t.id},${i})">
+        <span class="cl-num">${i+1}.</span>
+        <input type="text" class="cl-edit-input" id="cl-edit-${t.id}-${i}" value="${esc(it.text)}"
+          onkeydown="if(event.key==='Enter')saveCheckEdit(${t.id},${i});if(event.key==='Escape')cancelCheckEdit();"
+          onblur="saveCheckEdit(${t.id},${i})">
+        <button class="cl-del" title="Remove item" onmousedown="event.preventDefault()" onclick="delCheck(${t.id},${i})">✕</button>
+      </div>`;
+    }
+    return `<div class="cl-item">
+    <input type="checkbox" ${it.done?'checked':''} onclick="toggleCheck(${t.id},${i})">
+    <span class="cl-num">${i+1}.</span>
+    <span class="cl-text ${it.done?'done':''}" title="Click to edit" onclick="startCheckEdit(${t.id},${i})">${esc(it.text)}</span>
+    <button class="cl-del" title="Remove item" onclick="delCheck(${t.id},${i})">✕</button>
+  </div>`;
+  }).join('');
+  return `<div class="drawer">
+    <div class="cl-hd">
+      <span class="cl-title">☑ Checklist</span>
+      <span class="cl-prog"><span style="width:${pct}%"></span></span>
+      <span class="cl-frac">${done}/${cl.length}</span>
+    </div>
+    ${items}
+    <div class="cl-add">
+      <span class="plus">＋</span>
+      <input type="text" id="cl-add-${t.id}" placeholder="Add item…" onkeydown="if(event.key==='Enter')addCheck(${t.id})">
+    </div>
+  </div>`;
+}
+function toggleExpand(id){
+  const t=tasks.find(x=>x.id===id);
+  const defaultOpen=t&&Array.isArray(t.checklist)&&t.checklist.length>0;
+  const curOpen=clOverride.hasOwnProperty(id)?clOverride[id]:defaultOpen;
+  clOverride[id]=!curOpen;
+  if(!clOverride[id])editingCheck=null;
+  render();
+  focusChecklistInput(id);
+}
+function onGroupToggle(el,key){
+  // Fired by the native <details> element itself (user click, or our own
+  // programmatic changes in printAllExpanded) — just remember the state.
+  groupCollapsed[key]=!el.open;
+}
+function printAllExpanded(){
+  const els=[...document.querySelectorAll('#list details.tgroup')];
+  const saved=els.map(d=>d.open);
+  els.forEach(d=>{d.open=true;});
+  setTimeout(()=>{
+    window.print();
+    els.forEach((d,i)=>{d.open=saved[i];});
+  },50);
+}
+function focusChecklistInput(id){
+  const t=tasks.find(x=>x.id===id);
+  const defaultOpen=t&&Array.isArray(t.checklist)&&t.checklist.length>0;
+  const isOpen=clOverride.hasOwnProperty(id)?clOverride[id]:defaultOpen;
+  if(!isOpen)return;
+  requestAnimationFrame(()=>{const el=document.getElementById('cl-add-'+id);if(el)el.focus();});
+}
+function addCheck(id){
+  const t=tasks.find(x=>x.id===id);if(!t)return;
+  if(!Array.isArray(t.checklist))t.checklist=[];
+  const inp=document.getElementById('cl-add-'+id);
+  const v=inp.value.trim();if(!v){inp.focus();return;}
+  t.checklist.push({text:v,done:false});
+  saveTasks();render();focusChecklistInput(id);
+}
+function toggleCheck(id,idx){
+  const t=tasks.find(x=>x.id===id);if(!t||!t.checklist||!t.checklist[idx])return;
+  t.checklist[idx].done=!t.checklist[idx].done;
+  saveTasks();render();
+}
+function delCheck(id,idx){
+  const t=tasks.find(x=>x.id===id);if(!t||!t.checklist)return;
+  if(editingCheck&&editingCheck.taskId===id&&editingCheck.idx===idx)editingCheck=null;
+  t.checklist.splice(idx,1);
+  saveTasks();render();
+}
+function startCheckEdit(taskId,idx){
+  editingCheck={taskId,idx};
+  render();
+  requestAnimationFrame(()=>{
+    const el=document.getElementById('cl-edit-'+taskId+'-'+idx);
+    if(el){el.focus();el.select();}
+  });
+}
+function saveCheckEdit(taskId,idx){
+  if(!editingCheck||editingCheck.taskId!==taskId||editingCheck.idx!==idx)return; // already handled (e.g. Escape fired first)
+  const t=tasks.find(x=>x.id===taskId);if(!t||!t.checklist||!t.checklist[idx]){editingCheck=null;return;}
+  const el=document.getElementById('cl-edit-'+taskId+'-'+idx);
+  const v=el?el.value.trim():'';
+  if(v)t.checklist[idx].text=v;   // empty edit keeps the original text rather than deleting it
+  editingCheck=null;
+  saveTasks();render();
+}
+function cancelCheckEdit(){
+  editingCheck=null;
+  render();
+}
+
+function editRowHTML(t){
+  const evVal=t.eventId??'';
+  const evOptions=buildEventOptionsFor(evVal);
+  return `<div class="task">
+    <input type="checkbox" class="chk" ${t.done?'checked':''} disabled>
+    <div class="edit-form">
+      <input type="text" id="e-text-${t.id}" value="${esc(t.text)}">
+      <div class="edit-grid">
+        <select class="fld" id="e-event-${t.id}"><option value="">No event</option>${evOptions}</select>
+        <select class="fld team-select" id="e-team-${t.id}">
+          <option value="" ${!t.team?'selected':''}>No team</option>
+          <option value="presidential" ${t.team==='presidential'?'selected':''}>⭐ Presidential Cell</option>
+          <option value="finance" ${t.team==='finance'?'selected':''}>💰 Finance</option>
+          <option value="hr" ${t.team==='hr'?'selected':''}>🗂️ HR &amp; Welfare</option>
+          <option value="publicity" ${t.team==='publicity'?'selected':''}>🎨 Publicity</option>
+          <option value="internal" ${t.team==='internal'?'selected':''}>🏛️ Internal</option>
+          <option value="external" ${t.team==='external'?'selected':''}>🚀 External</option>
+          <option value="allmembers" ${t.team==='allmembers'?'selected':''}>👥 All Members</option>
+        </select>
+      </div>
+      <div class="edit-grid">
+        <select class="fld" id="e-pri-${t.id}">
+          <option value="high" ${t.priority==='high'?'selected':''}>Priority: High</option>
+          <option value="med" ${t.priority==='med'?'selected':''}>Priority: Medium</option>
+          <option value="low" ${t.priority==='low'?'selected':''}>Priority: Low</option>
+        </select>
+        <input type="date" class="fld" id="e-due-${t.id}" value="${t.due||''}">
+      </div>
+      <div class="edit-grid">
+        <input type="text" class="fld" id="e-linklabel-${t.id}" placeholder="Link label (optional)" value="${esc(t.link?.label||'')}">
+        <input type="text" class="fld" id="e-link-${t.id}" placeholder="https://… (Drive doc, form, chat)" value="${esc(t.link?.url||'')}">
+      </div>
+      <div class="img-upload-row" id="e-imgrow-${t.id}">
+        ${t.image?`<div class="img-preview" id="e-imgpreview-${t.id}"><img src="${t.image.dataUrl}" alt=""><span class="img-preview-name">${esc(t.image.name||'image')}</span><button type="button" class="img-remove" title="Remove image" onclick="removeImage(${t.id})">✕</button></div>`:`<div id="e-imgpreview-${t.id}"></div>`}
+        <label class="img-upload-btn">📷 ${t.image?'Replace image':'Attach image'}
+          <input type="file" accept="image/*" onchange="attachImage(${t.id},this)">
+        </label>
+      </div>
+      <div class="edit-acts">
+        <button class="mini save" onclick="saveEdit(${t.id})">Save</button>
+        <button class="mini cancel" onclick="cancelEdit()">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+}
+function buildEventOptionsFor(selectedId){
+  const today=todayISO();
+  const withDate=clubEvents.filter(e=>e.date).sort((a,b)=>a.date<b.date?-1:1);
+  const noDate=clubEvents.filter(e=>!e.date);
+  const upcoming=withDate.filter(e=>e.date>=today);
+  const past=withDate.filter(e=>e.date<today);
+  const opt=e=>`<option value="${e.id}" ${String(e.id)===String(selectedId)?'selected':''}>${esc(e.name)}${e.date?' — '+fmtDateShort(e.date):''}</option>`;
+  const grp=(l,a)=>a.length?`<optgroup label="${l}">${a.map(opt).join('')}</optgroup>`:'';
+  let html=grp('Upcoming',upcoming)+grp('Past',past)+grp('No date set',noDate);
+  // If the task points at an event we no longer have loaded, keep its cached name selectable.
+  if(selectedId&&!eventById(selectedId)){
+    const t=tasks.find(x=>String(x.eventId)===String(selectedId));
+    const nm=t?.eventName||('Event #'+selectedId);
+    html=`<optgroup label="Currently linked"><option value="${esc(selectedId)}" selected>${esc(nm)}</option></optgroup>`+html;
+  }
+  return html;
+}
+
+function render(){
+  renderStats();
+  const shown=tasks.filter(passesFilters);
+  const list=document.getElementById('list');
+
+  if(!tasks.length){
+    list.innerHTML=`<div class="empty"><div class="big">📋</div><div class="msg">No tasks yet.</div><div class="sub">Add your first task above. Link it to a club event to keep everything grouped.</div></div>`;
+    updateFootStatus();return;
+  }
+  if(!shown.length){
+    list.innerHTML=`<div class="empty"><div class="big">🔍</div><div class="msg">Nothing matches these filters.</div><div class="sub">Try switching to “All”, or clearing the event / priority filters.</div></div>`;
+    updateFootStatus();return;
+  }
+
+  // Group: one group per linked event (ordered by event date), then General.
+  const groups={};const order=[];
+  shown.forEach(t=>{
+    const key=t.eventId!=null?('ev_'+t.eventId):'__general__';
+    if(!groups[key]){groups[key]=[];order.push(key);}
+    groups[key].push(t);
+  });
+  // Sort groups: My Tasks first, then events by date (undated last).
+  order.sort((a,b)=>{
+    if(a==='__general__')return -1;if(b==='__general__')return 1;
+    const ea=eventById(a.slice(3)),eb=eventById(b.slice(3));
+    const da=ea?.date||'9999';const db=eb?.date||'9999';
+    return da<db?-1:da>db?1:0;
+  });
+
+  let html='';
+  order.forEach(key=>{
+    const items=groups[key].sort((a,b)=>{
+      if(a.done!==b.done)return a.done?1:-1;                 // open first
+      return (a.order??0)-(b.order??0);                      // then however you've dragged them
+    });
+    const isCollapsed=!!groupCollapsed[key];
+    const openAttr=isCollapsed?'':'open';
+    if(key==='__general__'){
+      html+=`<details class="tgroup" ${openAttr} ontoggle="onGroupToggle(this,'${key}')"><summary class="tgroup-hd general">
+        <span class="g-name">My Tasks</span>
+        <span class="g-meta">· not tied to an event</span>
+        <span class="g-count">${items.length}</span>
+        <span class="acc-chevron">▾</span>
+      </summary><div class="acc-body">${items.map(taskRowHTML).join('')}${groupAddRowHTML(key,'My Tasks')}</div></details>`;
+    }else{
+      const ev=eventById(key.slice(3));
+      const nm=ev?ev.name:(items[0].eventName||('Event #'+key.slice(3)));
+      const dateISO=ev?ev.date:null;
+      const venue=ev?ev.venue:'';
+      const cats=ev?.cats&&ev.cats.length?ev.cats:['internal'];
+      const primary=teamStyle(cats[0])||teamStyle('internal');
+      const teamChips=cats.map(c=>{const s=teamStyle(c);return s?`<span class="team-chip" style="background:${s.solidBg};color:${s.solid};border-color:${s.border}">${s.icon} ${s.label}</span>`:'';}).join('');
+      let whenChip='';
+      if(dateISO){
+        const d=daysBetween(todayISO(),dateISO);
+        let cls='future',txt='in '+d+'d';
+        if(d<0){cls='past';txt=(-d)+'d ago';}
+        else if(d===0){cls='today';txt='Today';}
+        else if(d<=7){cls='soon';txt='in '+d+'d';}
+        whenChip=`<span class="g-when ${cls}">${txt}</span>`;
+      }
+      const meta=[dateISO?fmtDate(dateISO):'no date set',venue].filter(Boolean).join(' · ');
+      html+=`<details class="tgroup" ${openAttr} style="border-left-color:${primary.solid}" ontoggle="onGroupToggle(this,'${key}')"><summary class="tgroup-hd">
+        <span class="g-name">${esc(nm)}</span>
+        <span class="g-meta">· ${esc(meta)}</span>
+        ${whenChip}
+        ${teamChips}
+        <span class="g-count">${items.length}</span>
+        <span class="acc-chevron">▾</span>
+      </summary><div class="acc-body">${items.map(taskRowHTML).join('')}${groupAddRowHTML(key,nm)}</div></details>`;
+    }
+  });
+  list.innerHTML=html;
+  updateFootStatus();
+}
+
+/* ─────────────────  BACKUP / RESTORE  ───────────────── */
+function backupTasks(){
+  const payload={kind:'nusscc-my-tasks',exported:new Date().toISOString(),tasks,eventsCache:clubEvents};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='My_NUSSCC_Tasks_'+todayISO()+'.json';a.click();URL.revokeObjectURL(a.href);
+  toast('⭳ Backed up '+tasks.length+' task'+(tasks.length===1?'':'s'));
+}
+function restoreTasks(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    let p;try{p=JSON.parse(r.result);}catch(err){toast('That file was not valid JSON.');return;}
+    const incoming=Array.isArray(p)?p:p.tasks;
+    if(!Array.isArray(incoming)){toast('No tasks found in that file.');return;}
+    if(tasks.length&&!confirm('Replace your current '+tasks.length+' task'+(tasks.length===1?'':'s')+' with '+incoming.length+' from the backup?'))return;
+    tasks=incoming;
+    tasks.forEach((t,i)=>{
+      if(!Array.isArray(t.checklist))t.checklist=[];
+      if(!('team' in t))t.team=null;
+      if(typeof t.order!=='number')t.order=i;
+    });
+    if(p.eventsCache&&Array.isArray(p.eventsCache)&&p.eventsCache.length){clubEvents=p.eventsCache;cacheEvents();}
+    nextId=tasks.length?Math.max(...tasks.map(t=>t.id))+1:1;
+    saveTasks();rebuildEventPickers();render();
+    toast('Restored '+tasks.length+' task'+(tasks.length===1?'':'s'));
+  };
+  r.readAsText(f);e.target.value='';
+}
+
+function updateFootStatus(){
+  const el=document.getElementById('foot-status');
+  el.innerHTML=`<b>${tasks.length}</b> task${tasks.length===1?'':'s'} · <b>${clubEvents.length}</b> event${clubEvents.length===1?'':'s'} linked-in · saved privately in this browser`;
+}
+
+// ── Toast ──
+let toastTimer=null;
+function toast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+/* ─────────────────  INIT  ───────────────── */
+// Try a silent auto-sync from the same browser on first load (no toast if absent).
+(function autoSyncQuiet(){
+  if(clubEvents.length)return;
+  let raw=null;try{raw=localStorage.getItem(CLUB_EVENTS_KEY);}catch(e){}
+  if(!raw)return;
+  try{
+    const parsed=JSON.parse(raw);
+    if(Array.isArray(parsed)&&parsed.length){
+      clubEvents=parsed.map(e=>({id:e.id,name:e.name,date:resolveEventDate(e),venue:e.venue||'',type:e.type||'',cats:resolveEventCats(e)}));
+      cacheEvents();
+    }
+  }catch(e){}
+})();
+
+rebuildEventPickers();
+render();
+</script>
+</body>
+</html>

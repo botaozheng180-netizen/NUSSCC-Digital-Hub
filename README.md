@@ -1,2 +1,2 @@
 # NUSSCC-Digital-Hub
-Unified web platform for NUS Semiconductor Club event planning, personal task management, member progress, and the Virtual Semiconductor Trek initiative.
+Unified web platform for NUS Semiconductor Club event planning and progress tracking, personal task management, and the Virtual Semiconductor Trek initiative.

@@ -51,6 +51,25 @@ if (vercelConfig.outputDirectory !== ".next") {
   );
 }
 
+const packageManifest = JSON.parse(await readFile("package.json", "utf8"));
+if (packageManifest.dependencies?.next !== "15.5.7") {
+  throw new Error(
+    "Next.js must remain on the patched 15.5.7 release until an intentional upgrade is reviewed.",
+  );
+}
+for (const dependency of ["react", "react-dom"]) {
+  if (packageManifest.dependencies?.[dependency] !== "19.1.2") {
+    throw new Error(`${dependency} must remain on the patched 19.1.2 release.`);
+  }
+}
+
+const globalStyles = await readFile("app/globals.css", "utf8");
+if (/align-items:\s*end\s*;/.test(globalStyles)) {
+  throw new Error(
+    'Use the broadly supported "flex-end" value instead of "end" for flex alignment.',
+  );
+}
+
 console.log(
-  "Phase 1 routes, navigation, legacy-data safeguards, and Vercel output verified.",
+  "Phase 1 routes, patched dependencies, CSS compatibility, legacy-data safeguards, and Vercel output verified.",
 );

@@ -29,6 +29,8 @@ In **Vercel → Project Settings → Build and Deployment**, the recommended das
 
 The committed configuration makes preview deployments deterministic, but clearing the old dashboard override avoids confusion for future maintainers.
 
+The framework versions are pinned deliberately. Vercel blocks known-vulnerable Next.js releases, so dependency upgrades must retain patched Next.js, React, and React DOM versions and pass a production build before deployment.
+
 ## Project documentation
 
 - [Phase 0 repository audit and migration plan](docs/phase-0-audit.md)

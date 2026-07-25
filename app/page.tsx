@@ -57,7 +57,7 @@ export default function Dashboard() {
           <div className="orbit orbit-one" />
           <div className="orbit orbit-two" />
           <div className="chip">
-            <ClubLogo title="NUSSCC interconnect mark" />
+            <ClubLogo title="NUSSCC interconnect mark" showFrame={false} />
           </div>
           <div className="node n1" />
           <div className="node n2" />

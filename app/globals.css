@@ -54,12 +54,12 @@ button {
 .brand {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 0 8px 32px;
+  gap: 12px;
+  padding: 0 1px 32px;
 }
 .brand-mark {
-  width: 45px;
-  height: 45px;
+  width: 62px;
+  height: 62px;
   flex: none;
   color: #fff;
 }
@@ -68,27 +68,28 @@ button {
   display: block;
 }
 .brand-name strong {
-  font-size: 14px;
-  line-height: 0.96;
-  letter-spacing: 0.035em;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: 0.025em;
 }
 .brand-name strong:nth-child(2) {
-  font-size: 9px;
-  margin-top: 3px;
-  letter-spacing: 0.045em;
+  font-size: 11px;
+  margin-top: 5px;
+  letter-spacing: 0.02em;
 }
 .brand-name span {
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1;
   font-weight: 800;
-  margin-top: 4px;
+  margin-top: 6px;
+  letter-spacing: 0.02em;
 }
 .brand-name b {
   color: #a9c7f8;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0;
-  margin-left: 2px;
+  letter-spacing: 0.01em;
+  margin-left: 4px;
 }
 .sidebar nav {
   display: grid;
@@ -264,10 +265,9 @@ main {
   z-index: 2;
 }
 .chip svg {
-  width: 76px;
-  height: 76px;
+  width: 82px;
+  height: 82px;
   color: #fff;
-  --logo-cutout: #1260d5;
 }
 .orbit {
   position: absolute;

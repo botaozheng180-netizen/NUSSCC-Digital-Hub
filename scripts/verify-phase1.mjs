@@ -47,7 +47,11 @@ if (!shell.includes("<ClubLogo") || !shell.includes("SEMICONDUCTOR")) {
 }
 
 const dashboard = await readFile("app/page.tsx", "utf8");
-if (!dashboard.includes('<ClubLogo title="NUSSCC interconnect mark"')) {
+if (
+  !dashboard.includes(
+    '<ClubLogo title="NUSSCC interconnect mark" showFrame={false}',
+  )
+) {
   throw new Error("The dashboard hero must use the NUSSCC interconnect mark.");
 }
 

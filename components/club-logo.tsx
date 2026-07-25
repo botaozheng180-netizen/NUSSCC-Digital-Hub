@@ -1,11 +1,13 @@
 type ClubLogoProps = {
   className?: string;
   title?: string;
+  showFrame?: boolean;
 };
 
 export function ClubLogo({
   className,
   title = "NUS Semiconductor Club",
+  showFrame = true,
 }: ClubLogoProps) {
   return (
     <svg
@@ -16,42 +18,46 @@ export function ClubLogo({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect
-        x="11"
-        y="11"
-        width="98"
-        height="98"
-        rx="18"
-        stroke="currentColor"
-        strokeWidth="5"
-      />
-      <path d="M38 12v37" stroke="currentColor" strokeWidth="5" />
-      <path d="M88 12v31" stroke="currentColor" strokeWidth="5" />
-      <path d="M12 67h16v41" stroke="currentColor" strokeWidth="5" />
-      <path d="M60 108V82" stroke="currentColor" strokeWidth="5" />
-      <path d="M108 72 90 90" stroke="currentColor" strokeWidth="5" />
+      {showFrame && (
+        <rect
+          x="9"
+          y="9"
+          width="102"
+          height="102"
+          rx="19"
+          stroke="currentColor"
+          strokeWidth="3.5"
+        />
+      )}
+      <path d="M38 10v39" stroke="currentColor" strokeWidth="3.5" />
+      <path d="M88 10v33" stroke="currentColor" strokeWidth="3.5" />
+      <path d="M10 67h17v43" stroke="currentColor" strokeWidth="3.5" />
+      <path d="M60 110V82" stroke="currentColor" strokeWidth="3.5" />
+      <path d="m110 70-22 22" stroke="currentColor" strokeWidth="3.5" />
       <path
-        d="m44 76 18-25h15"
+        d="m44 76 18-25h18"
         stroke="currentColor"
-        strokeWidth="5"
+        strokeWidth="3.5"
         strokeLinejoin="round"
       />
-      <circle cx="38" cy="53" r="7" fill="currentColor" />
-      <circle cx="88" cy="47" r="7" fill="currentColor" />
-      <circle cx="27" cy="67" r="7" fill="currentColor" />
-      <circle cx="44" cy="78" r="7" fill="currentColor" />
-      <circle cx="80" cy="51" r="7" fill="currentColor" />
-      <circle cx="60" cy="78" r="7" fill="currentColor" />
-      <circle cx="88" cy="92" r="7" fill="currentColor" />
-      <g fill="var(--logo-cutout, #071944)">
-        <circle cx="38" cy="53" r="2.4" />
-        <circle cx="88" cy="47" r="2.4" />
-        <circle cx="27" cy="67" r="2.4" />
-        <circle cx="44" cy="78" r="2.4" />
-        <circle cx="80" cy="51" r="2.4" />
-        <circle cx="60" cy="78" r="2.4" />
-        <circle cx="88" cy="92" r="2.4" />
-      </g>
+      {[
+        [38, 53],
+        [88, 47],
+        [27, 67],
+        [44, 78],
+        [80, 51],
+        [60, 78],
+        [88, 92],
+      ].map(([cx, cy]) => (
+        <circle
+          key={`${cx}-${cy}`}
+          cx={cx}
+          cy={cy}
+          r="5.5"
+          stroke="currentColor"
+          strokeWidth="3.5"
+        />
+      ))}
     </svg>
   );
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ClubLogo } from "@/components/club-logo";
 import { Icon } from "@/components/icons";
 
 const journeys = [
@@ -56,8 +57,7 @@ export default function Dashboard() {
           <div className="orbit orbit-one" />
           <div className="orbit orbit-two" />
           <div className="chip">
-            <span>NUS</span>
-            <strong>SCC</strong>
+            <ClubLogo title="NUSSCC interconnect mark" />
           </div>
           <div className="node n1" />
           <div className="node n2" />

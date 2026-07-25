@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { ClubLogo } from "./club-logo";
 import { Icon } from "./icons";
 
 const navigation = [
@@ -22,10 +23,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="app-shell">
       <aside className={`sidebar ${open ? "is-open" : ""}`}>
         <div className="brand">
-          <div className="brand-mark">◇</div>
-          <div>
-            <strong>NUSSCC</strong>
-            <span>Digital Hub</span>
+          <ClubLogo className="brand-mark" />
+          <div className="brand-name">
+            <strong>NUS</strong>
+            <strong>SEMICONDUCTOR</strong>
+            <span>
+              CLUB <b>Digital Hub</b>
+            </span>
           </div>
         </div>
         <nav aria-label="Primary navigation">
@@ -66,7 +70,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Icon name={open ? "close" : "menu"} />
           </button>
           <div className="mobile-brand">
-            NUSSCC <span>Digital Hub</span>
+            NUS SEMICONDUCTOR CLUB <span>Digital Hub</span>
           </div>
           <div className="phase-pill">
             <span /> Phase 1 · Foundation

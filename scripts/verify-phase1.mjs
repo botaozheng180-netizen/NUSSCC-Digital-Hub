@@ -40,6 +40,16 @@ for (const route of [
     throw new Error(`Shared navigation is missing ${route}.`);
   }
 }
+if (!shell.includes("<ClubLogo") || !shell.includes("SEMICONDUCTOR")) {
+  throw new Error(
+    "The shared shell must use the official NUSSCC mark and name.",
+  );
+}
+
+const dashboard = await readFile("app/page.tsx", "utf8");
+if (!dashboard.includes('<ClubLogo title="NUSSCC interconnect mark"')) {
+  throw new Error("The dashboard hero must use the NUSSCC interconnect mark.");
+}
 
 const vercelConfig = JSON.parse(await readFile("vercel.json", "utf8"));
 if (vercelConfig.framework !== "nextjs") {

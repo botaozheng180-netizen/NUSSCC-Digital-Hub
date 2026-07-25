@@ -41,4 +41,16 @@ for (const route of [
   }
 }
 
-console.log("Phase 1 routes, navigation, and legacy-data safeguards verified.");
+const vercelConfig = JSON.parse(await readFile("vercel.json", "utf8"));
+if (vercelConfig.framework !== "nextjs") {
+  throw new Error("Vercel must use the Next.js framework preset.");
+}
+if (vercelConfig.outputDirectory !== ".next") {
+  throw new Error(
+    'Vercel output must override the legacy "public" setting with ".next".',
+  );
+}
+
+console.log(
+  "Phase 1 routes, navigation, legacy-data safeguards, and Vercel output verified.",
+);

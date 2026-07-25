@@ -2,7 +2,7 @@
 
 **Audit date:** 25 July 2026  
 **Audited revision:** `ce6c7ee` (`work` branch)  
-**Status:** Repository inspection complete; architecture recommendation requires approval before Phase 1
+**Status:** Repository inspection complete; Next.js/TypeScript foundation approved for Phase 1
 
 ## 1. Executive summary
 
@@ -431,6 +431,6 @@ These decisions should be made before the relevant phase, not all before Phase 1
 - [x] Proposed routes, modules, preservation checks, and verification strategy documented.
 - [ ] External Vercel settings confirmed by the project owner.
 - [ ] Separate deployed-calendar source, backend, and ownership confirmed, if they exist.
-- [ ] Phase 1 architecture recommendation approved.
+- [x] Phase 1 architecture recommendation approved.
 
 Phase 0 repository analysis is complete. The unchecked external and owner decisions are explicit inputs to later work, not reasons to rewrite the existing applications speculatively.

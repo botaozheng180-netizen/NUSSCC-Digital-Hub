@@ -10,7 +10,7 @@
     "verify:phase1": "node scripts/verify-phase1.mjs"
   },
   "dependencies": {
-    "next": "15.5.7",
+    "next": "15.5.9",
     "react": "19.1.2",
     "react-dom": "19.1.2"
   },

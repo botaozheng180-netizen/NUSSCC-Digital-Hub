@@ -52,9 +52,9 @@ if (vercelConfig.outputDirectory !== ".next") {
 }
 
 const packageManifest = JSON.parse(await readFile("package.json", "utf8"));
-if (packageManifest.dependencies?.next !== "15.5.7") {
+if (packageManifest.dependencies?.next !== "15.5.9") {
   throw new Error(
-    "Next.js must remain on the patched 15.5.7 release until an intentional upgrade is reviewed.",
+    "Next.js must remain on the patched 15.5.9 release until an intentional upgrade is reviewed.",
   );
 }
 for (const dependency of ["react", "react-dom"]) {

@@ -68,18 +68,19 @@ button {
   display: block;
 }
 .brand-name strong {
-  font-size: 20px;
-  line-height: 1;
+  font-size: 22px;
+  line-height: 1.05;
   letter-spacing: 0.025em;
 }
 .brand-name strong:nth-child(2) {
-  font-size: 11px;
+  font-size: 12px;
+  line-height: 1.1;
   margin-top: 5px;
   letter-spacing: 0.02em;
 }
 .brand-name span {
-  font-size: 11px;
-  line-height: 1;
+  font-size: 12px;
+  line-height: 1.1;
   font-weight: 800;
   margin-top: 6px;
   letter-spacing: 0.02em;

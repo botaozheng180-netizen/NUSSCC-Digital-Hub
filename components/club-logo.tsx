@@ -45,9 +45,9 @@ export function ClubLogo({
       >
         <path d="M147 0v185" />
         <path d="M430 0v136" />
-        <path d="M64 290v222" />
+        <path d="M64 313v199" />
         <path d="M257 512V423" />
-        <path d="M512 354 443 442" />
+        <path d="M512 354 455 426" />
         <path d="M185 344v-63l105-127h22" />
       </g>
 

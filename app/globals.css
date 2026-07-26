@@ -265,8 +265,8 @@ main {
   z-index: 2;
 }
 .chip svg {
-  width: 82px;
-  height: 82px;
+  width: 100%;
+  height: 100%;
   color: #fff;
 }
 .orbit {

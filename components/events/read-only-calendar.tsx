@@ -57,6 +57,26 @@ function timeLabel(event: CalendarEvent) {
     : event.public.startTime;
 }
 
+function googleCalendarUrl(event: CalendarEvent) {
+  const startDate = eventDate(event).replaceAll("-", "");
+  const endDate = event.public.end
+    ? (academicDateToISO(event.public.end.weekId, event.public.end.day) ?? eventDate(event)).replaceAll("-", "")
+    : startDate;
+  const timed = (date: string, time: string | null) => `${date}T${(time ?? "00:00").replace(":", "")}00`;
+  const dates = event.public.allDay
+    ? `${startDate}/${addDay(`${endDate.slice(0, 4)}-${endDate.slice(4, 6)}-${endDate.slice(6, 8)}`).replaceAll("-", "")}`
+    : `${timed(startDate, event.public.startTime)}/${timed(endDate, event.public.endTime ?? event.public.startTime)}`;
+  const query = new URLSearchParams({
+    action: "TEMPLATE",
+    text: event.public.name,
+    dates,
+    ctz: "Asia/Singapore",
+    details: event.public.description,
+    location: event.public.venue,
+  });
+  return `https://calendar.google.com/calendar/render?${query}`;
+}
+
 export function ReadOnlyCalendar() {
   const [semester, setSemester] = useState<1 | 2>(1);
   const [result, setResult] = useState<LocalEventReadResult>(EMPTY);
@@ -244,8 +264,16 @@ export function ReadOnlyCalendar() {
             onMouseDown={(event) => event.stopPropagation()}
           >
             <button className="event-dialog-close" type="button" onClick={() => setSelected(null)} aria-label="Close event details">×</button>
-            <span className={`event-status status-${selected.planning.status}`}>{selected.planning.status}</span>
+            <div className="event-dialog-tags" aria-label="Event classification">
+              <span className={`event-tag type-${selected.public.type}`}>{TYPE_META[selected.public.type][0]} {TYPE_META[selected.public.type][1]}</span>
+              {selected.planning.teams.map((team) => <span className={`event-tag team-${team}`} key={team}>{TEAM_META[team][0]} {TEAM_META[team][1]}</span>)}
+              <span className={`event-tag status-${selected.planning.status}`}>{STATUS_META[selected.planning.status][0]} {STATUS_META[selected.planning.status][1]}</span>
+            </div>
             <h3 id="event-dialog-title">{selected.public.name}</h3>
+            <div className="event-editor-preview">
+              <button type="button" disabled title="Editing will be enabled after authentication and server-side role checks are available">✏️ Edit Event</button>
+              <span>EXCO editing will be enabled after secure sign-in.</span>
+            </div>
             <dl>
               <div><dt>Date</dt><dd>{eventDate(selected)}</dd></div>
               <div><dt>Time</dt><dd>{timeLabel(selected)}</dd></div>
@@ -258,6 +286,15 @@ export function ReadOnlyCalendar() {
                 {selected.public.links.map((link) => <a href={link.url} target="_blank" rel="noreferrer" key={link.url}>{link.label || "Event resource"}</a>)}
               </div>
             )}
+            <section className="event-tasks-preview">
+              <div><strong>✅ Tasks for this event</strong><button type="button" disabled title="Task editing is not enabled in the read-only preview">✏️ Edit Tasks</button></div>
+              <p>No migrated planning tasks for this event.</p>
+            </section>
+            <div className="event-dialog-actions">
+              <a href={googleCalendarUrl(selected)} target="_blank" rel="noreferrer">📅 Add to Google Calendar</a>
+              <button type="button" disabled title="Deletion is not enabled in the read-only preview">🗑️ Delete</button>
+              <button type="button" onClick={() => setSelected(null)}>Close</button>
+            </div>
           </section>
         </div>
       )}

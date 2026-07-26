@@ -29,6 +29,162 @@ body {
     "Segoe UI",
     sans-serif;
 }
+
+.calendar-migration {
+  margin-top: 26px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.calendar-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  padding: 24px;
+  border-bottom: 1px solid var(--line);
+}
+.calendar-toolbar h2 {
+  margin: 9px 0 4px;
+  font-size: 24px;
+}
+.calendar-toolbar p,
+.calendar-empty p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.semester-switch {
+  display: flex;
+  padding: 4px;
+  border-radius: 10px;
+  background: #edf2fa;
+}
+.semester-switch button {
+  border: 0;
+  border-radius: 7px;
+  padding: 9px 13px;
+  color: #5a6882;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+.semester-switch button.active {
+  color: white;
+  background: var(--blue);
+}
+.calendar-warning {
+  padding: 12px 24px;
+  color: #92400e;
+  background: #fffbeb;
+  border-bottom: 1px solid #fde68a;
+  font-size: 13px;
+}
+.calendar-empty {
+  max-width: 620px;
+  margin: 54px auto;
+  padding: 0 24px;
+  text-align: center;
+}
+.calendar-empty strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+.academic-calendar {
+  min-width: 880px;
+  overflow: auto;
+}
+.calendar-row {
+  display: grid;
+  grid-template-columns: 125px repeat(7, minmax(105px, 1fr));
+  border-bottom: 1px solid var(--line);
+}
+.calendar-row:last-child {
+  border-bottom: 0;
+}
+.calendar-header {
+  color: #65738d;
+  background: #f8faff;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.calendar-header span {
+  padding: 10px;
+  text-align: center;
+  border-right: 1px solid var(--line);
+}
+.week-label,
+.calendar-day {
+  min-height: 82px;
+  padding: 8px;
+  border-right: 1px solid var(--line);
+}
+.week-label {
+  background: #fafbfe;
+}
+.week-label strong,
+.week-label span {
+  display: block;
+}
+.week-label strong {
+  font-size: 12px;
+}
+.week-label span,
+.calendar-day > time {
+  margin-top: 4px;
+  color: #8591a6;
+  font-size: 10px;
+}
+.week-recess .week-label,
+.week-reading .week-label,
+.week-exam .week-label,
+.week-vac .week-label {
+  background: #f4f6fa;
+}
+.calendar-event {
+  margin-top: 5px;
+  padding: 6px;
+  border: 1px solid #b8d2fb;
+  border-radius: 6px;
+  color: #164b9c;
+  background: #eaf2ff;
+}
+.calendar-event strong,
+.calendar-event span {
+  display: block;
+}
+.calendar-event strong {
+  font-size: 10px;
+  line-height: 1.3;
+}
+.calendar-event span {
+  margin-top: 3px;
+  font-size: 9px;
+}
+.calendar-event.status-potential,
+.calendar-event.status-contacted,
+.calendar-event.status-discussion {
+  border-style: dashed;
+}
+
+@media (max-width: 700px) {
+  .calendar-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .semester-switch button {
+    flex: 1;
+  }
+  .calendar-migration {
+    overflow-x: auto;
+  }
+}
 a {
   color: inherit;
   text-decoration: none;

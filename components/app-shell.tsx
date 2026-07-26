@@ -9,6 +9,7 @@ import { Icon } from "./icons";
 const navigation = [
   ["/", "Dashboard", "dashboard"],
   ["/events", "Events", "calendar"],
+  ["/calendar", "Calendar", "calendar"],
   ["/tasks", "My Tasks", "tasks"],
   ["/trek", "Semiconductor Trek", "trek"],
   ["/achievements", "Achievements", "trophy"],

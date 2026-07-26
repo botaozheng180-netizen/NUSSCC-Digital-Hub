@@ -16,7 +16,7 @@ legacy compatibility path is tested.
 
 ## Intended access policy
 
-During layout development, `/events` temporarily exposes the supplied calendar
+During layout development, `/calendar` temporarily exposes the supplied calendar
 snapshot without requiring sign-in. The preview omits EXCO tasks, budgets,
 attendance, images, and contact details. This is a deliberate design-review
 exception, not the final access policy; it must be removed when authenticated
@@ -53,24 +53,22 @@ IDs, revisions, and authenticated audit fields.
 | Identity | View internal calendar | Edit internal calendar |
 | --- | --- | --- |
 | Website visitor | No | No |
-| Signed-in NUSSCC member | Yes | No |
-| Eligible signed-in EXCO member | Yes | Yes |
+| Signed-in NUSSCC member | Yes | Only when specifically delegated |
+| Signed-in EXCO member | Yes | Yes |
 
-Eligible editor roles are:
+All current EXCO members can edit. An EXCO-authorised member may also receive an
+explicit calendar-editor delegation without becoming EXCO. That delegation must
+be granted and revoked through an auditable administrative process; it must not
+be inferred from a hidden button or other client state. Client-side checks may
+improve the interface, but the future server must verify identity, active
+membership, current EXCO status or an active delegation on every query and
+mutation.
 
-- President;
-- Vice President;
-- External Events Director;
-- Internal Events Director;
-- Content Creation & Publicity Director;
-- Welfare & Fundraising Manager;
-- Secretary.
-
-The role list is represented in `lib/events/access-policy.ts` so UI states and
-future server checks can use one vocabulary. Client-side checks may improve the
-interface, but they must never be treated as security. The future server must
-verify identity, active membership, and an eligible current role on every
-calendar query and mutation.
+The unrestricted `/events` route is separate from the internal calendar. It is
+reserved for public recaps of past events and advertisements for selected
+upcoming events. Publishing an item there must be an explicit projection or
+editorial action; internal calendar records must never become public merely
+because their planning status changes.
 
 ## Migration stages
 

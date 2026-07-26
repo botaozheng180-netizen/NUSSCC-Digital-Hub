@@ -1,23 +1,7 @@
-/**
- * Calendar roles describe the intended server-side policy for the future
- * authenticated application. These helpers are not an authorization boundary;
- * enforcement must happen again on every server read and mutation.
- */
-export const CALENDAR_EDITOR_ROLES = [
-  "president",
-  "vice-president",
-  "external-events-director",
-  "internal-events-director",
-  "content-publicity-director",
-  "welfare-fundraising-manager",
-  "secretary",
-] as const;
-
-export type CalendarEditorRole = (typeof CALENDAR_EDITOR_ROLES)[number];
-
+/** This models the intended policy; the future server must enforce it. */
 export type CalendarPrincipal =
   | { kind: "visitor" }
-  | { kind: "member"; role: "member" | CalendarEditorRole };
+  | { kind: "member"; isExco: boolean; delegatedCalendarEditor: boolean };
 
 export type CalendarCapability = "view" | "edit";
 
@@ -25,9 +9,8 @@ export function calendarCapabilities(principal: CalendarPrincipal): Set<Calendar
   if (principal.kind === "visitor") return new Set();
 
   const capabilities = new Set<CalendarCapability>(["view"]);
-  if (CALENDAR_EDITOR_ROLES.includes(principal.role as CalendarEditorRole)) {
+  if (principal.isExco || principal.delegatedCalendarEditor) {
     capabilities.add("edit");
   }
   return capabilities;
 }
-

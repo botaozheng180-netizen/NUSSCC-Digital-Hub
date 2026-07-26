@@ -16,6 +16,12 @@ legacy compatibility path is tested.
 
 ## Intended access policy
 
+During layout development, `/events` temporarily exposes the supplied calendar
+snapshot without requiring sign-in. The preview omits EXCO tasks, budgets,
+attendance, images, and contact details. This is a deliberate design-review
+exception, not the final access policy; it must be removed when authenticated
+calendar reads are introduced.
+
 | Identity | View internal calendar | Edit internal calendar |
 | --- | --- | --- |
 | Website visitor | No | No |
@@ -78,4 +84,3 @@ two EXCO editors cannot unknowingly overwrite one another. Audit metadata must
 be written by the server, never accepted from the browser. Attachments should
 eventually move out of base64 event records into access-controlled object
 storage, but legacy base64 images must remain importable during migration.
-

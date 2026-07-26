@@ -11,6 +11,7 @@ import {
   LEGACY_BACKUP_TIMESTAMP_KEY,
   LEGACY_EDIT_TIMESTAMP_KEY,
   LEGACY_TODOS_STORAGE_KEY,
+  buildCalendarICS,
   createCalendarBackup,
   previewCalendarImport,
   toLegacyEvent,
@@ -105,6 +106,7 @@ export function ReadOnlyCalendar() {
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [tasks, setTasks] = useState<EventPlanningTask[]>([]);
   const [view, setView] = useState<"calendar" | "agenda">("calendar");
+  const [dataNotice, setDataNotice] = useState("");
   const importInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -182,6 +184,18 @@ export function ReadOnlyCalendar() {
     anchor.click();
     URL.revokeObjectURL(url);
     window.localStorage.setItem(LEGACY_BACKUP_TIMESTAMP_KEY, new Date().toISOString());
+    setDataNotice("Backup exported successfully.");
+  };
+
+  const exportICS = () => {
+    const blob = new Blob([buildCalendarICS(sourceEvents)], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "NUSSemiCon_Calendar_AY2627.ics";
+    anchor.click();
+    URL.revokeObjectURL(url);
+    setDataNotice("Calendar file exported successfully.");
   };
 
   const chooseImport = async (file: File | undefined) => {
@@ -199,13 +213,36 @@ export function ReadOnlyCalendar() {
   const proceedWithImport = () => {
     if (!importPreview) return;
     const now = new Date().toISOString();
-    window.localStorage.setItem(LEGACY_EVENTS_STORAGE_KEY, JSON.stringify(importPreview.events.map(toLegacyEvent)));
-    if (importPreview.todos) window.localStorage.setItem(LEGACY_TODOS_STORAGE_KEY, JSON.stringify(importPreview.todos));
-    window.localStorage.setItem(LEGACY_EDIT_TIMESTAMP_KEY, now);
-    setResult(readLegacyLocalEvents(window.localStorage));
-    setTasks(readPlanningTasks(window.localStorage));
-    setImportPreview(null);
+    const previousEvents = window.localStorage.getItem(LEGACY_EVENTS_STORAGE_KEY);
+    const previousTodos = window.localStorage.getItem(LEGACY_TODOS_STORAGE_KEY);
+    try {
+      window.localStorage.setItem(LEGACY_EVENTS_STORAGE_KEY, JSON.stringify(importPreview.events.map(toLegacyEvent)));
+      if (importPreview.todos) window.localStorage.setItem(LEGACY_TODOS_STORAGE_KEY, JSON.stringify(importPreview.todos));
+      window.localStorage.setItem(LEGACY_EDIT_TIMESTAMP_KEY, now);
+      const verified = readLegacyLocalEvents(window.localStorage);
+      if (verified.events.length !== importPreview.events.length) throw new Error("The imported events could not be verified after saving.");
+      setResult(verified);
+      setTasks(readPlanningTasks(window.localStorage));
+      setImportPreview(null);
+      setDataNotice(`Imported ${verified.events.length} event(s) successfully.`);
+    } catch (error) {
+      if (previousEvents === null) window.localStorage.removeItem(LEGACY_EVENTS_STORAGE_KEY); else window.localStorage.setItem(LEGACY_EVENTS_STORAGE_KEY, previousEvents);
+      if (previousTodos === null) window.localStorage.removeItem(LEGACY_TODOS_STORAGE_KEY); else window.localStorage.setItem(LEGACY_TODOS_STORAGE_KEY, previousTodos);
+      setImportError(`${error instanceof Error ? error.message : "Import failed."} The previous calendar was restored.`);
+      setImportPreview(null);
+    }
   };
+
+  const importChanges = useMemo(() => {
+    if (!importPreview) return null;
+    const currentIds = new Set(sourceEvents.map((event) => String(event.legacyId ?? event.id)));
+    const incomingIds = new Set(importPreview.events.map((event) => String(event.legacyId ?? event.id)));
+    return {
+      added: [...incomingIds].filter((id) => !currentIds.has(id)).length,
+      retained: [...incomingIds].filter((id) => currentIds.has(id)).length,
+      removed: [...currentIds].filter((id) => !incomingIds.has(id)).length,
+    };
+  }, [importPreview, sourceEvents]);
 
   const persistEvents = (events: CalendarEvent[]) => {
     window.localStorage.setItem(LEGACY_EVENTS_STORAGE_KEY, JSON.stringify(events.map(toLegacyEvent)));
@@ -311,10 +348,12 @@ export function ReadOnlyCalendar() {
       <div className="calendar-data-tools">
         <div><strong>Calendar data</strong><span>Legacy-compatible JSON backup and restore</span></div>
         <button type="button" onClick={exportCalendar}>💾 Export backup</button>
+        <button type="button" onClick={exportICS}>📅 Export .ics</button>
         <button type="button" onClick={() => importInput.current?.click()}>📂 Import backup</button>
         <input ref={importInput} type="file" accept=".json,application/json" hidden onChange={(event) => chooseImport(event.target.files?.[0])} />
       </div>
       {importError && <div className="calendar-import-error" role="alert">⚠️ {importError}</div>}
+      {dataNotice && <div className="calendar-data-notice" role="status">✅ {dataNotice}</div>}
 
       {loaded && result.issues.length > 0 && (
         <div className="calendar-warning" role="status">
@@ -424,10 +463,12 @@ export function ReadOnlyCalendar() {
             <dl>
               <div><dt>Ready to import</dt><dd>{importPreview.events.length} event(s)</dd></div>
               <div><dt>Rejected</dt><dd>{importPreview.rejected} record(s)</dd></div>
+              {importChanges && <><div><dt>New IDs</dt><dd>{importChanges.added}</dd></div><div><dt>Existing IDs</dt><dd>{importChanges.retained}</dd></div><div><dt>Removed IDs</dt><dd>{importChanges.removed}</dd></div></>}
               {importPreview.todos && <div><dt>Planning tasks</dt><dd>{importPreview.todos.length}</dd></div>}
             </dl>
             {importPreview.rejected > 0 && <p className="import-rejected">Records that failed validation will not be imported.</p>}
             <div className="import-confirmation-actions">
+              <button type="button" onClick={exportCalendar}>Download current backup</button>
               <button type="button" onClick={() => setImportPreview(null)}>Cancel</button>
               <button type="button" className="danger" disabled={importPreview.events.length === 0} onClick={proceedWithImport}>Proceed anyway</button>
             </div>

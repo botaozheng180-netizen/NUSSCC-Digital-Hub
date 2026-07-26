@@ -306,6 +306,13 @@ body {
   border-bottom: 1px solid #ffc9c5;
   font-size: 12px;
 }
+.calendar-data-notice {
+  padding: 10px 24px;
+  color: #087856;
+  background: #effcf7;
+  border-bottom: 1px solid #a5e8d0;
+  font-size: 12px;
+}
 .calendar-empty {
   max-width: 620px;
   margin: 54px auto;

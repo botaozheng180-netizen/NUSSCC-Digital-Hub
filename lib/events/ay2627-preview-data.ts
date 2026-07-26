@@ -53,7 +53,7 @@ const preview = (event: PreviewEvent): CalendarEvent => ({
 export const AY2627_PREVIEW_EVENTS: CalendarEvent[] = [
   preview({ id: 1, name: "Welcome (Bonding)", type: "bonding", teams: ["allmembers"], weekId: "s1w1", day: "Wed", startTime: "14:00", endTime: "16:00", venue: "CLB Seminar Room", description: "Kick off AY2026/27 with games, introductions and a semester preview." }),
   preview({ id: 100, name: "SSIA Semiconductor Awareness Day @ NUS", type: "extpartner", teams: ["allmembers"], weekId: "s1w3", day: "Wed", startTime: "10:00", endTime: "17:00", venue: "NUS E6", links: [{ label: "Event information", url: "https://ssia.org.sg/semiconductor-awareness-days/" }, { label: "Semiconductor overview", url: "https://ssia.org.sg/wp-content/uploads/semiconductor-overview.pdf" }] }),
-  preview({ id: 101, name: "IEEE Electronic Components and Technology Conference (ECTC)", type: "extpartner", teams: ["allmembers"], weekId: "s1e1_2", day: "Tue", endWeekId: "s1e1_2", endDay: "Fri", allDay: true, venue: "MBS Sands Conference" }),
+  preview({ id: 101, name: "IEEE Electronic Components and Technology Conference (ECTC)", type: "extpartner", teams: ["allmembers"], weekId: "s1e1_2", day: "Thu", endWeekId: "s1e1_2", endDay: "Sun", allDay: true, venue: "MBS Sands Conference" }),
   preview({ id: 102, name: "A*STAR IME", type: "visit", teams: ["external"], status: "potential", weekId: "s2w1", day: "Mon", startTime: "14:00", endTime: "16:00" }),
   preview({ id: 103, name: "E6 Nano Fab (NUS Visit)", type: "industry", teams: ["internal"], status: "potential", weekId: "s2w1", day: "Mon", startTime: "14:00", endTime: "16:00", venue: "NUS E6" }),
   preview({ id: 104, name: "Micron (Company Visit)", type: "visit", teams: ["external"], status: "discussion", weekId: "s1vac_1", day: "Tue", startTime: "14:00", endTime: "17:00", description: "Memory company" }),
@@ -67,4 +67,3 @@ export const AY2627_PREVIEW_EVENTS: CalendarEvent[] = [
   preview({ id: 112, name: "Marvell (Company Visit)", type: "visit", teams: ["external"], weekId: "s1w2", day: "Tue", startTime: "13:00", endTime: "17:15" }),
   preview({ id: 113, name: "STATS ChipPAC", type: "visit", teams: ["external"], weekId: "s1wr_1", day: "Wed", startTime: "13:00", endTime: "16:00" }),
 ];
-

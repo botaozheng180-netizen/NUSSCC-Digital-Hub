@@ -30,6 +30,13 @@ eligible EXCO roles and performed as an audited server transaction with a
 recoverable pre-import snapshot; a browser write must never be treated as a
 live shared-calendar import.
 
+Local export parity now includes versioned JSON backups and bulk `.ics` files.
+Restore checks the backup version and academic year, rejects duplicate IDs,
+previews added/retained/removed IDs, offers a pre-import download, and verifies
+the replacement write. If verification fails, the previous browser data is
+restored. These safeguards are the minimum contract for the later audited
+server import; they do not make the current browser operation collaborative.
+
 The event editor is likewise a temporary browser-local implementation. It
 supports layout and CRUD compatibility testing, but it does not grant an EXCO
 role and does not update other browsers. Before shared editing launches, these

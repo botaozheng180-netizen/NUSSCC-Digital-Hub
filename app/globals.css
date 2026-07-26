@@ -76,6 +76,17 @@ body {
   color: white;
   background: var(--blue);
 }
+.add-event-button {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 8px;
+  color: white;
+  background: #0d8a67;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 5px 14px rgba(13, 138, 103, 0.2);
+}
 .calendar-warning {
   padding: 12px 24px;
   color: #92400e;
@@ -451,8 +462,9 @@ body {
   padding: 9px 13px;
   border: 0;
   border-radius: 8px;
-  color: #9ba5b6;
-  background: #e8ebf0;
+  color: white;
+  background: #111827;
+  cursor: pointer;
   font-weight: 750;
 }
 .event-editor-preview span {
@@ -549,6 +561,83 @@ body {
   color: #a8b0bd;
   background: #f5f6f8;
 }
+.event-dialog-actions .delete {
+  color: #c62828;
+  border-color: #ffc1c1;
+  background: #fff5f5;
+}
+.event-dialog-actions .save {
+  color: white;
+  border-color: #087856;
+  background: #087856;
+  cursor: pointer;
+}
+.event-editor {
+  width: min(720px, 100%);
+}
+.event-editor .editor-notice {
+  margin: -6px 0 18px;
+  padding: 9px 11px;
+  border-radius: 8px;
+  color: #795100;
+  background: #fff9e8;
+  font-size: 11px;
+}
+.editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 13px;
+}
+.editor-grid .wide {
+  grid-column: 1 / -1;
+}
+.editor-grid label > span,
+.editor-grid legend {
+  display: block;
+  margin-bottom: 5px;
+  color: #66748c;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.editor-grid input:not([type="checkbox"]),
+.editor-grid select,
+.editor-grid textarea {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid #ccd5e3;
+  border-radius: 8px;
+  background: white;
+}
+.editor-grid textarea {
+  resize: vertical;
+}
+.editor-grid fieldset {
+  margin: 0;
+  padding: 10px;
+  border: 1px solid #d8dfea;
+  border-radius: 9px;
+}
+.editor-team-options {
+  display: flex;
+  gap: 8px 14px;
+  flex-wrap: wrap;
+}
+.editor-team-options label,
+.editor-check {
+  color: #46546c;
+  font-size: 11px;
+}
+.editor-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.editor-validation {
+  color: #b42318 !important;
+  font-size: 11px;
+}
 .import-confirmation {
   width: min(480px, 100%);
 }
@@ -601,6 +690,12 @@ body {
   .calendar-toolbar {
     align-items: stretch;
     flex-direction: column;
+  }
+  .editor-grid {
+    grid-template-columns: 1fr;
+  }
+  .editor-grid .wide {
+    grid-column: auto;
   }
   .calendar-filters {
     align-items: stretch;

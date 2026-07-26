@@ -30,6 +30,12 @@ eligible EXCO roles and performed as an audited server transaction with a
 recoverable pre-import snapshot; a browser write must never be treated as a
 live shared-calendar import.
 
+The event editor is likewise a temporary browser-local implementation. It
+supports layout and CRUD compatibility testing, but it does not grant an EXCO
+role and does not update other browsers. Before shared editing launches, these
+mutations must move behind authenticated server actions that enforce the
+calendar editor-role policy and record revision/audit metadata.
+
 | Identity | View internal calendar | Edit internal calendar |
 | --- | --- | --- |
 | Website visitor | No | No |

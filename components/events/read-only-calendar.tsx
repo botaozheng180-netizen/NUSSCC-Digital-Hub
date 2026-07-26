@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { EventEditor } from "@/components/events/event-editor";
 import { AY2627_WEEKS, academicDateToISO } from "@/lib/events/academic-calendar";
 import { AY2627_PREVIEW_EVENTS } from "@/lib/events/ay2627-preview-data";
 import { readLegacyLocalEvents, type LocalEventReadResult } from "@/lib/events/local-storage";
@@ -98,6 +99,8 @@ export function ReadOnlyCalendar() {
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
   const [importPreview, setImportPreview] = useState<ImportPreview | null>(null);
   const [importError, setImportError] = useState("");
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const importInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -118,7 +121,7 @@ export function ReadOnlyCalendar() {
     () => AY2627_WEEKS.filter((week) => week.semester === semester),
     [semester],
   );
-  const sourceEvents = result.events.length ? result.events : AY2627_PREVIEW_EVENTS;
+  const sourceEvents = result.source === "legacy-local-storage" ? result.events : AY2627_PREVIEW_EVENTS;
   const semesterEvents = useMemo(
     () => sourceEvents.filter((event) => event.public.start.weekId.startsWith(`s${semester}`)),
     [semester, sourceEvents],
@@ -198,11 +201,31 @@ export function ReadOnlyCalendar() {
     setImportPreview(null);
   };
 
+  const persistEvents = (events: CalendarEvent[]) => {
+    window.localStorage.setItem(LEGACY_EVENTS_STORAGE_KEY, JSON.stringify(events.map(toLegacyEvent)));
+    window.localStorage.setItem(LEGACY_EDIT_TIMESTAMP_KEY, new Date().toISOString());
+    setResult(readLegacyLocalEvents(window.localStorage));
+  };
+
+  const saveEvent = (event: CalendarEvent) => {
+    const exists = sourceEvents.some((item) => item.id === event.id);
+    persistEvents(exists ? sourceEvents.map((item) => item.id === event.id ? event : item) : [...sourceEvents, event]);
+    setEditorOpen(false);
+    setEditingEvent(null);
+    setSelected(null);
+  };
+
+  const deleteSelectedEvent = () => {
+    if (!selected || !window.confirm(`Delete “${selected.public.name}”? This change is saved in this browser.`)) return;
+    persistEvents(sourceEvents.filter((event) => event.id !== selected.id));
+    setSelected(null);
+  };
+
   return (
     <section className="calendar-migration" aria-labelledby="calendar-heading">
       <div className="calendar-toolbar">
         <div>
-          <span className="status-tag">Public layout preview · Read only</span>
+          <span className="status-tag">Public layout preview · Local editing</span>
           <h2 id="calendar-heading">AY2026/27 academic calendar</h2>
           <p>Current snapshot: 26 July 2026, 11:50 SGT</p>
         </div>
@@ -218,6 +241,7 @@ export function ReadOnlyCalendar() {
             </button>
           ))}
         </div>
+        <button className="add-event-button" type="button" onClick={() => { setEditingEvent(null); setEditorOpen(true); }}>＋ Add event</button>
       </div>
 
       <details className="calendar-panel overview-panel" open>
@@ -332,8 +356,8 @@ export function ReadOnlyCalendar() {
             </div>
             <h3 id="event-dialog-title">{selected.public.name}</h3>
             <div className="event-editor-preview">
-              <button type="button" disabled title="Editing will be enabled after authentication and server-side role checks are available">✏️ Edit Event</button>
-              <span>EXCO editing will be enabled after secure sign-in.</span>
+              <button type="button" onClick={() => { setEditingEvent(selected); setEditorOpen(true); setSelected(null); }}>✏️ Edit Event</button>
+              <span>Local preview mode</span>
             </div>
             <dl>
               <div><dt>Date</dt><dd>{eventDate(selected)}</dd></div>
@@ -353,7 +377,7 @@ export function ReadOnlyCalendar() {
             </section>
             <div className="event-dialog-actions">
               <a href={googleCalendarUrl(selected)} target="_blank" rel="noreferrer">📅 Add to Google Calendar</a>
-              <button type="button" disabled title="Deletion is not enabled in the read-only preview">🗑️ Delete</button>
+              <button type="button" className="delete" onClick={deleteSelectedEvent}>🗑️ Delete</button>
               <button type="button" onClick={() => setSelected(null)}>Close</button>
             </div>
           </section>
@@ -382,6 +406,7 @@ export function ReadOnlyCalendar() {
           </section>
         </div>
       )}
+      {editorOpen && <EventEditor event={editingEvent} semester={semester} onCancel={() => { setEditorOpen(false); setEditingEvent(null); }} onSave={saveEvent} />}
     </section>
   );
 }

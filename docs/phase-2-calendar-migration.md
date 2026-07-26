@@ -22,6 +22,14 @@ attendance, images, and contact details. This is a deliberate design-review
 exception, not the final access policy; it must be removed when authenticated
 calendar reads are introduced.
 
+The preview's JSON export/import controls currently operate only on the legacy
+browser-local keys. Import validates the file and requires an explicit
+"Proceed anyway" confirmation because it replaces the current local event
+array. In the shared-calendar phase, the same operation must be restricted to
+eligible EXCO roles and performed as an audited server transaction with a
+recoverable pre-import snapshot; a browser write must never be treated as a
+live shared-calendar import.
+
 | Identity | View internal calendar | Edit internal calendar |
 | --- | --- | --- |
 | Website visitor | No | No |

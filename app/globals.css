@@ -234,6 +234,46 @@ body {
   color: #71809a;
   font-size: 12px;
 }
+.calendar-data-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--line);
+  background: #f8fafc;
+}
+.calendar-data-tools > div {
+  margin-right: auto;
+}
+.calendar-data-tools strong,
+.calendar-data-tools span {
+  display: block;
+}
+.calendar-data-tools strong {
+  font-size: 12px;
+}
+.calendar-data-tools span {
+  margin-top: 2px;
+  color: #7b879c;
+  font-size: 10px;
+}
+.calendar-data-tools button {
+  padding: 8px 10px;
+  border: 1px solid #cdd6e4;
+  border-radius: 8px;
+  color: #40506a;
+  background: white;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 750;
+}
+.calendar-import-error {
+  padding: 10px 24px;
+  color: #b42318;
+  background: #fff1f0;
+  border-bottom: 1px solid #ffc9c5;
+  font-size: 12px;
+}
 .calendar-empty {
   max-width: 620px;
   margin: 54px auto;
@@ -509,6 +549,53 @@ body {
   color: #a8b0bd;
   background: #f5f6f8;
 }
+.import-confirmation {
+  width: min(480px, 100%);
+}
+.import-warning-icon {
+  display: block;
+  font-size: 30px;
+}
+.import-confirmation h3 {
+  margin-bottom: 10px;
+}
+.import-confirmation > p {
+  margin: 0 0 18px;
+}
+.import-confirmation dl {
+  padding: 13px;
+  border-radius: 9px;
+  background: #f7f8fb;
+}
+.import-confirmation .import-rejected {
+  margin-top: 12px;
+  color: #9a4b00;
+  font-size: 12px;
+}
+.import-confirmation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 22px;
+}
+.import-confirmation-actions button {
+  padding: 9px 13px;
+  border: 1px solid #cdd5e1;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-weight: 750;
+}
+.import-confirmation-actions .danger {
+  color: white;
+  border-color: #c62828;
+  background: #c62828;
+}
+.import-confirmation-actions .danger:disabled {
+  border-color: #d7dbe2;
+  background: #b9c0cb;
+  cursor: not-allowed;
+}
 
 @media (max-width: 700px) {
   .calendar-toolbar {
@@ -519,6 +606,13 @@ body {
     align-items: stretch;
     flex-direction: column;
     gap: 10px;
+  }
+  .calendar-data-tools {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+  .calendar-data-tools > div {
+    flex-basis: 100%;
   }
   .overview-grid {
     grid-template-columns: repeat(2, minmax(120px, 1fr));

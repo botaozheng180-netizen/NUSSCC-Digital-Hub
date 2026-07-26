@@ -1,9 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AY2627_WEEKS, academicDateToISO } from "@/lib/events/academic-calendar";
 import { AY2627_PREVIEW_EVENTS } from "@/lib/events/ay2627-preview-data";
 import { readLegacyLocalEvents, type LocalEventReadResult } from "@/lib/events/local-storage";
+import { LEGACY_EVENTS_STORAGE_KEY } from "@/lib/events/local-storage";
+import {
+  LEGACY_BACKUP_TIMESTAMP_KEY,
+  LEGACY_EDIT_TIMESTAMP_KEY,
+  LEGACY_TODOS_STORAGE_KEY,
+  createCalendarBackup,
+  previewCalendarImport,
+  toLegacyEvent,
+  type ImportPreview,
+} from "@/lib/events/import-export";
 import {
   EVENT_STATUSES,
   EVENT_TEAMS,
@@ -86,6 +96,9 @@ export function ReadOnlyCalendar() {
   const [teamFilters, setTeamFilters] = useState<string[]>([]);
   const [typeFilters, setTypeFilters] = useState<string[]>([]);
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
+  const [importPreview, setImportPreview] = useState<ImportPreview | null>(null);
+  const [importError, setImportError] = useState("");
+  const importInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     try {
@@ -144,6 +157,46 @@ export function ReadOnlyCalendar() {
     });
     return map;
   }, [visibleEvents]);
+
+  const exportCalendar = () => {
+    let todos: unknown[] = [];
+    try {
+      const saved = window.localStorage.getItem(LEGACY_TODOS_STORAGE_KEY);
+      const parsed = saved ? JSON.parse(saved) : [];
+      if (Array.isArray(parsed)) todos = parsed;
+    } catch {}
+    const backup = createCalendarBackup(sourceEvents, todos);
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `NUSSemiCon_Events_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+    window.localStorage.setItem(LEGACY_BACKUP_TIMESTAMP_KEY, new Date().toISOString());
+  };
+
+  const chooseImport = async (file: File | undefined) => {
+    if (!file) return;
+    setImportError("");
+    try {
+      setImportPreview(previewCalendarImport(JSON.parse(await file.text())));
+    } catch (error) {
+      setImportError(error instanceof Error ? error.message : "The selected backup could not be read.");
+    } finally {
+      if (importInput.current) importInput.current.value = "";
+    }
+  };
+
+  const proceedWithImport = () => {
+    if (!importPreview) return;
+    const now = new Date().toISOString();
+    window.localStorage.setItem(LEGACY_EVENTS_STORAGE_KEY, JSON.stringify(importPreview.events.map(toLegacyEvent)));
+    if (importPreview.todos) window.localStorage.setItem(LEGACY_TODOS_STORAGE_KEY, JSON.stringify(importPreview.todos));
+    window.localStorage.setItem(LEGACY_EDIT_TIMESTAMP_KEY, now);
+    setResult(readLegacyLocalEvents(window.localStorage));
+    setImportPreview(null);
+  };
 
   return (
     <section className="calendar-migration" aria-labelledby="calendar-heading">
@@ -210,6 +263,14 @@ export function ReadOnlyCalendar() {
         </label>
         <span>{visibleEvents.length} of {semesterEvents.length} event(s)</span>
       </div>
+
+      <div className="calendar-data-tools">
+        <div><strong>Calendar data</strong><span>Legacy-compatible JSON backup and restore</span></div>
+        <button type="button" onClick={exportCalendar}>💾 Export backup</button>
+        <button type="button" onClick={() => importInput.current?.click()}>📂 Import backup</button>
+        <input ref={importInput} type="file" accept=".json,application/json" hidden onChange={(event) => chooseImport(event.target.files?.[0])} />
+      </div>
+      {importError && <div className="calendar-import-error" role="alert">⚠️ {importError}</div>}
 
       {loaded && result.issues.length > 0 && (
         <div className="calendar-warning" role="status">
@@ -294,6 +355,29 @@ export function ReadOnlyCalendar() {
               <a href={googleCalendarUrl(selected)} target="_blank" rel="noreferrer">📅 Add to Google Calendar</a>
               <button type="button" disabled title="Deletion is not enabled in the read-only preview">🗑️ Delete</button>
               <button type="button" onClick={() => setSelected(null)}>Close</button>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {importPreview && (
+        <div className="event-dialog-backdrop" role="presentation">
+          <section className="event-dialog import-confirmation" role="alertdialog" aria-modal="true" aria-labelledby="import-title">
+            <span className="import-warning-icon">⚠️</span>
+            <h3 id="import-title">Overwrite the current calendar?</h3>
+            <p>
+              Importing this backup will replace every event currently stored in this browser
+              {importPreview.todos ? " and replace the EXCO planning tasks" : ""}. This cannot be undone unless you export a backup first.
+            </p>
+            <dl>
+              <div><dt>Ready to import</dt><dd>{importPreview.events.length} event(s)</dd></div>
+              <div><dt>Rejected</dt><dd>{importPreview.rejected} record(s)</dd></div>
+              {importPreview.todos && <div><dt>Planning tasks</dt><dd>{importPreview.todos.length}</dd></div>}
+            </dl>
+            {importPreview.rejected > 0 && <p className="import-rejected">Records that failed validation will not be imported.</p>}
+            <div className="import-confirmation-actions">
+              <button type="button" onClick={() => setImportPreview(null)}>Cancel</button>
+              <button type="button" className="danger" disabled={importPreview.events.length === 0} onClick={proceedWithImport}>Proceed anyway</button>
             </div>
           </section>
         </div>

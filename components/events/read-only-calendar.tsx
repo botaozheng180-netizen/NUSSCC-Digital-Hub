@@ -6,17 +6,13 @@ import { PlanningTaskBoard } from "@/components/events/planning-task-board";
 import { AY2627_WEEKS, academicDateToISO } from "@/lib/events/academic-calendar";
 import { AY2627_PREVIEW_EVENTS } from "@/lib/events/ay2627-preview-data";
 import { readLegacyLocalEvents, type LocalEventReadResult } from "@/lib/events/local-storage";
-import { LEGACY_EVENTS_STORAGE_KEY } from "@/lib/events/local-storage";
 import {
-  LEGACY_BACKUP_TIMESTAMP_KEY,
-  LEGACY_EDIT_TIMESTAMP_KEY,
   LEGACY_TODOS_STORAGE_KEY,
   buildCalendarICS,
-  createCalendarBackup,
   previewCalendarImport,
-  toLegacyEvent,
   type ImportPreview,
 } from "@/lib/events/import-export";
+import { LocalStorageEventRepository, type EventRepository } from "@/lib/events/event-repository";
 import { readPlanningTasks, writePlanningTasks, type EventPlanningTask } from "@/lib/events/planning-tasks";
 import {
   EVENT_STATUSES,
@@ -24,6 +20,7 @@ import {
   EVENT_TYPES,
   WEEKDAYS,
   type CalendarEvent,
+  type CalendarEventInput,
 } from "@/lib/events/model";
 
 const EMPTY: LocalEventReadResult = { events: [], rejected: 0, issues: [], source: "empty" };
@@ -108,9 +105,11 @@ export function ReadOnlyCalendar() {
   const [view, setView] = useState<"calendar" | "agenda">("calendar");
   const [dataNotice, setDataNotice] = useState("");
   const importInput = useRef<HTMLInputElement>(null);
+  const repository = useRef<EventRepository | null>(null);
 
   useEffect(() => {
     try {
+      repository.current = new LocalStorageEventRepository(window.localStorage, { fallbackEvents: AY2627_PREVIEW_EVENTS });
       setResult(readLegacyLocalEvents(window.localStorage));
       setTasks(readPlanningTasks(window.localStorage));
     } catch {
@@ -175,7 +174,8 @@ export function ReadOnlyCalendar() {
       const parsed = saved ? JSON.parse(saved) : [];
       if (Array.isArray(parsed)) todos = parsed;
     } catch {}
-    const backup = createCalendarBackup(sourceEvents, todos);
+    const backup = repository.current?.createBackup(todos);
+    if (!backup) return;
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -183,7 +183,7 @@ export function ReadOnlyCalendar() {
     anchor.download = `NUSSemiCon_Events_Backup_${new Date().toISOString().slice(0, 10)}.json`;
     anchor.click();
     URL.revokeObjectURL(url);
-    window.localStorage.setItem(LEGACY_BACKUP_TIMESTAMP_KEY, new Date().toISOString());
+    repository.current?.markBackupCreated();
     setDataNotice("Backup exported successfully.");
   };
 
@@ -211,23 +211,14 @@ export function ReadOnlyCalendar() {
   };
 
   const proceedWithImport = () => {
-    if (!importPreview) return;
-    const now = new Date().toISOString();
-    const previousEvents = window.localStorage.getItem(LEGACY_EVENTS_STORAGE_KEY);
-    const previousTodos = window.localStorage.getItem(LEGACY_TODOS_STORAGE_KEY);
+    if (!importPreview || !repository.current) return;
     try {
-      window.localStorage.setItem(LEGACY_EVENTS_STORAGE_KEY, JSON.stringify(importPreview.events.map(toLegacyEvent)));
-      if (importPreview.todos) window.localStorage.setItem(LEGACY_TODOS_STORAGE_KEY, JSON.stringify(importPreview.todos));
-      window.localStorage.setItem(LEGACY_EDIT_TIMESTAMP_KEY, now);
-      const verified = readLegacyLocalEvents(window.localStorage);
-      if (verified.events.length !== importPreview.events.length) throw new Error("The imported events could not be verified after saving.");
-      setResult(verified);
+      const replaced = repository.current.replaceAll(importPreview);
+      setResult({ events: replaced.events, rejected: 0, issues: [], source: "legacy-local-storage" });
       setTasks(readPlanningTasks(window.localStorage));
       setImportPreview(null);
-      setDataNotice(`Imported ${verified.events.length} event(s) successfully.`);
+      setDataNotice(`Imported ${replaced.events.length} event(s) successfully.`);
     } catch (error) {
-      if (previousEvents === null) window.localStorage.removeItem(LEGACY_EVENTS_STORAGE_KEY); else window.localStorage.setItem(LEGACY_EVENTS_STORAGE_KEY, previousEvents);
-      if (previousTodos === null) window.localStorage.removeItem(LEGACY_TODOS_STORAGE_KEY); else window.localStorage.setItem(LEGACY_TODOS_STORAGE_KEY, previousTodos);
       setImportError(`${error instanceof Error ? error.message : "Import failed."} The previous calendar was restored.`);
       setImportPreview(null);
     }
@@ -244,15 +235,12 @@ export function ReadOnlyCalendar() {
     };
   }, [importPreview, sourceEvents]);
 
-  const persistEvents = (events: CalendarEvent[]) => {
-    window.localStorage.setItem(LEGACY_EVENTS_STORAGE_KEY, JSON.stringify(events.map(toLegacyEvent)));
-    window.localStorage.setItem(LEGACY_EDIT_TIMESTAMP_KEY, new Date().toISOString());
-    setResult(readLegacyLocalEvents(window.localStorage));
-  };
-
-  const saveEvent = (event: CalendarEvent) => {
-    const exists = sourceEvents.some((item) => item.id === event.id);
-    persistEvents(exists ? sourceEvents.map((item) => item.id === event.id ? event : item) : [...sourceEvents, event]);
+  const saveEvent = (input: CalendarEventInput) => {
+    if (!repository.current) return;
+    if (editingEvent) repository.current.update(editingEvent.id, input);
+    else repository.current.create(input);
+    const events = repository.current.list();
+    setResult({ events, rejected: 0, issues: [], source: "legacy-local-storage" });
     setEditorOpen(false);
     setEditingEvent(null);
     setSelected(null);
@@ -260,7 +248,9 @@ export function ReadOnlyCalendar() {
 
   const deleteSelectedEvent = () => {
     if (!selected || !window.confirm(`Delete “${selected.public.name}”? This change is saved in this browser.`)) return;
-    persistEvents(sourceEvents.filter((event) => event.id !== selected.id));
+    repository.current?.delete(selected.id);
+    const events = repository.current?.list() ?? [];
+    setResult({ events, rejected: 0, issues: [], source: "legacy-local-storage" });
     setSelected(null);
   };
 

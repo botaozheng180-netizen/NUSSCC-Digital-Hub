@@ -43,6 +43,13 @@ role and does not update other browsers. Before shared editing launches, these
 mutations must move behind authenticated server actions that enforce the
 calendar editor-role policy and record revision/audit metadata.
 
+Calendar components now submit `NewCalendarEvent`/`CalendarEventUpdate` input
+data without creating persistence metadata. All event list, CRUD, replacement,
+and backup operations cross the `EventRepository` interface. The current
+`LocalStorageEventRepository` owns legacy serialization and timestamps; a
+future server repository can implement the same contract while adding stable
+IDs, revisions, and authenticated audit fields.
+
 | Identity | View internal calendar | Edit internal calendar |
 | --- | --- | --- |
 | Website visitor | No | No |

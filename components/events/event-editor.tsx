@@ -8,6 +8,7 @@ import {
   EVENT_TYPES,
   WEEKDAYS,
   type CalendarEvent,
+  type CalendarEventInput,
   type EventStatus,
   type EventTeam,
   type EventType,
@@ -24,7 +25,7 @@ type Props = {
   event: CalendarEvent | null;
   semester: 1 | 2;
   onCancel: () => void;
-  onSave: (event: CalendarEvent) => void;
+  onSave: (input: CalendarEventInput) => void;
 };
 
 export function EventEditor({ event, semester, onCancel, onSave }: Props) {
@@ -58,12 +59,7 @@ export function EventEditor({ event, semester, onCancel, onSave }: Props) {
         return;
       }
     }
-    const id = event?.id ?? `local-ay2627-${crypto.randomUUID()}`;
     onSave({
-      schemaVersion: 1,
-      id,
-      legacyId: event?.legacyId ?? id,
-      academicYear: "AY2026/27",
       public: {
         name: name.trim(), type, start: { weekId, day }, end: multiDay ? { weekId: endWeekId, day: endDay } : null, allDay,
         startTime: allDay ? null : startTime || null,

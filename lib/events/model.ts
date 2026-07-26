@@ -62,6 +62,24 @@ export type CalendarEvent = {
   };
 };
 
+/** User-editable fields; identifiers and audit metadata never come from forms. */
+export type CalendarEventInput = Pick<CalendarEvent, "public" | "planning">;
+
+export type NewCalendarEvent = CalendarEventInput;
+
+export type CalendarEventUpdate = CalendarEventInput & {
+  expectedRevision?: number;
+};
+
+/** Shape owned by a future shared store rather than by the browser editor. */
+export type PersistedCalendarEvent = CalendarEvent & {
+  revision: number;
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
+};
+
 /** Untrusted shape accepted at the legacy local-storage/backup boundary. */
 export type LegacyEventRecord = Record<string, unknown>;
 

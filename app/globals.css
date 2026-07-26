@@ -83,6 +83,118 @@ body {
   border-bottom: 1px solid #fde68a;
   font-size: 13px;
 }
+.calendar-panel {
+  margin: 18px 24px;
+  border: 1px solid #dfe4ec;
+  border-radius: 14px;
+  background: white;
+}
+.calendar-panel summary {
+  padding: 16px 18px;
+  cursor: pointer;
+  font-size: 17px;
+  list-style-position: inside;
+}
+.calendar-panel summary::marker {
+  color: #72809a;
+  font-size: 10px;
+}
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(105px, 1fr));
+  gap: 12px;
+  padding: 0 18px 18px;
+}
+.overview-card {
+  min-height: 118px;
+  padding: 15px;
+  border: 1px solid #d8dee8;
+  border-bottom-width: 4px;
+  border-radius: 13px;
+  background: #f8fafc;
+}
+.overview-card span,
+.overview-card strong,
+.overview-card small {
+  display: block;
+}
+.overview-card span {
+  font-size: 20px;
+}
+.overview-card strong {
+  margin: 5px 0 1px;
+  font-size: 30px;
+  line-height: 1;
+}
+.overview-card small {
+  color: #5e6c84;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.overview-card:nth-child(n + 7) {
+  grid-column: span 2;
+}
+.overview-potential,
+.team-presidential { color: #6d35dc; background: #f7f2ff; border-color: #d9c8ff; }
+.team-finance { color: #9a4b00; background: #fff9e9; border-color: #f4cc59; }
+.team-hr { color: #40516a; background: #f0f4f8; border-color: #c5d0dd; }
+.team-publicity { color: #08718a; background: #ecfbfd; border-color: #84e2ec; }
+.team-internal { color: #1d5bd1; background: #eef5ff; border-color: #acd0ff; }
+.team-external { color: #057a59; background: #e9fbf3; border-color: #6ce0ad; }
+.team-allmembers { color: #37308c; background: #f0f1ff; border-color: #bdc4ff; }
+.filter-groups {
+  padding: 0 18px 12px;
+}
+.filter-group {
+  display: grid;
+  grid-template-columns: 125px 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid #e4e8ef;
+}
+.filter-group:first-child {
+  border-top: 0;
+}
+.filter-group > strong {
+  padding-top: 7px;
+  color: #5d6b82;
+  font-size: 12px;
+}
+.filter-group > div {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.filter-chip {
+  padding: 7px 11px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  color: #53617a;
+  background: white;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.72;
+}
+.filter-chip.active {
+  opacity: 1;
+  box-shadow: inset 0 0 0 1px currentColor, 0 2px 6px rgba(20, 37, 73, 0.1);
+}
+.filter-chip.type-industry { color: #2457bd; background: #edf5ff; }
+.filter-chip.type-visit { color: #087856; background: #e9fbf2; }
+.filter-chip.type-extpartner { color: #a16207; background: #fffbea; }
+.filter-chip.type-bonding { color: #be185d; background: #fff0f7; }
+.filter-chip.type-external { color: #c2410c; background: #fff5ed; }
+.filter-chip.status-potential { color: #9333ea; background: #faf5ff; border-style: dashed; }
+.filter-chip.status-contacted { color: #0369a1; background: #f0f9ff; border-style: dashed; }
+.filter-chip.status-discussion { color: #b45309; background: #fffbeb; border-style: dashed; }
+.filter-chip.status-confirmed { color: #15803d; background: #f0fdf4; }
+.filter-chip.status-completed { color: #334155; background: #f8fafc; }
+.filter-chip.status-declined { color: #b91c1c; background: #fef2f2; }
 .calendar-filters {
   display: flex;
   align-items: flex-end;
@@ -221,6 +333,10 @@ body {
 .calendar-event.status-discussion {
   border-style: dashed;
 }
+.calendar-event.type-visit { color: #086447; background: #e3f8ed; border-color: #8bd6b4; }
+.calendar-event.type-extpartner { color: #8a5706; background: #fff8dc; border-color: #efd16e; }
+.calendar-event.type-bonding { color: #a51c5b; background: #fdf0f7; border-color: #efb8d1; }
+.calendar-event.type-external { color: #a84311; background: #fff2e9; border-color: #f3b98f; }
 .event-dialog-backdrop {
   position: fixed;
   inset: 0;
@@ -312,6 +428,15 @@ body {
     align-items: stretch;
     flex-direction: column;
     gap: 10px;
+  }
+  .overview-grid {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+  .overview-card:nth-child(n + 7) {
+    grid-column: span 1;
+  }
+  .filter-group {
+    grid-template-columns: 1fr;
   }
   .calendar-filters input[type="search"] {
     width: 100%;

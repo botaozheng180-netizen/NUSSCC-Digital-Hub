@@ -4,9 +4,40 @@ import { useEffect, useMemo, useState } from "react";
 import { AY2627_WEEKS, academicDateToISO } from "@/lib/events/academic-calendar";
 import { AY2627_PREVIEW_EVENTS } from "@/lib/events/ay2627-preview-data";
 import { readLegacyLocalEvents, type LocalEventReadResult } from "@/lib/events/local-storage";
-import { WEEKDAYS, type CalendarEvent } from "@/lib/events/model";
+import {
+  EVENT_STATUSES,
+  EVENT_TEAMS,
+  EVENT_TYPES,
+  WEEKDAYS,
+  type CalendarEvent,
+} from "@/lib/events/model";
 
 const EMPTY: LocalEventReadResult = { events: [], rejected: 0, issues: [], source: "empty" };
+
+const TEAM_META = {
+  presidential: ["⭐", "Presidential Cell"],
+  finance: ["💰", "Finance"],
+  hr: ["📁", "Human Resources & Welfare"],
+  publicity: ["🎨", "Publicity"],
+  internal: ["🏛️", "Internal Events"],
+  external: ["🚀", "External Events"],
+  allmembers: ["👥", "All Members"],
+} as const;
+const TYPE_META = {
+  industry: ["🎤", "Company Talk"],
+  visit: ["🏭", "Company Visit"],
+  extpartner: ["🌐", "External Partners"],
+  bonding: ["🤝", "Club Bonding"],
+  external: ["📌", "Others"],
+} as const;
+const STATUS_META = {
+  potential: ["🔍", "Potential / Sourcing"],
+  contacted: ["📨", "Outreach Sent"],
+  discussion: ["💬", "In Discussion"],
+  confirmed: ["✅", "Confirmed"],
+  completed: ["🏁", "Completed"],
+  declined: ["🚫", "Declined / Cancelled"],
+} as const;
 
 function eventDate(event: CalendarEvent) {
   return academicDateToISO(event.public.start.weekId, event.public.start.day) ?? "";
@@ -32,7 +63,9 @@ export function ReadOnlyCalendar() {
   const [loaded, setLoaded] = useState(false);
   const [selected, setSelected] = useState<CalendarEvent | null>(null);
   const [query, setQuery] = useState("");
-  const [showTentative, setShowTentative] = useState(true);
+  const [teamFilters, setTeamFilters] = useState<string[]>([]);
+  const [typeFilters, setTypeFilters] = useState<string[]>([]);
+  const [statusFilters, setStatusFilters] = useState<string[]>([]);
 
   useEffect(() => {
     try {
@@ -53,17 +86,29 @@ export function ReadOnlyCalendar() {
     [semester],
   );
   const sourceEvents = result.events.length ? result.events : AY2627_PREVIEW_EVENTS;
+  const semesterEvents = useMemo(
+    () => sourceEvents.filter((event) => event.public.start.weekId.startsWith(`s${semester}`)),
+    [semester, sourceEvents],
+  );
+  const teamCounts = useMemo(
+    () => Object.fromEntries(EVENT_TEAMS.map((team) => [team, semesterEvents.filter((event) => event.planning.teams.includes(team)).length])),
+    [semesterEvents],
+  );
+  const toggleFilter = (value: string, values: string[], update: (values: string[]) => void) =>
+    update(values.includes(value) ? values.filter((item) => item !== value) : [...values, value]);
   const visibleEvents = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    return sourceEvents.filter((event) => {
-      if (!showTentative && ["potential", "contacted", "discussion"].includes(event.planning.status)) return false;
+    return semesterEvents.filter((event) => {
+      if (teamFilters.length && !event.planning.teams.some((team) => teamFilters.includes(team))) return false;
+      if (typeFilters.length && !typeFilters.includes(event.public.type)) return false;
+      if (statusFilters.length && !statusFilters.includes(event.planning.status)) return false;
       if (!normalizedQuery) return true;
       return [event.public.name, event.public.venue, event.public.description, ...event.planning.teams]
         .join(" ")
         .toLowerCase()
         .includes(normalizedQuery);
     });
-  }, [query, showTentative, sourceEvents]);
+  }, [query, semesterEvents, statusFilters, teamFilters, typeFilters]);
   const eventsByDate = useMemo(() => {
     const map = new Map<string, CalendarEvent[]>();
     visibleEvents.forEach((event) => {
@@ -102,6 +147,37 @@ export function ReadOnlyCalendar() {
         </div>
       </div>
 
+      <details className="calendar-panel overview-panel" open>
+        <summary>📊 <strong>Overview</strong></summary>
+        <div className="overview-grid">
+          <article className="overview-card overview-total"><span>🗓️</span><strong>{semesterEvents.length}</strong><small>Semester {semester} events</small></article>
+          <article className="overview-card overview-potential"><span>🔍</span><strong>{semesterEvents.filter((event) => event.planning.status === "potential").length}</strong><small>Potential / sourcing</small></article>
+          {EVENT_TEAMS.map((team) => (
+            <article className={`overview-card team-${team}`} key={team}>
+              <span>{TEAM_META[team][0]}</span><strong>{teamCounts[team]}</strong><small>{TEAM_META[team][1]}</small>
+            </article>
+          ))}
+        </div>
+      </details>
+
+      <details className="calendar-panel filters-panel" open>
+        <summary>🔎 <strong>Filters</strong></summary>
+        <div className="filter-groups">
+          <div className="filter-group">
+            <strong>Team Managing:</strong>
+            <div>{EVENT_TEAMS.map((team) => <button type="button" className={`filter-chip team-${team} ${teamFilters.includes(team) ? "active" : ""}`} onClick={() => toggleFilter(team, teamFilters, setTeamFilters)} key={team}>{TEAM_META[team][0]} {TEAM_META[team][1]}</button>)}</div>
+          </div>
+          <div className="filter-group">
+            <strong>Event Types:</strong>
+            <div>{EVENT_TYPES.map((type) => <button type="button" className={`filter-chip type-${type} ${typeFilters.includes(type) ? "active" : ""}`} onClick={() => toggleFilter(type, typeFilters, setTypeFilters)} key={type}>{TYPE_META[type][0]} {TYPE_META[type][1]}</button>)}</div>
+          </div>
+          <div className="filter-group">
+            <strong>Status:</strong>
+            <div>{EVENT_STATUSES.map((status) => <button type="button" className={`filter-chip status-${status} ${statusFilters.includes(status) ? "active" : ""}`} onClick={() => toggleFilter(status, statusFilters, setStatusFilters)} key={status}>{STATUS_META[status][0]} {STATUS_META[status][1]}</button>)}</div>
+          </div>
+        </div>
+      </details>
+
       <div className="calendar-filters">
         <label>
           <span>Search events</span>
@@ -112,15 +188,7 @@ export function ReadOnlyCalendar() {
             placeholder="Name, venue, or team"
           />
         </label>
-        <label className="tentative-toggle">
-          <input
-            type="checkbox"
-            checked={showTentative}
-            onChange={(event) => setShowTentative(event.target.checked)}
-          />
-          Show tentative events
-        </label>
-        <span>{visibleEvents.length} event(s)</span>
+        <span>{visibleEvents.length} of {semesterEvents.length} event(s)</span>
       </div>
 
       {loaded && result.issues.length > 0 && (
@@ -150,7 +218,7 @@ export function ReadOnlyCalendar() {
                     {events.map((event) => (
                       <button
                         type="button"
-                        className={`calendar-event status-${event.planning.status}`}
+                        className={`calendar-event type-${event.public.type} status-${event.planning.status}`}
                         key={event.id}
                         onClick={() => setSelected(event)}
                       >

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EventEditor } from "@/components/events/event-editor";
+import { PlanningTaskBoard } from "@/components/events/planning-task-board";
 import { AY2627_WEEKS, academicDateToISO } from "@/lib/events/academic-calendar";
 import { AY2627_PREVIEW_EVENTS } from "@/lib/events/ay2627-preview-data";
 import { readLegacyLocalEvents, type LocalEventReadResult } from "@/lib/events/local-storage";
@@ -15,6 +16,7 @@ import {
   toLegacyEvent,
   type ImportPreview,
 } from "@/lib/events/import-export";
+import { readPlanningTasks, writePlanningTasks, type EventPlanningTask } from "@/lib/events/planning-tasks";
 import {
   EVENT_STATUSES,
   EVENT_TEAMS,
@@ -101,11 +103,14 @@ export function ReadOnlyCalendar() {
   const [importError, setImportError] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
+  const [tasks, setTasks] = useState<EventPlanningTask[]>([]);
+  const [view, setView] = useState<"calendar" | "agenda">("calendar");
   const importInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     try {
       setResult(readLegacyLocalEvents(window.localStorage));
+      setTasks(readPlanningTasks(window.localStorage));
     } catch {
       setResult({
         ...EMPTY,
@@ -198,6 +203,7 @@ export function ReadOnlyCalendar() {
     if (importPreview.todos) window.localStorage.setItem(LEGACY_TODOS_STORAGE_KEY, JSON.stringify(importPreview.todos));
     window.localStorage.setItem(LEGACY_EDIT_TIMESTAMP_KEY, now);
     setResult(readLegacyLocalEvents(window.localStorage));
+    setTasks(readPlanningTasks(window.localStorage));
     setImportPreview(null);
   };
 
@@ -220,6 +226,16 @@ export function ReadOnlyCalendar() {
     persistEvents(sourceEvents.filter((event) => event.id !== selected.id));
     setSelected(null);
   };
+
+  const changeTasks = (next: EventPlanningTask[]) => {
+    writePlanningTasks(window.localStorage, next);
+    setTasks(next);
+  };
+
+  const agendaEvents = useMemo(
+    () => [...visibleEvents].sort((left, right) => eventDate(left).localeCompare(eventDate(right)) || (left.public.startTime ?? "").localeCompare(right.public.startTime ?? "")),
+    [visibleEvents],
+  );
 
   return (
     <section className="calendar-migration" aria-labelledby="calendar-heading">
@@ -286,6 +302,10 @@ export function ReadOnlyCalendar() {
           />
         </label>
         <span>{visibleEvents.length} of {semesterEvents.length} event(s)</span>
+        <div className="view-switch" aria-label="Calendar view">
+          <button type="button" className={view === "calendar" ? "active" : ""} onClick={() => setView("calendar")}>▦ Calendar</button>
+          <button type="button" className={view === "agenda" ? "active" : ""} onClick={() => setView("agenda")}>☷ Agenda</button>
+        </div>
       </div>
 
       <div className="calendar-data-tools">
@@ -302,7 +322,7 @@ export function ReadOnlyCalendar() {
         </div>
       )}
 
-      <div className="calendar-scroll">
+      {view === "calendar" ? <div className="calendar-scroll">
         <div className="academic-calendar" role="table" aria-label={`Semester ${semester} events`}>
           <div className="calendar-row calendar-header" role="row">
             <span role="columnheader">Academic week</span>
@@ -337,7 +357,15 @@ export function ReadOnlyCalendar() {
             </div>
           ))}
         </div>
-      </div>
+      </div> : <div className="agenda-view">
+        {agendaEvents.length === 0 && <p className="planning-empty">No events match the current filters.</p>}
+        {agendaEvents.map((event) => <button type="button" className={`agenda-event type-${event.public.type}`} onClick={() => setSelected(event)} key={event.id}>
+          <time dateTime={eventDate(event)}><strong>{eventDate(event).slice(8)}</strong><span>{eventDate(event).slice(0, 7)}</span></time>
+          <div><div className="agenda-tags"><span>{TYPE_META[event.public.type][0]} {TYPE_META[event.public.type][1]}</span><span>{STATUS_META[event.planning.status][0]} {STATUS_META[event.planning.status][1]}</span></div><h3>{event.public.name}</h3><p>{timeLabel(event)}{event.public.venue ? ` · ${event.public.venue}` : ""}</p></div>
+        </button>)}
+      </div>}
+
+      <PlanningTaskBoard events={sourceEvents} tasks={tasks} onChange={changeTasks} />
 
       {selected && (
         <div className="event-dialog-backdrop" role="presentation" onMouseDown={() => setSelected(null)}>
@@ -372,8 +400,8 @@ export function ReadOnlyCalendar() {
               </div>
             )}
             <section className="event-tasks-preview">
-              <div><strong>✅ Tasks for this event</strong><button type="button" disabled title="Task editing is not enabled in the read-only preview">✏️ Edit Tasks</button></div>
-              <p>No migrated planning tasks for this event.</p>
+              <div><strong>✅ Tasks for this event</strong><span>{tasks.filter((task) => task.eventLegacyId === selected.legacyId && !task.done).length} open</span></div>
+              {tasks.filter((task) => task.eventLegacyId === selected.legacyId).length === 0 ? <p>No planning tasks for this event.</p> : tasks.filter((task) => task.eventLegacyId === selected.legacyId).map((task) => <label className={task.done ? "done" : ""} key={task.id}><input type="checkbox" checked={task.done} onChange={() => changeTasks(tasks.map((item) => item.id === task.id ? { ...item, done: !item.done } : item))} /> {task.text}</label>)}
             </section>
             <div className="event-dialog-actions">
               <a href={googleCalendarUrl(selected)} target="_blank" rel="noreferrer">📅 Add to Google Calendar</a>

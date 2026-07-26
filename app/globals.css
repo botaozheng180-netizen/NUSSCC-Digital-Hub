@@ -245,6 +245,27 @@ body {
   color: #71809a;
   font-size: 12px;
 }
+.view-switch {
+  display: flex;
+  padding: 3px;
+  border-radius: 8px;
+  background: #e9eef6;
+}
+.view-switch button {
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  color: #66748b;
+  background: transparent;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 750;
+}
+.view-switch button.active {
+  color: #123d82;
+  background: white;
+  box-shadow: 0 1px 4px rgba(20, 38, 72, 0.12);
+}
 .calendar-data-tools {
   display: flex;
   align-items: center;
@@ -388,6 +409,40 @@ body {
 .calendar-event.type-extpartner { color: #8a5706; background: #fff8dc; border-color: #efd16e; }
 .calendar-event.type-bonding { color: #a51c5b; background: #fdf0f7; border-color: #efb8d1; }
 .calendar-event.type-external { color: #a84311; background: #fff2e9; border-color: #f3b98f; }
+.agenda-view {
+  display: grid;
+  gap: 9px;
+  padding: 18px 24px 24px;
+  background: #f8fafc;
+}
+.agenda-event {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid #dce3ed;
+  border-left: 5px solid #5286dc;
+  border-radius: 11px;
+  text-align: left;
+  background: white;
+  cursor: pointer;
+}
+.agenda-event.type-visit { border-left-color: #19a474; }
+.agenda-event.type-extpartner { border-left-color: #d4a31d; }
+.agenda-event.type-bonding { border-left-color: #d34e8c; }
+.agenda-event.type-external { border-left-color: #df753e; }
+.agenda-event time {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  border-right: 1px solid var(--line);
+}
+.agenda-event time strong { font-size: 25px; }
+.agenda-event time span { color: #7a879b; font-size: 9px; }
+.agenda-event h3 { margin: 5px 0 3px; font-size: 15px; }
+.agenda-event p { margin: 0; color: #66748b; font-size: 11px; }
+.agenda-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.agenda-tags span { color: #69778c; font-size: 9px; font-weight: 800; text-transform: uppercase; }
 .event-dialog-backdrop {
   position: fixed;
   inset: 0;
@@ -535,6 +590,70 @@ body {
   text-align: center;
   font-size: 12px;
 }
+.event-tasks-preview > label {
+  display: block;
+  margin-top: 10px;
+  color: #46546b;
+  font-size: 12px;
+}
+.event-tasks-preview > label.done {
+  color: #9ba4b2;
+  text-decoration: line-through;
+}
+.planning-panel summary small {
+  margin-left: 8px;
+  color: #8490a3;
+  font-size: 10px;
+}
+.planning-task-form {
+  display: grid;
+  grid-template-columns: 2fr 1.4fr 1fr 1fr 1fr auto;
+  gap: 7px;
+  padding: 0 18px 13px;
+}
+.planning-task-form input,
+.planning-task-form select {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #cfd8e5;
+  border-radius: 7px;
+  background: white;
+  font-size: 10px;
+}
+.planning-task-form button {
+  border: 0;
+  border-radius: 7px;
+  color: white;
+  background: #087856;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 800;
+}
+.planning-task-controls {
+  padding: 9px 18px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  color: #6a778c;
+  font-size: 10px;
+}
+.planning-task-list {
+  padding: 0 18px 15px;
+}
+.planning-task-list article {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 9px;
+  padding: 11px 3px;
+  border-bottom: 1px solid #edf0f5;
+}
+.planning-task-list article.done strong { color: #929cab; text-decoration: line-through; }
+.planning-task-list strong,
+.planning-task-list span { display: block; }
+.planning-task-list strong { font-size: 12px; }
+.planning-task-list span { margin-top: 3px; color: #7a879a; font-size: 9px; }
+.planning-task-list button { border: 0; color: #a0a9b7; background: transparent; cursor: pointer; font-size: 17px; }
+.planning-empty { padding: 16px; color: #8a96a8; text-align: center; font-size: 11px; }
 .event-dialog-actions {
   display: flex;
   gap: 8px;
@@ -705,6 +824,9 @@ body {
   .calendar-data-tools {
     align-items: stretch;
     flex-wrap: wrap;
+  }
+  .planning-task-form {
+    grid-template-columns: 1fr;
   }
   .calendar-data-tools > div {
     flex-basis: 100%;

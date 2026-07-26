@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EventEditor } from "@/components/events/event-editor";
 import { PlanningTaskBoard } from "@/components/events/planning-task-board";
+import { AccessibleDialog } from "@/components/ui/accessible-dialog";
 import { AY2627_WEEKS, academicDateToISO } from "@/lib/events/academic-calendar";
 import { AY2627_PREVIEW_EVENTS } from "@/lib/events/ay2627-preview-data";
 import { readLegacyLocalEvents, type LocalEventReadResult } from "@/lib/events/local-storage";
@@ -104,7 +105,10 @@ export function ReadOnlyCalendar() {
   const [tasks, setTasks] = useState<EventPlanningTask[]>([]);
   const [view, setView] = useState<"calendar" | "agenda">("calendar");
   const [dataNotice, setDataNotice] = useState("");
+  const [deleteCandidate, setDeleteCandidate] = useState<CalendarEvent | null>(null);
   const importInput = useRef<HTMLInputElement>(null);
+  const dialogCloseRef = useRef<HTMLButtonElement>(null);
+  const importCancelRef = useRef<HTMLButtonElement>(null);
   const repository = useRef<EventRepository | null>(null);
 
   useEffect(() => {
@@ -247,11 +251,12 @@ export function ReadOnlyCalendar() {
   };
 
   const deleteSelectedEvent = () => {
-    if (!selected || !window.confirm(`Delete “${selected.public.name}”? This change is saved in this browser.`)) return;
-    repository.current?.delete(selected.id);
+    if (!deleteCandidate) return;
+    repository.current?.delete(deleteCandidate.id);
     const events = repository.current?.list() ?? [];
     setResult({ events, rejected: 0, issues: [], source: "legacy-local-storage" });
-    setSelected(null);
+    setDataNotice(`Deleted ${deleteCandidate.public.name}.`);
+    setDeleteCandidate(null);
   };
 
   const changeTasks = (next: EventPlanningTask[]) => {
@@ -272,12 +277,13 @@ export function ReadOnlyCalendar() {
           <h2 id="calendar-heading">AY2026/27 academic calendar</h2>
           <p>Current snapshot: 26 July 2026, 11:50 SGT</p>
         </div>
-        <div className="semester-switch" aria-label="Semester">
+        <div className="semester-switch" role="group" aria-label="Semester">
           {([1, 2] as const).map((value) => (
             <button
               type="button"
               key={value}
               className={semester === value ? "active" : ""}
+              aria-pressed={semester === value}
               onClick={() => setSemester(value)}
             >
               Semester {value}
@@ -303,19 +309,20 @@ export function ReadOnlyCalendar() {
       <details className="calendar-panel filters-panel" open>
         <summary>🔎 <strong>Filters</strong></summary>
         <div className="filter-groups">
-          <div className="filter-group">
-            <strong>Team Managing:</strong>
+          <div className="filter-group" role="group" aria-labelledby="team-filter-label">
+            <strong id="team-filter-label">Team Managing:</strong>
             <div>{EVENT_TEAMS.map((team) => <button type="button" aria-pressed={teamFilters.includes(team)} className={`filter-chip team-${team} ${teamFilters.includes(team) ? "active" : ""}`} onClick={() => toggleFilter(team, teamFilters, setTeamFilters)} key={team}>{TEAM_META[team][0]} {TEAM_META[team][1]}</button>)}</div>
           </div>
-          <div className="filter-group">
-            <strong>Event Types:</strong>
+          <div className="filter-group" role="group" aria-labelledby="type-filter-label">
+            <strong id="type-filter-label">Event Types:</strong>
             <div>{EVENT_TYPES.map((type) => <button type="button" aria-pressed={typeFilters.includes(type)} className={`filter-chip type-${type} ${typeFilters.includes(type) ? "active" : ""}`} onClick={() => toggleFilter(type, typeFilters, setTypeFilters)} key={type}>{TYPE_META[type][0]} {TYPE_META[type][1]}</button>)}</div>
           </div>
-          <div className="filter-group">
-            <strong>Status:</strong>
+          <div className="filter-group" role="group" aria-labelledby="status-filter-label">
+            <strong id="status-filter-label">Status:</strong>
             <div>{EVENT_STATUSES.map((status) => <button type="button" aria-pressed={statusFilters.includes(status)} className={`filter-chip status-${status} ${statusFilters.includes(status) ? "active" : ""}`} onClick={() => toggleFilter(status, statusFilters, setStatusFilters)} key={status}>{STATUS_META[status][0]} {STATUS_META[status][1]}</button>)}</div>
           </div>
         </div>
+        {(teamFilters.length + typeFilters.length + statusFilters.length > 0) && <button className="clear-filters" type="button" onClick={() => { setTeamFilters([]); setTypeFilters([]); setStatusFilters([]); }}>Clear all filters</button>}
       </details>
 
       <div className="calendar-filters">
@@ -328,8 +335,8 @@ export function ReadOnlyCalendar() {
             placeholder="Name, venue, or team"
           />
         </label>
-        <span>{visibleEvents.length} of {semesterEvents.length} event(s)</span>
-        <div className="view-switch" aria-label="Calendar view">
+        <span aria-live="polite">{visibleEvents.length} of {semesterEvents.length} event(s)</span>
+        <div className="view-switch" role="group" aria-label="Calendar view">
           <button type="button" aria-pressed={view === "calendar"} className={view === "calendar" ? "active" : ""} onClick={() => setView("calendar")}>▦ Calendar</button>
           <button type="button" aria-pressed={view === "agenda"} className={view === "agenda" ? "active" : ""} onClick={() => setView("agenda")}>☷ Agenda</button>
         </div>
@@ -374,6 +381,7 @@ export function ReadOnlyCalendar() {
                         type="button"
                         className={`calendar-event type-${event.public.type} status-${event.planning.status}`}
                         key={event.id}
+                        aria-label={`${event.public.name}, ${eventDate(event)}, ${timeLabel(event)}`}
                         onClick={() => setSelected(event)}
                       >
                         <strong>{event.public.name}</strong>
@@ -386,26 +394,19 @@ export function ReadOnlyCalendar() {
             </div>
           ))}
         </div>
-      </div> : <div className="agenda-view">
-        {agendaEvents.length === 0 && <p className="planning-empty">No events match the current filters.</p>}
-        {agendaEvents.map((event) => <button type="button" className={`agenda-event type-${event.public.type}`} onClick={() => setSelected(event)} key={event.id}>
+      </div> : <div className="agenda-view"><h2 className="sr-only">Semester {semester} event agenda</h2><ul>
+        {agendaEvents.length === 0 && <li className="planning-empty">No events match the current filters.</li>}
+        {agendaEvents.map((event) => <li key={event.id}><button type="button" className={`agenda-event type-${event.public.type}`} aria-label={`${event.public.name}, ${eventDate(event)}, ${timeLabel(event)}`} onClick={() => setSelected(event)}>
           <time dateTime={eventDate(event)}><strong>{eventDate(event).slice(8)}</strong><span>{eventDate(event).slice(0, 7)}</span></time>
           <div><div className="agenda-tags"><span>{TYPE_META[event.public.type][0]} {TYPE_META[event.public.type][1]}</span><span>{STATUS_META[event.planning.status][0]} {STATUS_META[event.planning.status][1]}</span></div><h3>{event.public.name}</h3><p>{timeLabel(event)}{event.public.venue ? ` · ${event.public.venue}` : ""}</p></div>
-        </button>)}
-      </div>}
+        </button></li>)}
+      </ul></div>}
 
       <PlanningTaskBoard events={sourceEvents} tasks={tasks} onChange={changeTasks} />
 
       {selected && (
-        <div className="event-dialog-backdrop" role="presentation" onMouseDown={() => setSelected(null)}>
-          <section
-            className="event-dialog"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="event-dialog-title"
-            onMouseDown={(event) => event.stopPropagation()}
-          >
-            <button className="event-dialog-close" type="button" onClick={() => setSelected(null)} aria-label="Close event details">×</button>
+        <AccessibleDialog labelledBy="event-dialog-title" onClose={() => setSelected(null)} initialFocusRef={dialogCloseRef} closeOnBackdrop>
+            <button ref={dialogCloseRef} className="event-dialog-close" type="button" onClick={() => setSelected(null)} aria-label="Close event details">×</button>
             <div className="event-dialog-tags" aria-label="Event classification">
               <span className={`event-tag type-${selected.public.type}`}>{TYPE_META[selected.public.type][0]} {TYPE_META[selected.public.type][1]}</span>
               {selected.planning.teams.map((team) => <span className={`event-tag team-${team}`} key={team}>{TEAM_META[team][0]} {TEAM_META[team][1]}</span>)}
@@ -434,19 +435,17 @@ export function ReadOnlyCalendar() {
             </section>
             <div className="event-dialog-actions">
               <a href={googleCalendarUrl(selected)} target="_blank" rel="noreferrer">📅 Add to Google Calendar</a>
-              <button type="button" className="delete" onClick={deleteSelectedEvent}>🗑️ Delete</button>
+              <button type="button" className="delete" onClick={() => { setDeleteCandidate(selected); setSelected(null); }}>🗑️ Delete</button>
               <button type="button" onClick={() => setSelected(null)}>Close</button>
             </div>
-          </section>
-        </div>
+        </AccessibleDialog>
       )}
 
       {importPreview && (
-        <div className="event-dialog-backdrop" role="presentation">
-          <section className="event-dialog import-confirmation" role="alertdialog" aria-modal="true" aria-labelledby="import-title">
+        <AccessibleDialog className="import-confirmation" role="alertdialog" labelledBy="import-title" describedBy="import-description" onClose={() => setImportPreview(null)} initialFocusRef={importCancelRef}>
             <span className="import-warning-icon">⚠️</span>
             <h3 id="import-title">Overwrite the current calendar?</h3>
-            <p>
+            <p id="import-description">
               Importing this backup will replace every event currently stored in this browser
               {importPreview.todos ? " and replace the EXCO planning tasks" : ""}. This cannot be undone unless you export a backup first.
             </p>
@@ -459,12 +458,12 @@ export function ReadOnlyCalendar() {
             {importPreview.rejected > 0 && <p className="import-rejected">Records that failed validation will not be imported.</p>}
             <div className="import-confirmation-actions">
               <button type="button" onClick={exportCalendar}>Download current backup</button>
-              <button type="button" onClick={() => setImportPreview(null)}>Cancel</button>
+              <button ref={importCancelRef} type="button" onClick={() => setImportPreview(null)}>Cancel</button>
               <button type="button" className="danger" disabled={importPreview.events.length === 0} onClick={proceedWithImport}>Proceed anyway</button>
             </div>
-          </section>
-        </div>
+        </AccessibleDialog>
       )}
+      {deleteCandidate && <AccessibleDialog className="delete-confirmation" role="alertdialog" labelledBy="delete-title" describedBy="delete-description" onClose={() => setDeleteCandidate(null)} initialFocusRef={importCancelRef}><h3 id="delete-title">Delete this event?</h3><p id="delete-description">“{deleteCandidate.public.name}” will be removed from this browser calendar. This action cannot be undone without a backup.</p><div className="import-confirmation-actions"><button ref={importCancelRef} type="button" onClick={() => setDeleteCandidate(null)}>Cancel</button><button type="button" className="danger" onClick={deleteSelectedEvent}>Delete event</button></div></AccessibleDialog>}
       {editorOpen && <EventEditor event={editingEvent} semester={semester} onCancel={() => { setEditorOpen(false); setEditingEvent(null); }} onSave={saveEvent} />}
     </section>
   );

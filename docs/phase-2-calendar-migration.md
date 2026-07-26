@@ -76,7 +76,7 @@ because their planning status changes.
    calculations, legacy normalization, fixtures, and tests. The legacy HTML and
    all four existing local-storage keys remain unchanged.
 2. **Local read-only calendar:** render normalized browser-local events inside
-   `/events`; no writes and no claims of shared state.
+   the temporary `/calendar` preview; no claims of shared state.
 3. **Local feature parity:** migrate filters, agenda/grid views, export, guarded
    restore, and finally editing while preserving legacy backup compatibility.
 4. **Identity and server design:** select the identity and data providers,
@@ -120,7 +120,13 @@ The migration now has three automated layers:
 - `npm run test:component` covers the event editor, planning-task form, search,
   agenda switching, and event details using a simulated browser DOM;
 - `npm run test:smoke` runs the public-events/internal-calendar split and core
-  calendar workflows in desktop and mobile Chromium.
+  calendar workflows in desktop and mobile Chromium. It also runs axe scans,
+  keyboard dialog checks, mobile coverage, and a 200% zoom check.
+
+All calendar dialogs use the shared accessible-dialog primitive for initial
+focus, focus trapping, Escape handling, trigger-focus restoration, background
+inertness, and scroll locking. Destructive event/task actions and dirty-editor
+closure use alert-dialog confirmations with the safe action focused first.
 
 Run `npm test`, `npm run test:smoke`, `npm run typecheck`, and `npm run build`
 before merging calendar changes. Production member data must not be introduced

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/calendar");
@@ -39,9 +40,34 @@ test("creates, edits, persists, and deletes a browser-local event", async ({ pag
   await page.getByRole("button", { name: /Save event/ }).click();
   await page.getByRole("searchbox", { name: /Search events/ }).fill("Edited Smoke Event");
   await page.getByRole("button", { name: /Edited Smoke Event/ }).click();
-  page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: /Delete/ }).click();
+  const deleteDialog = page.getByRole("alertdialog", { name: /Delete this event/ });
+  await expect(deleteDialog.getByRole("button", { name: "Cancel" })).toBeFocused();
+  await deleteDialog.getByRole("button", { name: /Delete event/ }).click();
   await expect(page.getByText("Edited Smoke Event")).toHaveCount(0);
+});
+
+test("calendar has no automatically detectable accessibility violations", async ({ page }) => {
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+  await page.getByRole("button", { name: /Marvell/ }).click();
+  const dialogResults = await new AxeBuilder({ page }).analyze();
+  expect(dialogResults.violations).toEqual([]);
+});
+
+test("event dialog supports keyboard-only opening and Escape focus return", async ({ page }) => {
+  const event = page.getByRole("button", { name: /Welcome \(Bonding\)/ }).first();
+  await event.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("button", { name: /Close event details/ })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(event).toBeFocused();
+});
+
+test("calendar remains operable at 200 percent zoom", async ({ page }) => {
+  await page.evaluate(() => { document.documentElement.style.zoom = "2"; });
+  await page.getByRole("button", { name: /Agenda/ }).click();
+  await expect(page.getByRole("button", { name: /Marvell/ })).toBeVisible();
 });
 
 test("creates an event-linked EXCO planning task", async ({ page }) => {

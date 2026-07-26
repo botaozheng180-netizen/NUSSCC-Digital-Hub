@@ -8,7 +8,7 @@ import { Icon } from "./icons";
 
 const navigation = [
   ["/", "Dashboard", "dashboard"],
-  ["/events", "Events", "calendar"],
+  ["/events", "Events", "megaphone"],
   ["/calendar", "Calendar", "calendar"],
   ["/tasks", "My Tasks", "tasks"],
   ["/trek", "Semiconductor Trek", "trek"],

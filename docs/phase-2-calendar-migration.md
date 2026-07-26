@@ -110,3 +110,18 @@ two EXCO editors cannot unknowingly overwrite one another. Audit metadata must
 be written by the server, never accepted from the browser. Attachments should
 eventually move out of base64 event records into access-controlled object
 storage, but legacy base64 images must remain importable during migration.
+
+## Calendar test gates
+
+The migration now has three automated layers:
+
+- `npm run test:unit` covers academic dates, normalization, JSON/ICS
+  compatibility, repository CRUD, and planning-task persistence;
+- `npm run test:component` covers the event editor, planning-task form, search,
+  agenda switching, and event details using a simulated browser DOM;
+- `npm run test:smoke` runs the public-events/internal-calendar split and core
+  calendar workflows in desktop and mobile Chromium.
+
+Run `npm test`, `npm run test:smoke`, `npm run typecheck`, and `npm run build`
+before merging calendar changes. Production member data must not be introduced
+into fixtures; the reviewed 26 July preview remains the deterministic dataset.

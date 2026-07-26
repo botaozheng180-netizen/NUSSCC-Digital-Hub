@@ -305,15 +305,15 @@ export function ReadOnlyCalendar() {
         <div className="filter-groups">
           <div className="filter-group">
             <strong>Team Managing:</strong>
-            <div>{EVENT_TEAMS.map((team) => <button type="button" className={`filter-chip team-${team} ${teamFilters.includes(team) ? "active" : ""}`} onClick={() => toggleFilter(team, teamFilters, setTeamFilters)} key={team}>{TEAM_META[team][0]} {TEAM_META[team][1]}</button>)}</div>
+            <div>{EVENT_TEAMS.map((team) => <button type="button" aria-pressed={teamFilters.includes(team)} className={`filter-chip team-${team} ${teamFilters.includes(team) ? "active" : ""}`} onClick={() => toggleFilter(team, teamFilters, setTeamFilters)} key={team}>{TEAM_META[team][0]} {TEAM_META[team][1]}</button>)}</div>
           </div>
           <div className="filter-group">
             <strong>Event Types:</strong>
-            <div>{EVENT_TYPES.map((type) => <button type="button" className={`filter-chip type-${type} ${typeFilters.includes(type) ? "active" : ""}`} onClick={() => toggleFilter(type, typeFilters, setTypeFilters)} key={type}>{TYPE_META[type][0]} {TYPE_META[type][1]}</button>)}</div>
+            <div>{EVENT_TYPES.map((type) => <button type="button" aria-pressed={typeFilters.includes(type)} className={`filter-chip type-${type} ${typeFilters.includes(type) ? "active" : ""}`} onClick={() => toggleFilter(type, typeFilters, setTypeFilters)} key={type}>{TYPE_META[type][0]} {TYPE_META[type][1]}</button>)}</div>
           </div>
           <div className="filter-group">
             <strong>Status:</strong>
-            <div>{EVENT_STATUSES.map((status) => <button type="button" className={`filter-chip status-${status} ${statusFilters.includes(status) ? "active" : ""}`} onClick={() => toggleFilter(status, statusFilters, setStatusFilters)} key={status}>{STATUS_META[status][0]} {STATUS_META[status][1]}</button>)}</div>
+            <div>{EVENT_STATUSES.map((status) => <button type="button" aria-pressed={statusFilters.includes(status)} className={`filter-chip status-${status} ${statusFilters.includes(status) ? "active" : ""}`} onClick={() => toggleFilter(status, statusFilters, setStatusFilters)} key={status}>{STATUS_META[status][0]} {STATUS_META[status][1]}</button>)}</div>
           </div>
         </div>
       </details>
@@ -330,8 +330,8 @@ export function ReadOnlyCalendar() {
         </label>
         <span>{visibleEvents.length} of {semesterEvents.length} event(s)</span>
         <div className="view-switch" aria-label="Calendar view">
-          <button type="button" className={view === "calendar" ? "active" : ""} onClick={() => setView("calendar")}>▦ Calendar</button>
-          <button type="button" className={view === "agenda" ? "active" : ""} onClick={() => setView("agenda")}>☷ Agenda</button>
+          <button type="button" aria-pressed={view === "calendar"} className={view === "calendar" ? "active" : ""} onClick={() => setView("calendar")}>▦ Calendar</button>
+          <button type="button" aria-pressed={view === "agenda"} className={view === "agenda" ? "active" : ""} onClick={() => setView("agenda")}>☷ Agenda</button>
         </div>
       </div>
 

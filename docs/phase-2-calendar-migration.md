@@ -131,3 +131,7 @@ closure use alert-dialog confirmations with the safe action focused first.
 Run `npm test`, `npm run test:smoke`, `npm run typecheck`, and `npm run build`
 before merging calendar changes. Production member data must not be introduced
 into fixtures; the reviewed 26 July preview remains the deterministic dataset.
+
+Phase 3 product decisions, committee handover rules, the proposed relational
+model, provider evaluation criteria, and remaining open decisions are recorded
+in [`phase-3-database-handover.md`](./phase-3-database-handover.md).

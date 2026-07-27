@@ -8,7 +8,8 @@ import { Icon } from "./icons";
 
 const navigation = [
   ["/", "Dashboard", "dashboard"],
-  ["/events", "Events", "calendar"],
+  ["/events", "Events", "megaphone"],
+  ["/calendar", "Calendar", "calendar"],
   ["/tasks", "My Tasks", "tasks"],
   ["/trek", "Semiconductor Trek", "trek"],
   ["/achievements", "Achievements", "trophy"],
@@ -73,7 +74,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             NUS SEMICONDUCTOR CLUB <span>Digital Hub</span>
           </div>
           <div className="phase-pill">
-            <span /> Phase 1 · Foundation
+            <span /> Phase 2 · Calendar Migration
           </div>
         </header>
         <main>{children}</main>

@@ -15,6 +15,12 @@ const paths: Record<string, React.ReactNode> = {
       <path d="M16 3v4M8 3v4M3 10h18" />
     </>
   ),
+  megaphone: (
+    <>
+      <path d="M4 13v-2a2 2 0 0 1 2-2h3l8-4v14l-8-4H6a2 2 0 0 1-2-2Z" />
+      <path d="m7 15 1 5h4l-1.5-4.25M20 9v6" />
+    </>
+  ),
   tasks: (
     <>
       <rect x="4" y="3" width="16" height="18" rx="2" />

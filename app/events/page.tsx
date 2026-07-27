@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Notice, PageIntro } from "@/components/page-intro";
 export const metadata = { title: "Events" };
 export default function EventsPage() {
@@ -6,31 +7,23 @@ export default function EventsPage() {
       <PageIntro
         eyebrow="EVENTS"
         title="Find your next NUSSCC experience"
-        description="The existing AY26/27 calendar will be migrated here carefully, preserving its planning, filtering, export, and backup tools."
+        description="Discover public highlights from NUSSCC and watch this space for upcoming activities open to the wider community."
       />
       <Notice>
-        No shared event data is published yet. The original calendar remains
-        unchanged while its data model is prepared for safe migration.
+        This public events space is being prepared. The internal planning calendar
+        now has its own member-facing route.
       </Notice>
       <div className="placeholder-grid">
         <article className="placeholder-card wide">
-          <span className="skeleton label" />
-          <span className="skeleton title" />
-          <div className="calendar-preview">
-            {Array.from({ length: 21 }, (_, i) => (
-              <span key={i} className={i === 9 || i === 16 ? "event-day" : ""}>
-                {i + 1}
-              </span>
-            ))}
-          </div>
+          <span className="status-tag">COMING SOON</span>
+          <h2>Upcoming public events</h2>
+          <p>Confirmed opportunities, talks, visits, and club activities intended for public discovery will appear here.</p>
         </article>
         <article className="placeholder-card">
-          <span className="status-tag">Coming in the calendar migration</span>
-          <h2>One reliable event source</h2>
-          <p>
-            Published details for members, protected planning fields for EXCO,
-            and stable event links for personal tasks.
-          </p>
+          <span className="status-tag">MEMBER CALENDAR</span>
+          <h2>Looking for internal planning?</h2>
+          <p>NUSSCC members can use the dedicated calendar route during the migration preview.</p>
+          <Link className="button primary" href="/calendar">Open calendar</Link>
         </article>
       </div>
     </div>

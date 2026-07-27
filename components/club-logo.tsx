@@ -4,6 +4,13 @@ type ClubLogoProps = {
   showFrame?: boolean;
 };
 
+/**
+ * The interconnect geometry from the club's official mark.
+ *
+ * The frame is optional because the dashboard chip's thick white border forms
+ * the frame there. The traces deliberately terminate at the view-box edge so
+ * they meet that border instead of appearing as a second, inset icon.
+ */
 export function ClubLogo({
   className,
   title = "NUS Semiconductor Club",
@@ -12,7 +19,7 @@ export function ClubLogo({
   return (
     <svg
       className={className}
-      viewBox="0 0 120 120"
+      viewBox="0 0 512 512"
       role="img"
       aria-label={title}
       fill="none"
@@ -22,40 +29,44 @@ export function ClubLogo({
         <rect
           x="9"
           y="9"
-          width="102"
-          height="102"
-          rx="19"
+          width="494"
+          height="494"
+          rx="47"
           stroke="currentColor"
-          strokeWidth="3.5"
+          strokeWidth="18"
         />
       )}
-      <path d="M38 10v39" stroke="currentColor" strokeWidth="3.5" />
-      <path d="M88 10v33" stroke="currentColor" strokeWidth="3.5" />
-      <path d="M10 67h17v43" stroke="currentColor" strokeWidth="3.5" />
-      <path d="M60 110V82" stroke="currentColor" strokeWidth="3.5" />
-      <path d="m110 70-22 22" stroke="currentColor" strokeWidth="3.5" />
-      <path
-        d="m44 76 18-25h18"
+
+      <g
         stroke="currentColor"
-        strokeWidth="3.5"
-        strokeLinejoin="round"
-      />
+        strokeWidth="18"
+        strokeLinecap="square"
+        strokeLinejoin="miter"
+      >
+        <path d="M147 0v185" />
+        <path d="M430 0v136" />
+        <path d="M64 313v199" />
+        <path d="M257 512V423" />
+        <path d="M512 354 455 426" />
+        <path d="M185 344v-63l105-127h22" />
+      </g>
+
       {[
-        [38, 53],
-        [88, 47],
-        [27, 67],
-        [44, 78],
-        [80, 51],
-        [60, 78],
-        [88, 92],
+        [147, 204],
+        [430, 157],
+        [64, 290],
+        [185, 362],
+        [257, 400],
+        [330, 153],
+        [443, 442],
       ].map(([cx, cy]) => (
         <circle
           key={`${cx}-${cy}`}
           cx={cx}
           cy={cy}
-          r="5.5"
+          r="17"
           stroke="currentColor"
-          strokeWidth="3.5"
+          strokeWidth="14"
         />
       ))}
     </svg>

@@ -74,7 +74,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             NUS SEMICONDUCTOR CLUB <span>Digital Hub</span>
           </div>
           <div className="phase-pill">
-            <span /> Phase 2 · Calendar Migration
+            <span /> Phase 3 Database Implementation
           </div>
         </header>
         <main>{children}</main>

@@ -31,4 +31,19 @@ describe("PlanningTaskBoard", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Enter the due date in YYYY-MM-DD format.");
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it("selects a due date from an English calendar dialog", async () => {
+    const user = userEvent.setup();
+    render(<PlanningTaskBoard events={AY2627_PREVIEW_EVENTS} tasks={[]} onChange={vi.fn()} />);
+    const dueDate = screen.getByLabelText(/Due date \(YYYY-MM-DD\)/);
+    await user.type(dueDate, "2026-08-10");
+    await user.click(screen.getByRole("button", { name: "Choose due date" }));
+    const picker = screen.getByRole("dialog", { name: "August 2026" });
+    expect(picker).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Mon" })).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "Sun" })).toBeInTheDocument();
+    await user.click(screen.getByRole("gridcell", { name: "Choose Wednesday, August 12, 2026" }));
+    expect(dueDate).toHaveValue("2026-08-12");
+    expect(screen.queryByRole("dialog", { name: "August 2026" })).not.toBeInTheDocument();
+  });
 });

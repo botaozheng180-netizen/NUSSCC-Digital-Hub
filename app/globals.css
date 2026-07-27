@@ -671,6 +671,78 @@ body {
   color: #7a879a;
   font-size: 8px;
 }
+.english-date-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30px;
+}
+.english-date-picker .date-picker-trigger {
+  min-height: 0;
+  padding: 0;
+  border: 1px solid #cfd8e5;
+  border-left: 0;
+  border-radius: 0 7px 7px 0;
+  color: #43516a;
+  background: #f8fafc;
+}
+.english-date-picker input {
+  border-radius: 7px 0 0 7px;
+}
+.date-picker-dialog {
+  width: min(390px, 100%);
+}
+.date-picker-header {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  gap: 8px;
+}
+.date-picker-header h3 {
+  margin: 0;
+  text-align: center;
+}
+.date-picker-header button,
+.date-picker-actions button {
+  padding: 8px;
+  border: 1px solid #cfd8e5;
+  border-radius: 7px;
+  background: white;
+  cursor: pointer;
+}
+.date-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-top: 18px;
+}
+.date-picker-grid > span {
+  padding: 5px 0;
+  color: #68758a;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 750;
+}
+.date-picker-grid > button {
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 7px;
+  color: var(--navy);
+  background: #f4f7fb;
+  cursor: pointer;
+}
+.date-picker-grid > button:hover {
+  background: #e1ebfb;
+}
+.date-picker-grid > button.selected {
+  color: white;
+  background: var(--blue);
+  font-weight: 800;
+}
+.date-picker-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
 .planning-task-form button {
   align-self: end;
   min-height: 33px;

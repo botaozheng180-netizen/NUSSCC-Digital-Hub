@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { AccessibleDialog } from "@/components/ui/accessible-dialog";
+import { EnglishDatePicker, isValidISODate } from "@/components/ui/english-date-picker";
 import { EVENT_TEAMS, type CalendarEvent, type EventTeam } from "@/lib/events/model";
 import { type EventPlanningTask, taskEvent } from "@/lib/events/planning-tasks";
 
@@ -27,7 +28,7 @@ export function PlanningTaskBoard({ events, tasks, onChange }: Props) {
   const addTask = (formEvent: React.FormEvent) => {
     formEvent.preventDefault();
     if (!text.trim()) { setValidation("Enter a task name."); return; }
-    if (due && !/^\d{4}-(0[1-9]|1[0-2])-([0-2]\d|3[01])$/.test(due)) {
+    if (due && !isValidISODate(due)) {
       setValidation("Enter the due date in YYYY-MM-DD format.");
       return;
     }
@@ -49,7 +50,7 @@ export function PlanningTaskBoard({ events, tasks, onChange }: Props) {
       <form className="planning-task-form" onSubmit={addTask} noValidate>
         <label><span>Task</span><input value={text} onChange={(event) => { setText(event.target.value); setValidation(""); }} placeholder="Add a planning task…" required aria-invalid={validation === "Enter a task name."} aria-describedby={validation === "Enter a task name." ? "planning-task-validation" : undefined} /></label>
         <label><span>Linked event</span><select value={eventId} onChange={(event) => setEventId(event.target.value)}><option value="">No linked event</option>{events.map((event) => <option value={String(event.legacyId)} key={event.id}>{event.public.name}</option>)}</select></label>
-        <label><span>Due date</span><input type="text" inputMode="numeric" autoComplete="off" value={due} onChange={(event) => { setDue(event.target.value); setValidation(""); }} placeholder="YYYY-MM-DD" aria-label="Due date (YYYY-MM-DD)" aria-invalid={validation.includes("due date")} aria-describedby={validation.includes("due date") ? "planning-task-validation" : "due-date-format"} /><small id="due-date-format">YYYY-MM-DD</small></label>
+        <label><span>Due date</span><EnglishDatePicker value={due} onChange={(value) => { setDue(value); setValidation(""); }} invalid={validation.includes("due date")} describedBy={validation.includes("due date") ? "planning-task-validation" : "due-date-format"} /><small id="due-date-format">YYYY-MM-DD</small></label>
         <label><span>Owner</span><input value={owner} onChange={(event) => setOwner(event.target.value)} placeholder="Owner" /></label>
         <label><span>Managing team</span><select value={team} onChange={(event) => setTeam(event.target.value as EventTeam | "")}><option value="">No team</option>{EVENT_TEAMS.map((value) => <option value={value} key={value}>{value}</option>)}</select></label>
         <button type="submit">＋ Add task</button>

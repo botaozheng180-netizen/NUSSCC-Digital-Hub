@@ -20,12 +20,17 @@ export function PlanningTaskBoard({ events, tasks, onChange }: Props) {
   const [showCompleted, setShowCompleted] = useState(true);
   const [deleteTask, setDeleteTask] = useState<EventPlanningTask | null>(null);
   const [notice, setNotice] = useState("");
+  const [validation, setValidation] = useState("");
   const cancelDeleteRef = useRef<HTMLButtonElement>(null);
   const visible = useMemo(() => tasks.filter((task) => showCompleted || !task.done), [showCompleted, tasks]);
 
   const addTask = (formEvent: React.FormEvent) => {
     formEvent.preventDefault();
-    if (!text.trim()) return;
+    if (!text.trim()) { setValidation("Enter a task name."); return; }
+    if (due && !/^\d{4}-(0[1-9]|1[0-2])-([0-2]\d|3[01])$/.test(due)) {
+      setValidation("Enter the due date in YYYY-MM-DD format.");
+      return;
+    }
     const selected = events.find((event) => String(event.legacyId) === eventId);
     onChange([...tasks, {
       id: `local-task-${crypto.randomUUID()}`,
@@ -34,20 +39,22 @@ export function PlanningTaskBoard({ events, tasks, onChange }: Props) {
       owner: owner.trim() || null, description: "", links: [], images: [],
     }]);
     setNotice(`Added task: ${text.trim()}`);
+    setValidation("");
     setText(""); setDue(""); setOwner("");
   };
 
   return (
     <details className="calendar-panel planning-panel" open>
       <summary>✅ <strong>EXCO Planning Tasks</strong> <small>{tasks.filter((task) => !task.done).length} open</small></summary>
-      <form className="planning-task-form" onSubmit={addTask}>
-        <label><span>Task</span><input value={text} onChange={(event) => setText(event.target.value)} placeholder="Add a planning task…" required /></label>
+      <form className="planning-task-form" onSubmit={addTask} noValidate>
+        <label><span>Task</span><input value={text} onChange={(event) => { setText(event.target.value); setValidation(""); }} placeholder="Add a planning task…" required aria-invalid={validation === "Enter a task name."} aria-describedby={validation === "Enter a task name." ? "planning-task-validation" : undefined} /></label>
         <label><span>Linked event</span><select value={eventId} onChange={(event) => setEventId(event.target.value)}><option value="">No linked event</option>{events.map((event) => <option value={String(event.legacyId)} key={event.id}>{event.public.name}</option>)}</select></label>
-        <label><span>Due date</span><input type="date" value={due} onChange={(event) => setDue(event.target.value)} /></label>
+        <label><span>Due date</span><input type="text" inputMode="numeric" autoComplete="off" value={due} onChange={(event) => { setDue(event.target.value); setValidation(""); }} placeholder="YYYY-MM-DD" aria-label="Due date (YYYY-MM-DD)" aria-invalid={validation.includes("due date")} aria-describedby={validation.includes("due date") ? "planning-task-validation" : "due-date-format"} /><small id="due-date-format">YYYY-MM-DD</small></label>
         <label><span>Owner</span><input value={owner} onChange={(event) => setOwner(event.target.value)} placeholder="Owner" /></label>
         <label><span>Managing team</span><select value={team} onChange={(event) => setTeam(event.target.value as EventTeam | "")}><option value="">No team</option>{EVENT_TEAMS.map((value) => <option value={value} key={value}>{value}</option>)}</select></label>
         <button type="submit">＋ Add task</button>
       </form>
+      {validation && <p className="editor-validation" id="planning-task-validation" role="alert">{validation}</p>}
       <div className="sr-only" aria-live="polite">{notice}</div>
       <div className="planning-task-controls"><label><input type="checkbox" checked={showCompleted} onChange={(event) => setShowCompleted(event.target.checked)} /> Show completed</label></div>
       <div className="planning-task-list">

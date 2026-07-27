@@ -665,6 +665,12 @@ body {
   font-size: 9px;
   font-weight: 750;
 }
+.planning-task-form label > small {
+  display: block;
+  margin-top: 3px;
+  color: #7a879a;
+  font-size: 8px;
+}
 .planning-task-form button {
   align-self: end;
   min-height: 33px;

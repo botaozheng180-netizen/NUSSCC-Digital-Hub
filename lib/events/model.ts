@@ -78,6 +78,8 @@ export type PersistedCalendarEvent = CalendarEvent & {
   createdBy: string;
   updatedAt: string;
   updatedBy: string;
+  deletedAt: string | null;
+  deletedBy: string | null;
 };
 
 /** Untrusted shape accepted at the legacy local-storage/backup boundary. */

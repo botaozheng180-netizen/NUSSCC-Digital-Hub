@@ -1836,7 +1836,7 @@ footer {
     font-size: 0;
   }
   .phase-pill:after {
-    content: "Phase 2";
+    content: "Phase 3 Database Implementation";
     font-size: 10px;
   }
   .hero {

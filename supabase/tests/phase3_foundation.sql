@@ -1,0 +1,12 @@
+begin;
+select plan(8);
+select has_table('public','academic_years','academic years exist');
+select has_table('public','capability_grants','capability grants exist');
+select has_table('public','events','events exist');
+select has_table('public','planning_tasks','tasks exist');
+select has_table('public','public_event_publications','publication is separate');
+select has_table('public','audit_entries','audit exists');
+select is((select relrowsecurity from pg_class where oid='public.events'::regclass),true,'events RLS enabled');
+select is((select relforcerowsecurity from pg_class where oid='public.events'::regclass),true,'events RLS forced');
+select * from finish();
+rollback;

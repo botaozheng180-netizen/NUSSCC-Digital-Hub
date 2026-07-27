@@ -242,3 +242,7 @@ authorization boundary.
 These items must be resolved before the affected feature reaches production,
 but they do not prevent schema migrations, policy tests, or a synthetic-data
 server repository from being started in the next conversation.
+
+## First implementation increment (27 July 2026)
+
+ADR-0001 provisionally selects Supabase-compatible PostgreSQL for local work. Ordered migrations now define the multi-year relational schema, forced deny-by-default RLS, scoped capability helpers, independent publication rights, optimistic revision functions, atomic event/task soft deletion, append-only client audit behavior, and synthetic fixtures. Realtime and production authentication remain disabled. See `phase-3-schema-and-authorization.md` for the implemented matrix and remaining trusted-server guarantees. The unresolved handover approval, staff-advisor, special-term, provider procurement, storage, and import decisions above remain unresolved.

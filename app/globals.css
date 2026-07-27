@@ -673,10 +673,16 @@ body {
 }
 .english-date-picker {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 30px;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  align-items: stretch;
 }
 .english-date-picker .date-picker-trigger {
-  min-height: 0;
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  width: 34px;
+  min-height: 34px;
+  height: 34px;
   padding: 0;
   border: 1px solid #cfd8e5;
   border-left: 0;
@@ -685,6 +691,9 @@ body {
   background: #f8fafc;
 }
 .english-date-picker input {
+  width: 100%;
+  min-height: 34px;
+  height: 34px;
   border-radius: 7px 0 0 7px;
 }
 .date-picker-dialog {

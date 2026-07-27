@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Icon } from "@/components/icons";
 import { AccessibleDialog } from "./accessible-dialog";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] as const;
@@ -62,7 +63,7 @@ export function EnglishDatePicker({ value, onChange, invalid = false, describedB
   return (
     <div className="english-date-picker">
       <input type="text" inputMode="numeric" autoComplete="off" value={value} onChange={(event) => onChange(event.target.value)} placeholder="YYYY-MM-DD" aria-label="Due date (YYYY-MM-DD)" aria-invalid={invalid} aria-describedby={describedBy} />
-      <button ref={triggerRef} type="button" className="date-picker-trigger" onClick={openPicker} aria-label="Choose due date" aria-haspopup="dialog">▦</button>
+      <button ref={triggerRef} type="button" className="date-picker-trigger" onClick={openPicker} aria-label="Choose due date" aria-haspopup="dialog"><Icon name="calendar" size={15} /></button>
       {open && <AccessibleDialog className="date-picker-dialog" labelledBy="date-picker-title" onClose={() => setOpen(false)} initialFocusRef={selectedIsVisible ? selectedDateRef : undefined}>
         <div className="date-picker-header">
           <button type="button" onClick={() => moveMonth(-1)} aria-label="Previous month">←</button>
